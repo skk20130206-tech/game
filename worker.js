@@ -6,9 +6,10 @@ import p5 from "./data/orbit-5.txt";
 import p6 from "./data/orbit-6.txt";
 import newMeta from "./patch/new-meta.txt";
 import newCreature from "./patch/new-creature.txt";
+import startScreen from "./patch/start-screen.txt";
 
 const b64=[p1,p2,p3,p4,p5,p6].map(x=>x.trim()).join("");
-const BUILD="game-mystic-creatures-20260912-v2";
+const BUILD="game-mystic-start-screen-20260912-v3";
 let gameHtmlPromise;
 
 async function loadGameHtml(){
@@ -31,8 +32,13 @@ async function loadGameHtml(){
   if(creatureStart<0||creatureEnd<0||creatureEnd<=creatureStart) throw new Error("Creature renderer section markers not found");
   html=html.slice(0,creatureStart)+newCreature.trimEnd()+"\n"+html.slice(creatureEnd);
 
+  const bodyEnd=html.lastIndexOf("</body>");
+  if(bodyEnd<0) throw new Error("HTML body closing tag not found");
+  html=html.slice(0,bodyEnd)+startScreen.trim()+"\n"+html.slice(bodyEnd);
+
   const required=["mistmoth","sunwhorl","aurorayne","cinderwisp","veilfox"];
   for(const id of required) if(!html.includes(id)) throw new Error(`Mystic creature missing after patch: ${id}`);
+  if(!html.includes("orbit-start-screen")) throw new Error("Start screen injection failed");
   if(!html.toLowerCase().includes("<!doctype html")||!html.includes("ORBIT")) throw new Error("ORBIT HTML validation failed");
   return html;
 }
@@ -45,7 +51,7 @@ export default {
       try{
         if(!gameHtmlPromise) gameHtmlPromise=loadGameHtml();
         const html=await gameHtmlPromise;
-        return new Response(JSON.stringify({ok:true,build:BUILD,dataLength:b64.length,htmlLength:html.length,creatures:11,mystic:true}),{headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store"}});
+        return new Response(JSON.stringify({ok:true,build:BUILD,dataLength:b64.length,htmlLength:html.length,creatures:11,mystic:true,startScreen:true}),{headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store"}});
       }catch(error){
         gameHtmlPromise=undefined;
         return new Response(JSON.stringify({ok:false,build:BUILD,error:error instanceof Error?error.message:String(error)}),{status:500,headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store"}});
