@@ -6,10 +6,10 @@ import p5 from "./data/orbit-5.txt";
 import p6 from "./data/orbit-6.txt";
 import newMeta from "./patch/new-meta.txt";
 import newCreature from "./patch/new-creature.txt";
-import startScreen from "./patch/start-screen.txt";
+import startScreen from "./patch/start-screen-side-ad.txt";
 
 const b64=[p1,p2,p3,p4,p5,p6].map(x=>x.trim()).join("");
-const BUILD="game-mystic-start-screen-20260912-v4";
+const BUILD="game-mystic-start-side-ad-20260912-v5";
 let gameHtmlPromise;
 
 async function loadGameHtml(){
@@ -38,7 +38,7 @@ async function loadGameHtml(){
 
   const required=["mistmoth","sunwhorl","aurorayne","cinderwisp","veilfox"];
   for(const id of required) if(!html.includes(id)) throw new Error(`Mystic creature missing after patch: ${id}`);
-  if(!html.includes("orbit-start-screen")||!html.includes("orbit-shop-panel")||!html.includes("orbit-ad-slot")) throw new Error("Start screen monetization UI injection failed");
+  if(!html.includes("orbit-start-screen")||!html.includes("orbit-ad-rail")||!html.includes("orbit-ad-slot")) throw new Error("Side-only start screen ad UI injection failed");
   if(!html.toLowerCase().includes("<!doctype html")||!html.includes("ORBIT")) throw new Error("ORBIT HTML validation failed");
   return html;
 }
@@ -51,7 +51,7 @@ export default {
       try{
         if(!gameHtmlPromise) gameHtmlPromise=loadGameHtml();
         const html=await gameHtmlPromise;
-        return new Response(JSON.stringify({ok:true,build:BUILD,dataLength:b64.length,htmlLength:html.length,creatures:11,mystic:true,startScreen:true,shopUI:true,adSlot:true,supportUI:true}),{headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store"}});
+        return new Response(JSON.stringify({ok:true,build:BUILD,dataLength:b64.length,htmlLength:html.length,creatures:11,mystic:true,startScreen:true,adSlot:true,adPlacement:"start-screen-side-only"}),{headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store"}});
       }catch(error){
         gameHtmlPromise=undefined;
         return new Response(JSON.stringify({ok:false,build:BUILD,error:error instanceof Error?error.message:String(error)}),{status:500,headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store"}});
