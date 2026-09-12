@@ -12,7 +12,9 @@ import siteReady from "./patch/adsense-ready.txt";
 import {homePage,guidePage,aboutPage,updatesPage,privacyPage,termsPage,contactPage,notFoundPage,robots,sitemap} from "./site.js";
 
 const b64=[p1,p2,p3,p4,p5,p6].map(x=>x.trim()).join("");
-const BUILD="game-adsense-review-ready-20260912-v8";
+const BUILD="game-adsense-verification-20260912-v9";
+const ADSENSE_CLIENT="ca-pub-6073295964667681";
+const ADSENSE_SNIPPET=`<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}" crossorigin="anonymous"></script>`;
 let gameHtmlPromise;
 
 const securityHeaders={
@@ -22,8 +24,16 @@ const securityHeaders={
   "permissions-policy":"camera=(), microphone=(), geolocation=()"
 };
 
-function htmlResponse(html,status=200,cache="public, max-age=300"){
-  return new Response(html,{status,headers:{"content-type":"text/html; charset=UTF-8","content-language":"ko","cache-control":cache,...securityHeaders}});
+function injectAdSense(html){
+  if(!html||html.includes(`client=${ADSENSE_CLIENT}`)) return html;
+  const headEnd=html.indexOf("</head>");
+  if(headEnd<0) return html;
+  return html.slice(0,headEnd)+ADSENSE_SNIPPET+html.slice(headEnd);
+}
+
+function htmlResponse(html,status=200,cache="public, max-age=300",withAdSense=true){
+  const body=withAdSense?injectAdSense(html):html;
+  return new Response(body,{status,headers:{"content-type":"text/html; charset=UTF-8","content-language":"ko","cache-control":cache,...securityHeaders}});
 }
 
 function cleanHomeHtml(){
@@ -79,7 +89,7 @@ export default {
       try{
         if(!gameHtmlPromise) gameHtmlPromise=loadGameHtml();
         const html=await gameHtmlPromise;
-        return new Response(JSON.stringify({ok:true,build:BUILD,dataLength:b64.length,htmlLength:html.length,creatures:11,mystic:true,startScreen:true,share:true,adsenseReviewReady:true,gameRoute:"/play",contentPages:["/","/guide","/about","/updates","/privacy","/terms","/contact"],playAds:false,preApprovalAdPlaceholders:false}),{headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store",...securityHeaders}});
+        return new Response(JSON.stringify({ok:true,build:BUILD,dataLength:b64.length,htmlLength:html.length,creatures:11,mystic:true,startScreen:true,share:true,adsenseReviewReady:true,adsenseClient:ADSENSE_CLIENT,adsenseSnippetOnContentPages:true,gameRoute:"/play",contentPages:["/","/guide","/about","/updates","/privacy","/terms","/contact"],playAds:false,preApprovalAdPlaceholders:false}),{headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store",...securityHeaders}});
       }catch(error){
         gameHtmlPromise=undefined;
         return new Response(JSON.stringify({ok:false,build:BUILD,error:error instanceof Error?error.message:String(error)}),{status:500,headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store",...securityHeaders}});
@@ -107,7 +117,7 @@ export default {
         gameHtmlPromise=undefined;
         const message=error instanceof Error?(error.stack||error.message):String(error);
         const safe=message.replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
-        return htmlResponse(`<!doctype html><meta charset="utf-8"><meta name="robots" content="noindex"><title>ORBIT deployment error</title><body style="margin:0;background:#050816;color:#fff;font:16px/1.6 monospace;padding:24px"><h1>ORBIT 배포 오류</h1><pre style="white-space:pre-wrap">${safe}</pre><p>build: ${BUILD}</p><p><a href="/" style="color:#c3f379">홈으로 돌아가기</a></p></body>`,500,"no-store");
+        return htmlResponse(`<!doctype html><meta charset="utf-8"><meta name="robots" content="noindex"><title>ORBIT deployment error</title><body style="margin:0;background:#050816;color:#fff;font:16px/1.6 monospace;padding:24px"><h1>ORBIT 배포 오류</h1><pre style="white-space:pre-wrap">${safe}</pre><p>build: ${BUILD}</p><p><a href="/" style="color:#c3f379">홈으로 돌아가기</a></p></body>`,500,"no-store",false);
       }
     }
 
