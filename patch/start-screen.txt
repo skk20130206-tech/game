@@ -1,0 +1,39 @@
+<style>
+#orbit-start-screen{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;overflow:hidden;background:radial-gradient(circle at 68% 35%,#204c5455 0 12%,transparent 36%),radial-gradient(circle at 22% 75%,#755aa52f 0 7%,transparent 32%),linear-gradient(145deg,#02070d 0%,#07131b 48%,#0b1f25 100%);color:#eef8f3;font-family:Inter,Pretendard,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;transition:opacity .45s ease,visibility .45s ease}.orbit-start-stars,.orbit-start-stars:before,.orbit-start-stars:after{position:absolute;inset:0;content:"";pointer-events:none;background-image:radial-gradient(circle,#fff 0 1px,transparent 1.4px);background-size:83px 83px;opacity:.35}.orbit-start-stars:before{background-size:137px 137px;transform:translate(31px,19px);opacity:.45}.orbit-start-stars:after{background-size:211px 211px;transform:translate(-45px,38px);opacity:.65}.orbit-start-orbit{position:absolute;width:min(76vw,860px);aspect-ratio:1;border:1px solid #bdf7d222;border-radius:50%;right:-25vw;top:-46%;box-shadow:0 0 120px #8dffd41a,inset 0 0 90px #8dffd40d;animation:orbit-start-spin 34s linear infinite}.orbit-start-orbit:after{content:"";position:absolute;width:18px;height:18px;border-radius:50%;background:#c3f379;box-shadow:0 0 34px #c3f379;left:9%;top:20%}@keyframes orbit-start-spin{to{transform:rotate(360deg)}}.orbit-start-card{position:relative;width:min(920px,calc(100vw - 34px));padding:clamp(26px,5vw,58px);border:1px solid #b8e7cd2e;border-radius:30px;background:linear-gradient(145deg,#0b1a22e8,#112c2be0);box-shadow:0 35px 100px #0008;backdrop-filter:blur(22px)}.orbit-start-kicker{display:flex;align-items:center;gap:10px;color:#b8d2c6;font-size:11px;letter-spacing:3px;font-weight:700}.orbit-start-dot{width:7px;height:7px;border-radius:50%;background:#c3f379;box-shadow:0 0 16px #c3f379}.orbit-start-logo{font-size:clamp(58px,10vw,118px);line-height:.9;letter-spacing:.13em;margin:22px 0 20px;font-weight:850;color:#f3fff7;text-shadow:0 0 38px #b9f5d223}.orbit-start-logo span{color:#c3f379}.orbit-start-copy{max-width:610px;color:#b8cbc3;font-size:clamp(14px,2vw,17px);line-height:1.9}.orbit-start-copy strong{color:#eaf7ed}.orbit-start-chips{display:flex;flex-wrap:wrap;gap:9px;margin:25px 0 30px}.orbit-start-chip{padding:8px 12px;border:1px solid #b9dec635;border-radius:999px;background:#102a296e;color:#d3e7dc;font-size:11px;letter-spacing:.4px}.orbit-start-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.orbit-start-primary{min-width:210px;padding:16px 25px;border-radius:12px;border:1px solid #ddffb5;background:#c3f379;color:#193121;font-weight:800;font-size:15px;box-shadow:0 8px 34px #b6ef7040;transition:transform .18s ease,filter .18s ease}.orbit-start-primary:hover{transform:translateY(-2px);filter:brightness(1.06)}.orbit-start-secondary{padding:14px 18px;border:1px solid #c5e4d533;border-radius:11px;background:#18302f8f;color:#c8ddd2;font-size:12px}.orbit-start-controls{margin-left:auto;text-align:right;color:#78958b;font-size:10px;line-height:1.7;letter-spacing:.3px}.orbit-start-save{margin-top:20px;padding-top:18px;border-top:1px solid #cce8da18;color:#718e84;font-size:10px;display:flex;justify-content:space-between;gap:16px}.orbit-start-screen-hidden{opacity:0!important;visibility:hidden!important;pointer-events:none!important}@media(max-width:680px){.orbit-start-card{padding:30px 24px;border-radius:22px}.orbit-start-logo{font-size:58px}.orbit-start-controls{width:100%;text-align:left;margin:5px 0 0}.orbit-start-primary{width:100%}.orbit-start-secondary{width:100%}.orbit-start-save{flex-direction:column;gap:5px}.orbit-start-orbit{width:130vw;right:-70vw;top:-20vw}}
+</style>
+<div id="orbit-start-screen" role="dialog" aria-modal="true" aria-label="ORBIT 시작 화면">
+  <div class="orbit-start-stars"></div><div class="orbit-start-orbit"></div>
+  <main class="orbit-start-card">
+    <div class="orbit-start-kicker"><i class="orbit-start-dot"></i>SIGMA SYSTEM · EXPEDITION READY</div>
+    <h1 class="orbit-start-logo">ORB<span>I</span>T</h1>
+    <p class="orbit-start-copy"><strong>별 사이에 나만의 개척지를 세우세요.</strong><br>낯선 행성에 착륙해 자원을 모으고 집을 지으며, 신비로운 생명체들과 조용한 우주의 이야기를 발견하세요.</p>
+    <div class="orbit-start-chips"><span class="orbit-start-chip">행성 5개</span><span class="orbit-start-chip">생명체 11종</span><span class="orbit-start-chip">채굴 · 건설 · 탐험</span><span class="orbit-start-chip">브라우저 자동 저장</span></div>
+    <div class="orbit-start-actions">
+      <button id="orbit-start-button" class="orbit-start-primary" type="button">탐험 시작</button>
+      <button id="orbit-start-guide" class="orbit-start-secondary" type="button">조작법 보기</button>
+      <div class="orbit-start-controls">이동 WASD / 방향키<br>교류 E · 스캔 Q · 건설 B</div>
+    </div>
+    <div class="orbit-start-save"><span id="orbit-start-save-text">저장 기록 확인 중…</span><span>ORBIT · FRONTIER BUILD</span></div>
+  </main>
+</div>
+<script>
+(()=>{
+  const screen=document.getElementById('orbit-start-screen');
+  const start=document.getElementById('orbit-start-button');
+  const guide=document.getElementById('orbit-start-guide');
+  const saveText=document.getElementById('orbit-start-save-text');
+  let hasSave=false;
+  try{hasSave=!!localStorage.getItem('orbit-frontier-save-v1')}catch(e){}
+  start.textContent=hasSave?'탐험 이어하기':'탐험 시작';
+  saveText.textContent=hasSave?'이 기기의 저장 기록을 발견했어요 · 마지막 위치에서 이어집니다':'새로운 탐험을 시작합니다 · 진행 상황은 이 기기에 자동 저장됩니다';
+  window.dispatchEvent(new Event('blur'));
+  const block=e=>{if(!screen.classList.contains('orbit-start-screen-hidden')&&e.key!=='Tab'){if(e.key==='Enter'||e.key===' '){e.preventDefault();start.click()}else e.stopImmediatePropagation()}};
+  window.addEventListener('keydown',block,true);
+  start.addEventListener('click',()=>{
+    screen.classList.add('orbit-start-screen-hidden');
+    window.removeEventListener('keydown',block,true);
+    setTimeout(()=>{window.dispatchEvent(new Event('focus'));document.getElementById('world')?.focus({preventScroll:true});screen.remove()},470);
+  });
+  guide.addEventListener('click',()=>{document.getElementById('help-button')?.click()});
+})();
+</script>
