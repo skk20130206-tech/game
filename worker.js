@@ -12,7 +12,7 @@ import siteReady from "./patch/adsense-ready.txt";
 import {homePage,guidePage,aboutPage,updatesPage,privacyPage,termsPage,contactPage,notFoundPage,robots,sitemap} from "./site.js";
 
 const b64=[p1,p2,p3,p4,p5,p6].map(x=>x.trim()).join("");
-const BUILD="game-adsense-review-ready-20260912-v7";
+const BUILD="game-adsense-review-ready-20260912-v8";
 let gameHtmlPromise;
 
 const securityHeaders={
@@ -24,6 +24,10 @@ const securityHeaders={
 
 function htmlResponse(html,status=200,cache="public, max-age=300"){
   return new Response(html,{status,headers:{"content-type":"text/html; charset=UTF-8","content-language":"ko","cache-control":cache,...securityHeaders}});
+}
+
+function cleanHomeHtml(){
+  return homePage().replace(/<div class="adbox"[\s\S]*?<\/div><\/div>/,"");
 }
 
 async function loadGameHtml(){
@@ -55,6 +59,7 @@ async function loadGameHtml(){
   const bodyEnd=html.lastIndexOf("</body>");
   if(bodyEnd<0) throw new Error("HTML body closing tag not found");
   html=html.slice(0,bodyEnd)+startScreen.trim()+"\n"+shareFeature.trim()+"\n"+siteReady.trim()+"\n"+html.slice(bodyEnd);
+  html=html.replace(/<aside class="orbit-ad-rail"[\s\S]*?<\/aside>/,"");
 
   const required=["mistmoth","sunwhorl","aurorayne","cinderwisp","veilfox"];
   for(const id of required) if(!html.includes(id)) throw new Error(`Mystic creature missing after patch: ${id}`);
@@ -74,7 +79,7 @@ export default {
       try{
         if(!gameHtmlPromise) gameHtmlPromise=loadGameHtml();
         const html=await gameHtmlPromise;
-        return new Response(JSON.stringify({ok:true,build:BUILD,dataLength:b64.length,htmlLength:html.length,creatures:11,mystic:true,startScreen:true,share:true,adsenseReviewReady:true,gameRoute:"/play",contentPages:["/","/guide","/about","/updates","/privacy","/terms","/contact"],playAds:false}),{headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store",...securityHeaders}});
+        return new Response(JSON.stringify({ok:true,build:BUILD,dataLength:b64.length,htmlLength:html.length,creatures:11,mystic:true,startScreen:true,share:true,adsenseReviewReady:true,gameRoute:"/play",contentPages:["/","/guide","/about","/updates","/privacy","/terms","/contact"],playAds:false,preApprovalAdPlaceholders:false}),{headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store",...securityHeaders}});
       }catch(error){
         gameHtmlPromise=undefined;
         return new Response(JSON.stringify({ok:false,build:BUILD,error:error instanceof Error?error.message:String(error)}),{status:500,headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store",...securityHeaders}});
@@ -85,7 +90,7 @@ export default {
     if(path==="/sitemap.xml") return new Response(sitemap(origin),{headers:{"content-type":"application/xml; charset=UTF-8","cache-control":"public, max-age=3600",...securityHeaders}});
     if(path==="/favicon.ico") return new Response(null,{status:204,headers:{"cache-control":"public, max-age=86400",...securityHeaders}});
 
-    if(path==="/") return htmlResponse(homePage());
+    if(path==="/") return htmlResponse(cleanHomeHtml());
     if(path==="/guide") return htmlResponse(guidePage());
     if(path==="/about") return htmlResponse(aboutPage());
     if(path==="/updates") return htmlResponse(updatesPage());
