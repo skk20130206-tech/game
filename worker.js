@@ -24,7 +24,7 @@ export default {
       headers: {
         "content-type": "text/html; charset=UTF-8",
         "cache-control": "no-store, max-age=0",
-        "x-orbit-build": "complete-47024"
+        "x-orbit-build": "complete-47024-v2"
       }
     });
   }
