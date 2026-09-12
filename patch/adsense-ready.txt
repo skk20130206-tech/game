@@ -1,0 +1,24 @@
+<style>
+/* AdSense-review preparation: keep live ad inventory away from game controls. */
+.orbit-start-shell{grid-template-columns:minmax(0,1fr)!important;max-width:920px!important}
+.orbit-ad-rail{display:none!important}
+.orbit-site-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;padding-top:16px;border-top:1px solid #cce8da18}
+.orbit-site-links a{display:inline-flex;align-items:center;min-height:34px;padding:7px 11px;border:1px solid #c5e4d52b;border-radius:9px;color:#a9c4b9;text-decoration:none;font:700 10px/1.3 Inter,Pretendard,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:.04em;background:#0c1c22a8}
+.orbit-site-links a:hover,.orbit-site-links a:focus-visible{color:#f1fff6;border-color:#c3f37980;outline:none}
+.orbit-review-note{margin-top:12px;color:#69877c;font-size:10px;line-height:1.65}
+</style>
+<script>
+(()=>{
+  const card=document.querySelector('.orbit-start-card');
+  if(!card||document.querySelector('.orbit-site-links'))return;
+  const nav=document.createElement('nav');
+  nav.className='orbit-site-links';
+  nav.setAttribute('aria-label','사이트 안내');
+  nav.innerHTML='<a href="/">홈</a><a href="/guide">게임 가이드</a><a href="/about">게임 소개</a><a href="/updates">업데이트</a><a href="/privacy">개인정보처리방침</a><a href="/terms">이용약관</a><a href="/contact">문의</a>';
+  card.appendChild(nav);
+  const note=document.createElement('p');
+  note.className='orbit-review-note';
+  note.textContent='게임 플레이 중에는 광고를 표시하지 않도록 구성했습니다. 광고가 활성화되더라도 조작 버튼과 분리된 콘텐츠 페이지에 배치합니다.';
+  card.appendChild(note);
+})();
+</script>
