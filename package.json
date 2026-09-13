@@ -1,0 +1,9 @@
+{
+  "name": "justgame",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "node scripts/dev.mjs",
+    "test": "node --test test/*.test.mjs"
+  }
+}

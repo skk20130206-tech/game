@@ -1,18 +1,10 @@
-import p1 from "./data/orbit-1.txt";
-import p2 from "./data/orbit-2.txt";
-import p3 from "./data/orbit-3.txt";
-import p4 from "./data/orbit-4.txt";
-import p5 from "./data/orbit-5.txt";
-import p6 from "./data/orbit-6.txt";
-import newMeta from "./patch/new-meta.txt";
-import newCreature from "./patch/new-creature.txt";
+import immersiveGame from "./game/play.txt";
 import startScreen from "./patch/start-screen-side-ad.txt";
 import shareFeature from "./patch/share-feature.txt";
 import siteReady from "./patch/adsense-ready.txt";
 import {homePage,guidePage,aboutPage,updatesPage,privacyPage,termsPage,contactPage,notFoundPage,robots,sitemap} from "./site.js";
 
-const b64=[p1,p2,p3,p4,p5,p6].map(x=>x.trim()).join("");
-const BUILD="game-adsense-verification-20260912-v9";
+const BUILD="justgame-immersive-20260913-v10";
 const ADSENSE_CLIENT="ca-pub-6073295964667681";
 const ADSENSE_SNIPPET=`<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}" crossorigin="anonymous"></script>`;
 let gameHtmlPromise;
@@ -41,30 +33,13 @@ function cleanHomeHtml(){
 }
 
 async function loadGameHtml(){
-  if(b64.length!==47024) throw new Error(`ORBIT data length mismatch: expected 47024, got ${b64.length}`);
-
-  const binary=atob(b64);
-  const bytes=new Uint8Array(binary.length);
-  for(let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
-
-  const decompressed=new Response(bytes).body.pipeThrough(new DecompressionStream("gzip"));
-  let html=await new Response(decompressed).text();
-
-  const metaStart=html.indexOf("  const PLANETS=[");
-  const metaEnd=html.indexOf("  const BUILDINGS={",metaStart);
-  if(metaStart<0||metaEnd<0||metaEnd<=metaStart) throw new Error("Planet/species section markers not found");
-  html=html.slice(0,metaStart)+newMeta.trimEnd()+"\n"+html.slice(metaEnd);
-
-  const creatureStart=html.indexOf("  function creature(c,id,t=0,scale=1,met=false){");
-  const creatureEnd=html.indexOf("  function astronaut(c,t,angle,moving){",creatureStart);
-  if(creatureStart<0||creatureEnd<0||creatureEnd<=creatureStart) throw new Error("Creature renderer section markers not found");
-  html=html.slice(0,creatureStart)+newCreature.trimEnd()+"\n"+html.slice(creatureEnd);
+  let html=immersiveGame;
 
   const headEnd=html.indexOf("</head>");
   if(headEnd<0) throw new Error("HTML head closing tag not found");
-  const reviewMeta=`<meta name="description" content="ORBIT은 낯선 행성을 탐험하고 자원을 수집해 거점을 건설하며 신비로운 생명체를 발견하는 브라우저 우주 탐험 게임입니다."><meta name="robots" content="index,follow"><meta name="theme-color" content="#07131b"><link rel="canonical" href="/play"><meta property="og:type" content="website"><meta property="og:title" content="ORBIT | 우주 탐험 게임"><meta property="og:description" content="행성을 탐험하고 자원을 모아 개척지를 세우는 브라우저 우주 탐험 게임.">`;
+  const reviewMeta=`<meta name="description" content="justgame은 낯선 행성을 탐험하고 자원을 수집해 거점을 건설하며 신비로운 생명체를 발견하는 브라우저 우주 탐험 게임입니다."><meta name="robots" content="index,follow"><meta name="theme-color" content="#07131b"><link rel="canonical" href="/play"><meta property="og:type" content="website"><meta property="og:title" content="justgame | 우주 탐험 게임"><meta property="og:description" content="행성을 탐험하고 자원을 모아 개척지를 세우는 브라우저 우주 탐험 게임.">`;
   html=html.slice(0,headEnd)+reviewMeta+html.slice(headEnd);
-  html=html.replace(/<title>[^<]*<\/title>/i,"<title>ORBIT | 우주 탐험 게임</title>");
+  html=html.replace(/<title>[^<]*<\/title>/i,"<title>justgame | 입체 우주 탐험 게임</title>");
 
   const bodyEnd=html.lastIndexOf("</body>");
   if(bodyEnd<0) throw new Error("HTML body closing tag not found");
@@ -89,7 +64,7 @@ export default {
       try{
         if(!gameHtmlPromise) gameHtmlPromise=loadGameHtml();
         const html=await gameHtmlPromise;
-        return new Response(JSON.stringify({ok:true,build:BUILD,dataLength:b64.length,htmlLength:html.length,creatures:11,mystic:true,startScreen:true,share:true,adsenseReviewReady:true,adsenseClient:ADSENSE_CLIENT,adsenseSnippetOnContentPages:true,gameRoute:"/play",contentPages:["/","/guide","/about","/updates","/privacy","/terms","/contact"],playAds:false,preApprovalAdPlaceholders:false}),{headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store",...securityHeaders}});
+        return new Response(JSON.stringify({ok:true,build:BUILD,rendering:"WebGL 3D",immersive:true,creatureCare:true,companions:true,relics:15,htmlLength:html.length,creatures:11,mystic:true,startScreen:true,share:true,adsenseReviewReady:true,adsenseClient:ADSENSE_CLIENT,adsenseSnippetOnContentPages:true,gameRoute:"/play",contentPages:["/","/guide","/about","/updates","/privacy","/terms","/contact"],playAds:false,preApprovalAdPlaceholders:false}),{headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store",...securityHeaders}});
       }catch(error){
         gameHtmlPromise=undefined;
         return new Response(JSON.stringify({ok:false,build:BUILD,error:error instanceof Error?error.message:String(error)}),{status:500,headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store",...securityHeaders}});
