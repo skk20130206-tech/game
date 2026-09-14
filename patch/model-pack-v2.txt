@@ -1,75 +1,132 @@
   function spaceshipModel(b,time,space,moving){
-    // ORBIT Explorer Mk II — fully procedural browser-game mesh.
-    // The model intentionally uses only Batch primitives so it needs no downloaded 3D asset.
-    const hull='#e7ece8',hullShade='#aebfc0',panel='#72878b',dark='#263f4a',glass='#285f73',glassHi='#7cc8d5',accent='#e89a45',lime='#c3f379',glow='#8cecff';
+    // ORBIT Explorer Mk II — heavy industrial survey lander.
+    // Built procedurally from the user's reference: faceted cockpit, twin rear engines,
+    // communications mast, radar dish, cargo pods and four-point landing gear.
+    const hull='#d9d7cf',hullHi='#efeae0',trim='#b8b2a8',dark='#23282e',panel='#4d5962',glass='#2f4957',orange='#e89a45',glow='#ffb14a',leg='#1b2025';
 
-    // Main fuselage: layered volumes give the ship a manufactured, panelled silhouette.
-    b.tube([0,29,-47],[0,29,47],24,17,hull,24);
-    b.tube([0,29,43],[0,29,78],17,1,hull,24);
-    b.tube([0,24,-57],[0,24,-30],20,24,hullShade,20);
-    b.roundedBox(0,31,-14,36,16,48,6,hullShade);
-    b.roundedBox(0,20,-20,31,8,34,4,dark);
+    // Main armored fuselage and layered underside.
+    b.roundedBox(0,28,-2,134,28,150,6,hull);
+    b.roundedBox(0,40,8,110,18,108,5,hullHi);
+    b.roundedBox(0,12,-16,114,12,84,4,trim);
+    b.roundedBox(0,8,18,84,14,60,3,trim);
 
-    // Cockpit canopy and forward sensor brow.
-    b.sphere(0,43,27,20,13,31,glass,28,16,.12);
-    b.sphere(0,45,31,16,8,25,glassHi,24,12,.15);
-    b.roundedBox(0,52,5,17,4,25,2,dark);
-    b.box(0,53,14,10,2,13,lime,.65);
-    b.box(0,33,76,8,3,5,accent,.65);
-
-    // Dorsal spine, antenna and center engine housing.
-    b.roundedBox(0,49,-24,16,9,34,4,panel);
-    b.tube([0,54,-30],[0,68,-38],3,1.3,hullShade,8);
-    b.sphere(0,69,-39,2.8,2.8,2.8,lime,8,5,.75);
-    b.tube([0,27,-63],[0,27,-50],9,12,dark,18);
-    b.tube([0,27,-66],[0,27,-61],7,9,glow,18,.65);
-
+    // Underside equipment packs and orange service markings.
     for(const sign of[-1,1]){
-      // Swept wings: double skins plus an inset dark panel keep the shape readable from above and below.
-      b.quad([sign*16,32,34],[sign*81,19,-20],[sign*72,18,-49],[sign*13,29,-34],hull);
-      b.quad([sign*16,36,30],[sign*13,33,-31],[sign*72,23,-47],[sign*81,24,-18],hullShade);
-      b.quad([sign*29,34,13],[sign*68,24,-20],[sign*61,23,-35],[sign*24,31,-22],dark);
-      b.quad([sign*35,35,4],[sign*64,26,-16],[sign*59,25,-24],[sign*31,32,-12],accent,.18);
+      b.roundedBox(sign*26,4,10,26,18,62,3,hullHi);
+      b.box(sign*26,11,40,22,2,2,orange,.25);
+      b.box(sign*26,11,-12,22,2,2,orange,.25);
+      b.box(sign*34,4,10,2,12,48,dark);
+    }
 
-      // Main nacelles, intake rim and emissive rear ring.
-      b.tube([sign*43,22,-52],[sign*43,22,-2],13,10,hullShade,18);
-      b.sphere(sign*43,22,-12,14,13,24,hull,18,10);
-      b.tube([sign*43,22,-58],[sign*43,22,-48],10,13,dark,18);
-      b.tube([sign*43,22,-62],[sign*43,22,-57],8.5,10,glow,18,.75);
-      b.ring(sign*43,22,-63,9,2,glow,.9);
-      b.box(sign*43,34,-15,8,3,24,accent,.22);
-      b.box(sign*71,23,-24,6,3,13,lime,.8);
+    // Side cargo / survival pods.
+    for(const sign of[-1,1]){
+      b.roundedBox(sign*74,14,18,34,38,64,4,hullHi);
+      b.roundedBox(sign*74,14,18,22,30,48,3,hull);
+      b.box(sign*74,18,45,18,2,2,orange,.35);
+      b.box(sign*74,-1,18,8,10,24,panel);
+      b.box(sign*64,16,-3,4,20,16,dark);
+      b.box(sign*84,16,-3,4,20,16,dark);
+      b.box(sign*74,16,49,10,12,2,'#c8f57e',.7);
+      b.tube([sign*54,22,16],[sign*62,20,18],5,4,dark,8);
+      b.tube([sign*54,14,-6],[sign*62,12,-6],4,4,dark,8);
+      b.tube([sign*54,14,40],[sign*62,12,40],4,4,dark,8);
+    }
 
-      // Forward maneuvering pods and small navigation lamps.
-      b.sphere(sign*56,22,3,11,9,18,hull,16,9);
-      b.tube([sign*56,22,0],[sign*56,22,11],7,4,dark,12);
-      b.sphere(sign*56,22,12,4.5,4.5,4.5,glow,10,6,.72);
-      b.sphere(sign*76,25,-21,2.4,2.4,2.4,sign<0?'#ff9b77':'#9fffd0',7,5,.9);
+    // Faceted cockpit block and angular nose.
+    b.roundedBox(0,31,66,92,34,58,5,hullHi);
+    b.quad([-44,17,54],[-56,24,94],[-48,47,96],[-33,49,62],hullHi);
+    b.quad([44,17,54],[56,24,94],[48,47,96],[33,49,62],hullHi);
+    b.quad([-33,49,62],[33,49,62],[48,47,96],[-48,47,96],hull);
+    b.quad([-44,17,54],[44,17,54],[56,24,94],[-56,24,94],trim);
 
-      // Landing gear deploys only when the craft is on a surface.
-      if(!space){
-        b.tube([sign*34,16,-24],[sign*43,2,-30],4,3,panel,8);
-        b.tube([sign*43,2,-30],[sign*49,0,-29],3,3,dark,8);
-        b.roundedBox(sign*49,1,-29,19,4,16,2,hullShade);
-      }
+    // Multi-pane forward canopy.
+    b.quad([-15,31,91],[15,31,91],[13,52,94],[-13,52,94],glass,.12);
+    b.quad([-39,32,71],[-16,31,91],[-14,52,94],[-38,53,70],glass,.10);
+    b.quad([39,32,71],[16,31,91],[14,52,94],[38,53,70],glass,.10);
+    b.quad([-51,35,50],[-41,32,69],[-39,53,70],[-49,54,52],glass,.08);
+    b.quad([51,35,50],[41,32,69],[39,53,70],[49,54,52],glass,.08);
+    b.box(0,52,83,58,1.5,1.5,trim);
+    b.box(0,31,90,30,1.5,1.5,trim);
+    b.box(-28,42,80,2,18,2,trim);
+    b.box(28,42,80,2,18,2,trim);
+    b.box(0,42,88,2,18,2,trim);
 
-      // Optional local exhaust is kept for static previews; gameplay adds a longer dynamic flame separately.
-      if(space&&moving){
-        const flicker=48+Math.sin(time*42)*9;
-        b.tube([sign*43,22,-63],[sign*43,22,-63-flicker],7,0,glow,10,1);
-        b.tube([sign*43,22,-63],[sign*43,22,-82],3,0,'#f1fff2',8,1);
+    // Front bumper, lights and identity stripe.
+    b.box(-18,17,100,15,3,3,'#f8f0d8',.85);
+    b.box(18,17,100,15,3,3,'#f8f0d8',.85);
+    b.box(0,11,98,54,8,9,dark);
+    b.box(-22,6,101,8,5,5,dark);
+    b.box(22,6,101,8,5,5,dark);
+    b.box(0,22,55,82,2,2,orange,.25);
+    b.box(-47,18,80,2,9,18,orange,.25);
+    b.box(47,18,80,2,9,18,orange,.25);
+
+    // Side vents and access panels.
+    for(const sign of[-1,1]){
+      b.box(sign*57,28,28,3,15,18,dark);
+      b.box(sign*57,41,10,3,10,14,dark);
+      b.box(sign*46,18,4,8,10,2,orange,.35);
+    }
+
+    // Twin oversized engine nacelles and tall rear fins.
+    for(const sign of[-1,1]){
+      b.tube([sign*54,45,-12],[sign*54,45,-96],27,23,trim,24);
+      b.tube([sign*54,45,-96],[sign*54,45,-117],23,19,panel,24);
+      b.tube([sign*54,45,-117],[sign*54,45,-130],19,0,hullHi,24);
+      // Flattened emissive discs read as rear engine cores from the flight camera.
+      b.sphere(sign*54,45,-119,12,12,2,glow,20,10,.9);
+      b.sphere(sign*54,45,-121,6,6,1.5,'#fff1c6',16,8,1);
+      b.tube([sign*42,36,-16],[sign*50,39,-35],6,6,dark,10);
+      b.tube([sign*42,48,-18],[sign*50,47,-38],6,6,dark,10);
+      b.quad([sign*38,52,-42],[sign*54,86,-57],[sign*43,83,-78],[sign*28,50,-56],panel);
+      b.quad([sign*41,52,-44],[sign*29,50,-56],[sign*43,83,-78],[sign*54,86,-57],hullHi);
+      b.quad([sign*44,57,-49],[sign*49,72,-56],[sign*43,74,-69],[sign*39,60,-60],orange,.2);
+    }
+
+    // Busy top deck, central service hatch and panel lines.
+    b.roundedBox(0,55,4,54,6,42,2,hull);
+    b.ring(6,58,2,11,3,orange,.5);
+    b.box(0,59,28,36,2,4,panel);
+    b.box(-18,59,28,4,3,5,dark);
+    b.box(18,59,28,4,3,5,dark);
+    b.box(-26,58,-3,10,2,8,dark);
+    b.box(34,58,24,8,2,8,dark);
+    b.box(52,58,42,8,2,8,dark);
+    b.box(-54,58,34,8,2,8,dark);
+
+    // Communications tower inspired by the tall mast in the reference.
+    b.tube([18,58,10],[20,112,12],3.5,2.4,dark,8);
+    b.tube([22,60,7],[26,95,9],2.2,1.6,panel,7);
+    b.box(19,74,11,8,16,8,dark);
+    b.box(19,93,12,3,18,3,'#c5f27b',.9);
+    b.cone(20,112,12,2.2,0,13,trim,7);
+
+    // Compact radar dish assembly.
+    b.cone(48,67,18,14,2,5,trim,14);
+    b.ring(48,72,18,11,1,trim,.25);
+    b.tube([48,58,18],[48,69,18],2.5,2,dark,6);
+    b.tube([48,69,18],[41,64,24],1.1,1.1,dark,5);
+
+    // Small hull lamps and service striping.
+    b.box(-44,20,46,3,8,2,'#f4d49b',.55);
+    b.box(44,20,46,3,8,2,'#f4d49b',.55);
+    b.box(0,18,-66,22,2,2,orange,.25);
+
+    // Four-point landing gear only appears on planetary surfaces.
+    if(!space){
+      for(const [x,y,z] of[[-40,6,76],[40,6,76],[-74,4,-18],[74,4,-18]]){
+        b.tube([x,y,z],[x-Math.sign(x)*10,-23,z+8],4.5,3.2,leg,8);
+        b.tube([x-Math.sign(x)*10,-23,z+8],[x-Math.sign(x)*13,-32,z+11],3.2,2.8,leg,8);
+        b.roundedBox(x-Math.sign(x)*15,-35,z+13,20,5,14,2,dark);
       }
     }
 
-    // Ventral details, orange identity stripe, and nose contour.
-    b.roundedBox(0,20,25,18,5,43,2,dark);
-    b.box(0,24,48,6,3,31,accent,.18);
-    b.box(-12,34,55,4,3,16,accent,.25);
-    b.box(12,34,55,4,3,16,accent,.25);
-    b.tri([-9,34,70],[9,34,70],[0,35,82],hullShade);
-
-    if(!space){
-      b.tube([0,15,35],[0,1,43],4,3,panel,8);
-      b.roundedBox(0,1,46,20,4,17,2,hullShade);
+    // Local exhaust for previews; gameplay adds a longer boost flame separately.
+    if(space&&moving){
+      const pulse=8+Math.sin(time*45)*3;
+      for(const sign of[-1,1]){
+        b.tube([sign*54,45,-123],[sign*54,45,-165-pulse],10,0,'#8cecff',9,1);
+        b.tube([sign*54,45,-123],[sign*54,45,-148],4,0,'#fff1c6',7,1);
+      }
     }
   }
