@@ -13,36 +13,73 @@
   function transform(m,p){const[x,y,z]=p;return[m[0]*x+m[4]*y+m[8]*z+m[12],m[1]*x+m[5]*y+m[9]*z+m[13],m[2]*x+m[6]*y+m[10]*z+m[14]];}
   function perspective(fov,aspect,near,far){const f=1/Math.tan(fov/2),nf=1/(near-far);return new Float32Array([f/aspect,0,0,0,0,f,0,0,0,0,(far+near)*nf,-1,0,0,2*far*near*nf,0]);}
   function lookAt(eye,target){const z=norm(sub(eye,target)),x=norm(cross([0,1,0],z)),y=cross(z,x);return new Float32Array([x[0],y[0],z[0],0,x[1],y[1],z[1],0,x[2],y[2],z[2],0,-dot(x,eye),-dot(y,eye),-dot(z,eye),1]);}
-  function heightAt(x,z,p){const clear=clamp((Math.hypot(x,z)-310)/380,0,1);return clear*(Math.sin(x*.008+p.seed)*Math.cos(z*.007)*37+Math.sin(x*.019+z*.014)*11+Math.cos(z*.015-x*.009)*9);}
+  function heightAt(x,z,p){const t=clamp((Math.hypot(x,z)-310)/380,0,1),clear=t*t*(3-2*t);return clear*(Math.sin(x*.008+p.seed)*Math.cos(z*.007)*37+Math.sin(x*.019+z*.014)*11+Math.cos(z*.015-x*.009)*9);}
+  function terrainNormal(x,z,p){return norm([heightAt(x-1,z,p)-heightAt(x+1,z,p),2,heightAt(x,z-1,p)-heightAt(x,z+1,p)]);}
+  function terrainColor(x,z,p){
+    const wave=.5+Math.sin(x*.0031+p.seed)*Math.cos(z*.0027)*.24+Math.sin(x*.007-z*.005+p.seed*.7)*.13;
+    const t=clamp(wave,0,1)*(p.ground.length-1),i=Math.min(p.ground.length-2,Math.floor(t)),f=t-i,a=rgb(p.ground[i]),b=rgb(p.ground[i+1]);
+    return a.map((v,k)=>v+(b[k]-v)*f);
+  }
   class Batch{
-    constructor(){this.data=[];this.mat=identity();}
+    constructor(){this.data=[];this.shadowData=[];this.mat=identity();}
     at(x,y,z,scale,yaw,fn){const old=this.mat,c=Math.cos(yaw),s=Math.sin(yaw);this.mat=multiply(old,[c*scale,0,-s*scale,0,0,scale,0,0,s*scale,0,c*scale,0,x,y,z,1]);fn();this.mat=old;}
-    tri(a,b,c,color,emissive=0){a=transform(this.mat,a);b=transform(this.mat,b);c=transform(this.mat,c);const n=norm(cross(sub(b,a),sub(c,a))),co=rgb(color);for(const p of[a,b,c])this.data.push(...p,...n,...co,emissive);}
+    tri(a,b,c,color,emissive=0,normals=null,colors=null,emissions=null){
+      const points=[a,b,c].map(p=>transform(this.mat,p)),face=normals?null:norm(cross(sub(points[1],points[0]),sub(points[2],points[0]))),co=rgb(color),m=this.mat;
+      for(let i=0;i<3;i++){const n=normals?norm([m[0]*normals[i][0]+m[4]*normals[i][1]+m[8]*normals[i][2],m[1]*normals[i][0]+m[5]*normals[i][1]+m[9]*normals[i][2],m[2]*normals[i][0]+m[6]*normals[i][1]+m[10]*normals[i][2]]):face;this.data.push(...points[i],...n,...(colors?colors[i]:co),emissions?emissions[i]:emissive);}
+    }
     quad(a,b,c,d,color,e=0){this.tri(a,b,c,color,e);this.tri(a,c,d,color,e);}
     box(x,y,z,w,h,d,color,e=0){
       const p=[[-w/2,-h/2,-d/2],[w/2,-h/2,-d/2],[w/2,h/2,-d/2],[-w/2,h/2,-d/2],[-w/2,-h/2,d/2],[w/2,-h/2,d/2],[w/2,h/2,d/2],[-w/2,h/2,d/2]].map(a=>[a[0]+x,a[1]+y,a[2]+z]);
       for(const f of[[4,5,6,7],[1,0,3,2],[0,4,7,3],[5,1,2,6],[7,6,2,3],[0,1,5,4]])this.quad(...f.map(i=>p[i]),color,e);
     }
-    sphere(x,y,z,rx,ry,rz,color,segments=10,rings=7,e=0){
-      const pt=(i,j)=>{const a=i/segments*TAU,b=j/rings*Math.PI;return[x+Math.sin(b)*Math.cos(a)*rx,y+Math.cos(b)*ry,z+Math.sin(b)*Math.sin(a)*rz];};
-      for(let j=0;j<rings;j++)for(let i=0;i<segments;i++){const a=pt(i,j),b=pt(i+1,j),c=pt(i+1,j+1),d=pt(i,j+1),co=tint(color,.94+.08*Math.sin(i*9+j*5));if(j>0)this.tri(a,c,b,co,e);if(j<rings-1)this.tri(a,d,c,co,e);}
+    roundedBox(x,y,z,w,h,d,r,color,e=0){
+      const half=[w/2,h/2,d/2];r=Math.min(r,...half);const inner=half.map(v=>v-r),grid=half.map((v,i)=>[-v,-inner[i],inner[i],v]);
+      for(let axis=0;axis<3;axis++)for(const sign of[-1,1]){const u=(axis+1)%3,v=(axis+2)%3;
+        const pt=(i,j)=>{const q=[0,0,0];q[axis]=half[axis]*sign;q[u]=grid[u][i];q[v]=grid[v][j];const center=q.map((n,k)=>clamp(n,-inner[k],inner[k])),normal=norm(sub(q,center));return{p:center.map((n,k)=>n+normal[k]*r+[x,y,z][k]),n:normal};};
+        for(let j=0;j<3;j++)for(let i=0;i<3;i++){const a=pt(i,j),b=pt(i+1,j),c=pt(i+1,j+1),d=pt(i,j+1),quad=sign>0?[a,b,c,d]:[a,d,c,b];this.tri(quad[0].p,quad[1].p,quad[2].p,color,e,quad.slice(0,3).map(v=>v.n));this.tri(quad[0].p,quad[2].p,quad[3].p,color,e,[quad[0].n,quad[2].n,quad[3].n]);}
+      }
+    }
+    sphere(x,y,z,rx,ry,rz,color,segments=10,rings=7,e=0,smooth=true){
+      if(smooth&&Math.max(rx,ry,rz)>2.5){segments=Math.max(segments,Math.max(rx,ry,rz)>10?12:8);rings=Math.max(rings,Math.max(rx,ry,rz)>10?7:5);}
+      const pt=(i,j)=>{const a=i/segments*TAU,b=j/rings*Math.PI,s=Math.sin(b),dir=[s*Math.cos(a),Math.cos(b),s*Math.sin(a)];return{p:[x+dir[0]*rx,y+dir[1]*ry,z+dir[2]*rz],n:norm([dir[0]/rx,dir[1]/ry,dir[2]/rz])};};
+      const grid=Array.from({length:rings+1},(_,j)=>Array.from({length:segments+1},(_,i)=>pt(i,j)));
+      for(let j=0;j<rings;j++)for(let i=0;i<segments;i++){const a=grid[j][i],b=grid[j][i+1],c=grid[j+1][i+1],d=grid[j+1][i];if(j>0)this.tri(a.p,b.p,c.p,color,e,smooth?[a.n,b.n,c.n]:null);if(j<rings-1)this.tri(a.p,c.p,d.p,color,e,smooth?[a.n,c.n,d.n]:null);}
     }
     tube(a,b,r1,r2,color,sides=8,e=0){
-      const axis=norm(sub(b,a)),u=norm(cross(axis,Math.abs(axis[1])>.9?[1,0,0]:[0,1,0])),v=cross(axis,u);
+      const axis=norm(sub(b,a)),u=norm(cross(axis,Math.abs(axis[1])>.9?[1,0,0]:[0,1,0])),v=cross(axis,u),smooth=sides>=6;
+      if(smooth)sides=Math.max(12,sides);
       const pt=(center,r,i)=>{const t=i/sides*TAU;return center.map((n,k)=>n+r*(Math.cos(t)*u[k]+Math.sin(t)*v[k]));};
-      for(let i=0;i<sides;i++){const aa=pt(a,r1,i),ab=pt(a,r1,i+1),ba=pt(b,r2,i),bb=pt(b,r2,i+1);this.quad(aa,ab,bb,ba,color,e);if(r1)this.tri(a,ab,aa,color,e);if(r2)this.tri(b,ba,bb,color,e);}
+      const slope=(r1-r2)/Math.max(.001,Math.hypot(...sub(b,a))),normal=i=>{const t=i/sides*TAU;return norm(axis.map((n,k)=>Math.cos(t)*u[k]+Math.sin(t)*v[k]+n*slope));};
+      for(let i=0;i<sides;i++){const aa=pt(a,r1,i),ab=pt(a,r1,i+1),ba=pt(b,r2,i),bb=pt(b,r2,i+1),na=normal(i),nb=normal(i+1);if(r1)this.tri(aa,ab,bb,color,e,smooth?[na,nb,nb]:null);if(r2)this.tri(aa,bb,ba,color,e,smooth?[na,nb,na]:null);if(r1)this.tri(a,ab,aa,color,e);if(r2)this.tri(b,ba,bb,color,e);}
     }
     cone(x,y,z,r1,r2,h,color,sides=8,e=0){this.tube([x,y,z],[x,y+h,z],r1,r2,color,sides,e);}
     ring(x,y,z,r,w,color,e=1){for(let i=0;i<64;i++){const a=i/64*TAU,b=(i+1)/64*TAU;this.quad([x+Math.cos(a)*r,y,z+Math.sin(a)*r],[x+Math.cos(b)*r,y,z+Math.sin(b)*r],[x+Math.cos(b)*(r+w),y,z+Math.sin(b)*(r+w)],[x+Math.cos(a)*(r+w),y,z+Math.sin(a)*(r+w)],color,e);}}
-    array(){return new Float32Array(this.data);}
+    array(){const data=new Float32Array(this.data);if(this.shadowData.length)data.shadows=new Float32Array(this.shadowData);return data;}
   }
   const shaders={
     vertex:`precision highp float;
       attribute vec3 aPosition; attribute vec3 aNormal; attribute vec3 aColor; attribute float aEmission;
-      uniform mat4 uVP; uniform mat4 uModel; uniform vec3 uEye; varying vec3 vColor; varying float vDistance;
-      void main(){vec3 position=(uModel*vec4(aPosition,1.0)).xyz;vec3 normal=normalize(mat3(uModel)*aNormal);float diffuse=max(dot(normal,normalize(vec3(-0.5,0.85,0.4))),0.0);float hemi=0.53+0.16*(normal.y*0.5+0.5);vColor=aColor*mix(hemi+diffuse*0.42,1.12,aEmission);vDistance=length(position-uEye);gl_Position=uVP*vec4(position,1.0);}`,
-    fragment:`precision mediump float; varying vec3 vColor; varying float vDistance; uniform vec3 uFog; uniform vec2 uFogRange;
-      void main(){float fog=smoothstep(uFogRange.x,uFogRange.y,vDistance);gl_FragColor=vec4(mix(vColor,uFog,fog),1.0);}`,
+      uniform mat4 uVP; uniform mat4 uModel; uniform vec3 uEye;
+      varying vec3 vColor; varying vec3 vNormal; varying vec3 vView; varying float vEmission;
+      void main(){vec3 position=(uModel*vec4(aPosition,1.0)).xyz;vNormal=normalize(mat3(uModel)*aNormal);vColor=aColor;vEmission=aEmission;vView=(uEye-position)/6500.0;gl_Position=uVP*vec4(position,1.0);}`,
+    fragment:`#ifdef GL_FRAGMENT_PRECISION_HIGH
+      precision highp float;
+      #else
+      precision mediump float;
+      #endif
+      varying vec3 vColor; varying vec3 vNormal; varying vec3 vView; varying float vEmission; uniform vec3 uFog; uniform vec2 uFogRange;
+      void main(){
+        float fog=smoothstep(uFogRange.x,uFogRange.y,length(vView)*6500.0);
+        if(vEmission<0.0){gl_FragColor=vec4(vColor,clamp(-vEmission-1.0,0.0,1.0)*(1.0-fog));return;}
+        vec3 normal=normalize(vNormal),view=normalize(vView),light=normalize(vec3(-0.5,0.85,0.4));
+        float diffuse=max(dot(normal,light),0.0),emission=clamp(vEmission,0.0,1.0);
+        vec3 ambient=mix(vec3(0.32,0.36,0.38),vec3(0.70,0.77,0.79),normal.y*0.5+0.5);
+        vec3 color=vColor*(ambient+vec3(1.0,0.95,0.86)*diffuse*0.44);
+        float highlight=pow(max(dot(normal,normalize(light+view)),0.0),32.0)*0.09;
+        float rim=pow(1.0-max(dot(normal,view),0.0),3.0)*0.045;
+        color=mix(color+vec3(highlight)+vec3(0.65,0.85,1.0)*rim,vColor*1.12,emission);
+        gl_FragColor=vec4(mix(color,uFog,fog),1.0);
+      }`,
     skyVertex:`attribute vec2 aPosition; varying vec2 vUV;void main(){vUV=aPosition*0.5+0.5;gl_Position=vec4(aPosition,0.9999,1.0);}`,
     skyFragment:`#ifdef GL_FRAGMENT_PRECISION_HIGH
       precision highp float;
@@ -51,7 +88,27 @@
       #endif
       varying vec2 vUV;uniform vec3 uTop;uniform vec3 uBottom;uniform float uTime;uniform float uSpace;uniform float uYaw;
       float hash(vec2 p){return fract(sin(dot(mod(p,64.0),vec2(127.1,311.7)))*43758.5453);}
-      void main(){vec3 col=mix(uBottom,uTop,smoothstep(0.05,1.0,vUV.y));vec2 grid=(vUV+vec2(uYaw*0.12,0.0))*vec2(220.0,125.0);float r=hash(floor(grid));float star=(1.0-smoothstep(0.0,0.10,length(fract(grid)-0.5)))*step(0.982,r);col+=star*(0.35+uSpace*0.65)*(0.7+0.3*sin(uTime+r*100.0));float haze=exp(-length((vUV-vec2(0.66,0.54))*vec2(1.2,2.0))*3.5);col+=vec3(0.02,0.06,0.08)*haze;gl_FragColor=vec4(col,1.0);}`
+      void main(){vec3 col=mix(uBottom,uTop,smoothstep(0.05,1.0,vUV.y));vec2 grid=(vUV+vec2(uYaw*0.12,0.0))*vec2(220.0,125.0);float r=hash(floor(grid));float star=(1.0-smoothstep(0.0,0.10,length(fract(grid)-0.5)))*step(0.982,r);col+=star*(0.35+uSpace*0.65)*(0.7+0.3*sin(uTime+r*100.0));float haze=exp(-length((vUV-vec2(0.66,0.54))*vec2(1.2,2.0))*3.5);col+=vec3(0.02,0.06,0.08)*haze;gl_FragColor=vec4(col,1.0);}`,
+    // An edge-only pass preserves surface detail and never filters the HTML HUD.
+    postFragment:`#ifdef GL_FRAGMENT_PRECISION_HIGH
+      precision highp float;
+      #else
+      precision mediump float;
+      #endif
+      varying vec2 vUV;uniform sampler2D uScene;uniform vec2 uPixel;
+      void main(){
+        vec3 center=texture2D(uScene,vUV).rgb,luma=vec3(0.299,0.587,0.114);
+        float nw=dot(texture2D(uScene,vUV+vec2(-1.0,1.0)*uPixel).rgb,luma),ne=dot(texture2D(uScene,vUV+vec2(1.0,1.0)*uPixel).rgb,luma);
+        float sw=dot(texture2D(uScene,vUV+vec2(-1.0,-1.0)*uPixel).rgb,luma),se=dot(texture2D(uScene,vUV+vec2(1.0,-1.0)*uPixel).rgb,luma),mid=dot(center,luma);
+        float low=min(mid,min(min(nw,ne),min(sw,se))),high=max(mid,max(max(nw,ne),max(sw,se)));
+        if(high-low<max(0.035,high*0.10)){gl_FragColor=vec4(center,1.0);return;}
+        vec2 direction=vec2(-((nw+ne)-(sw+se)),(nw+sw)-(ne+se));
+        float reduce=max((nw+ne+sw+se)*0.03125,0.0078125);
+        direction=clamp(direction/(min(abs(direction.x),abs(direction.y))+reduce),vec2(-6.0),vec2(6.0))*uPixel;
+        vec3 a=0.5*(texture2D(uScene,vUV-direction/6.0).rgb+texture2D(uScene,vUV+direction/6.0).rgb);
+        vec3 b=a*0.5+0.25*(texture2D(uScene,vUV-direction*0.5).rgb+texture2D(uScene,vUV+direction*0.5).rgb);
+        float value=dot(b,luma);gl_FragColor=vec4(value<low||value>high?a:b,1.0);
+      }`
   };
   class GLScene{
     constructor(canvas){
@@ -63,20 +120,51 @@
       this.skyUniforms={};for(const n of['uTop','uBottom','uTime','uSpace','uYaw'])this.skyUniforms[n]=gl.getUniformLocation(this.skyProgram,n);
       this.skyAttribute=gl.getAttribLocation(this.skyProgram,'aPosition');this.buffers={};
       this.skyBuffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,this.skyBuffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);
+      this.shadowQueue=[];this.postSize='';this.postReady=false;
+      try{this.postProgram=this.programFor(shaders.skyVertex,shaders.postFragment);this.postAttribute=gl.getAttribLocation(this.postProgram,'aPosition');this.postPixel=gl.getUniformLocation(this.postProgram,'uPixel');this.postScene=gl.getUniformLocation(this.postProgram,'uScene');}catch(e){this.postProgram=null;}
       gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);gl.disable(gl.CULL_FACE);
     }
     programFor(vs,fs){const gl=this.gl,compile=(type,source)=>{const s=gl.createShader(type);gl.shaderSource(s,source);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)){const e=gl.getShaderInfoLog(s);gl.deleteShader(s);throw Error('3D 셰이더 오류: '+e);}return s;};const v=compile(gl.VERTEX_SHADER,vs),f=compile(gl.FRAGMENT_SHADER,fs),p=gl.createProgram();gl.attachShader(p,v);gl.attachShader(p,f);gl.linkProgram(p);gl.deleteShader(v);gl.deleteShader(f);if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw Error('3D 그래픽 연결 오류');return p;}
-    upload(name,data,dynamic=false){const gl=this.gl;let b=this.buffers[name];if(!b)b=this.buffers[name]={buffer:gl.createBuffer(),count:0,capacity:0};b.count=data.length/10;gl.bindBuffer(gl.ARRAY_BUFFER,b.buffer);if(dynamic){if(data.byteLength>b.capacity){b.capacity=2**Math.ceil(Math.log2(Math.max(1024,data.byteLength)));gl.bufferData(gl.ARRAY_BUFFER,b.capacity,gl.DYNAMIC_DRAW);}if(data.byteLength)gl.bufferSubData(gl.ARRAY_BUFFER,0,data);}else gl.bufferData(gl.ARRAY_BUFFER,data,gl.STATIC_DRAW);}
+    upload(name,data,dynamic=false){const gl=this.gl;let b=this.buffers[name];if(!b)b=this.buffers[name]={buffer:gl.createBuffer(),count:0,capacity:0};b.count=data.length/10;gl.bindBuffer(gl.ARRAY_BUFFER,b.buffer);if(dynamic){if(data.byteLength>b.capacity){b.capacity=2**Math.ceil(Math.log2(Math.max(1024,data.byteLength)));gl.bufferData(gl.ARRAY_BUFFER,b.capacity,gl.DYNAMIC_DRAW);}if(data.byteLength)gl.bufferSubData(gl.ARRAY_BUFFER,0,data);}else gl.bufferData(gl.ARRAY_BUFFER,data,gl.STATIC_DRAW);if(data.shadows?.length){b.shadow=name+'-shadow';this.upload(b.shadow,data.shadows,dynamic);}else b.shadow=null;}
+    resizeTarget(w,h){
+      const gl=this.gl,size=w+'x'+h;if(!this.postProgram||size===this.postSize)return;this.postSize=size;this.postReady=false;
+      // Reuse the framebuffer and resize its attachments only when resolution changes.
+      if(!this.framebuffer){this.framebuffer=gl.createFramebuffer();this.sceneTexture=gl.createTexture();this.sceneDepth=gl.createRenderbuffer();}
+      if(!this.framebuffer||!this.sceneTexture||!this.sceneDepth)return;
+      gl.bindTexture(gl.TEXTURE_2D,this.sceneTexture);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,w,h,0,gl.RGBA,gl.UNSIGNED_BYTE,null);
+      // Packed depth/stencil preserves depth precision where curved surfaces meet.
+      gl.bindRenderbuffer(gl.RENDERBUFFER,this.sceneDepth);gl.renderbufferStorage(gl.RENDERBUFFER,gl.DEPTH_STENCIL,w,h);
+      gl.bindFramebuffer(gl.FRAMEBUFFER,this.framebuffer);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,this.sceneTexture,0);gl.framebufferRenderbuffer(gl.FRAMEBUFFER,gl.DEPTH_STENCIL_ATTACHMENT,gl.RENDERBUFFER,this.sceneDepth);
+      this.postReady=gl.checkFramebufferStatus(gl.FRAMEBUFFER)===gl.FRAMEBUFFER_COMPLETE;
+      gl.bindTexture(gl.TEXTURE_2D,null);gl.bindRenderbuffer(gl.RENDERBUFFER,null);gl.bindFramebuffer(gl.FRAMEBUFFER,null);
+    }
     begin(w,h,vp,eye,space,p,time,yaw){
-      const gl=this.gl;gl.viewport(0,0,w,h);gl.clearColor(.04,.08,.12,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.disable(gl.DEPTH_TEST);for(const a of Object.values(this.attributes))gl.disableVertexAttribArray(a);gl.useProgram(this.skyProgram);
+      const gl=this.gl;this.resizeTarget(w,h);this.shadowQueue.length=0;this.width=w;this.height=h;gl.bindFramebuffer(gl.FRAMEBUFFER,this.postReady?this.framebuffer:null);gl.depthMask(true);gl.disable(gl.BLEND);gl.viewport(0,0,w,h);gl.clearColor(.04,.08,.12,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.disable(gl.DEPTH_TEST);for(const a of Object.values(this.attributes))gl.disableVertexAttribArray(a);gl.useProgram(this.skyProgram);
       gl.bindBuffer(gl.ARRAY_BUFFER,this.skyBuffer);gl.enableVertexAttribArray(this.skyAttribute);gl.vertexAttribPointer(this.skyAttribute,2,gl.FLOAT,false,8,0);
       const bottom=space?[.025,.05,.1]:p.id==='ember'?[.28,.17,.18]:p.id==='nix'?[.43,.59,.69]:p.id==='solara'?[.55,.45,.32]:p.id==='prisma'?[.37,.31,.53]:[.34,.5,.48];this.fog=bottom;
       gl.uniform3fv(this.skyUniforms.uTop,space?[.018,.025,.065]:[.045,.105,.17]);gl.uniform3fv(this.skyUniforms.uBottom,bottom);gl.uniform1f(this.skyUniforms.uTime,time);gl.uniform1f(this.skyUniforms.uSpace,space?1:0);gl.uniform1f(this.skyUniforms.uYaw,yaw);gl.drawArrays(gl.TRIANGLES,0,6);gl.disableVertexAttribArray(this.skyAttribute);
       gl.enable(gl.DEPTH_TEST);gl.useProgram(this.program);gl.uniformMatrix4fv(this.uniforms.uVP,false,vp);gl.uniform3fv(this.uniforms.uEye,eye);gl.uniform3fv(this.uniforms.uFog,bottom);gl.uniform2fv(this.uniforms.uFogRange,space?[1800,5500]:[650,2600]);
     }
-    draw(name,model=identity()){const b=this.buffers[name];if(!b||!b.count)return;const gl=this.gl,a=this.attributes;gl.uniformMatrix4fv(this.uniforms.uModel,false,model);gl.bindBuffer(gl.ARRAY_BUFFER,b.buffer);for(const[n,size,offset]of[['aPosition',3,0],['aNormal',3,12],['aColor',3,24],['aEmission',1,36]]){gl.enableVertexAttribArray(a[n]);gl.vertexAttribPointer(a[n],size,gl.FLOAT,false,40,offset);}gl.drawArrays(gl.TRIANGLES,0,b.count);}
+    draw(name,model=identity()){const b=this.buffers[name];if(!b)return;if(b.shadow)this.shadowQueue.push([b.shadow,model]);if(!b.count)return;const gl=this.gl,a=this.attributes;gl.uniformMatrix4fv(this.uniforms.uModel,false,model);gl.bindBuffer(gl.ARRAY_BUFFER,b.buffer);for(const[n,size,offset]of[['aPosition',3,0],['aNormal',3,12],['aColor',3,24],['aEmission',1,36]]){gl.enableVertexAttribArray(a[n]);gl.vertexAttribPointer(a[n],size,gl.FLOAT,false,40,offset);}gl.drawArrays(gl.TRIANGLES,0,b.count);}
+    end(){
+      const gl=this.gl;gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.depthMask(false);gl.enable(gl.POLYGON_OFFSET_FILL);gl.polygonOffset(-1,-1);
+      for(const[name,model]of this.shadowQueue)this.draw(name,model);
+      gl.disable(gl.POLYGON_OFFSET_FILL);gl.depthMask(true);gl.disable(gl.BLEND);
+      if(!this.postReady)return;
+      gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.disable(gl.DEPTH_TEST);for(const a of Object.values(this.attributes))gl.disableVertexAttribArray(a);
+      gl.useProgram(this.postProgram);gl.bindBuffer(gl.ARRAY_BUFFER,this.skyBuffer);gl.enableVertexAttribArray(this.postAttribute);gl.vertexAttribPointer(this.postAttribute,2,gl.FLOAT,false,8,0);
+      gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,this.sceneTexture);gl.uniform1i(this.postScene,0);gl.uniform2f(this.postPixel,1/this.width,1/this.height);gl.drawArrays(gl.TRIANGLES,0,6);gl.bindTexture(gl.TEXTURE_2D,null);gl.disableVertexAttribArray(this.postAttribute);gl.enable(gl.DEPTH_TEST);
+    }
   }
-  function shadow(b,x,y,z,r,p){b.cone(x,y+.22,z,r,r,.08,tint(p.dark,.74),12);}
+  function shadow(b,x,y,z,r,p){
+    const opaque=b.data;b.data=b.shadowData;const levels=[0,.32,.66,1],alpha=[.3,.24,.09,0],sides=16,co=tint(p.dark,.42),up=[0,1,0];
+    const pt=(level,i)=>{const a=i/sides*TAU,xx=x+Math.cos(a)*r*1.3*level,zz=z+Math.sin(a)*r*1.3*level;return[xx,heightAt(xx,zz,p)+.65,zz];};
+    // Reuse samples across triangles; keep shadows in a pass with no depth writes.
+    const grid=levels.map(level=>Array.from({length:sides+1},(_,i)=>pt(level,i)));
+    for(let j=0;j<3;j++)for(let i=0;i<sides;i++){const a=grid[j][i],bb=grid[j][i+1],c=grid[j+1][i+1],d=grid[j+1][i],inner=-1-alpha[j],outer=-1-alpha[j+1];
+      if(j)b.tri(a,c,bb,co,0,[up,up,up],null,[inner,outer,inner]);b.tri(a,d,c,co,0,[up,up,up],null,[inner,outer,outer]);
+    }b.data=opaque;
+  }
   function resourceModel(b,n,p){
     const x=n.x,z=n.y,y=heightAt(x,z,p),s=n.size||1;shadow(b,x,y,z,27*s,p);
     b.at(x,y,z,s,n.rotation||0,()=>{
@@ -89,22 +177,22 @@
     const y=heightAt(d.x,d.z,p);shadow(b,d.x,y,d.z,36*d.s,p);
     b.at(d.x,y,d.z,d.s,d.a,()=>{
       if(p.id==='nix'||p.id==='prisma'){b.cone(0,0,0,20,15,100,p.id==='nix'?'#8faac5':'#ad8dcd',5);b.cone(0,100,0,15,0,43,p.light,5);b.cone(20,0,7,13,0,80,p.color,5);}
-      else if(d.kind===0){b.cone(0,0,0,8,5,92,'#849889',7);b.cone(0,81,0,46,38,14,tint(p.flora,.83),10);b.sphere(0,100,0,49,21,48,p.flora,10,5);b.sphere(-14,112,6,12,3,11,p.light,6,3);b.sphere(15,115,-10,8,3,8,p.light,6,3);}
+      else if(d.kind===0){b.cone(0,0,0,8,5,92,'#849889',12);b.sphere(0,86,0,46,8,44,tint(p.flora,.83),18,8);b.sphere(0,100,0,49,21,48,p.flora,20,12);b.sphere(-14,116,6,12,3,11,p.light,10,5);b.sphere(15,118,-10,8,3,8,p.light,10,5);}
       else if(d.kind===1){b.cone(0,0,0,9,4,73,'#788e76',7);b.sphere(0,86,0,41,40,40,p.flora,8,5);b.sphere(-23,74,5,25,29,27,tint(p.flora,.88),8,5);b.sphere(26,93,-9,29,26,29,p.light,8,5);}
       else{for(let i=0;i<5;i++){const a=i/5*TAU;b.tube([0,0,0],[Math.sin(a)*20,40+i%2*13,Math.cos(a)*20],3,1,p.flora,4);b.sphere(Math.sin(a)*20,40+i%2*13,Math.cos(a)*20,8,16,8,p.light,6,4);}}
     });
   }
   function astronautModel(b,time,moving){
     const step=moving?Math.sin(time*12)*5:0;
-    b.box(-8,8+step,0,10,17,13,'#b8c9ca');b.box(8,8-step,0,10,17,13,'#d8e2db');
-    b.box(0,30,0,29,30,21,'#e8ece2');b.box(0,33,-16,21,24,12,'#93ad9e');b.box(0,37,-23,13,8,2,'#c0ec94',.4);
+    b.roundedBox(-8,8+step,0,10,17,13,3,'#b8c9ca');b.roundedBox(8,8-step,0,10,17,13,3,'#d8e2db');
+    b.roundedBox(0,30,0,29,30,21,5,'#e8ece2');b.roundedBox(0,33,-16,21,24,12,3,'#93ad9e');b.box(0,37,-23,13,8,2,'#c0ec94',.4);
     b.tube([-19,38,0],[-22,19,-step],5,5,'#d7e3d5',7);b.tube([19,37,0],[22,22,step],5,5,'#edf2e5',7);
-    b.sphere(0,56,0,21,21,20,'#f1f3e8',12,8);b.sphere(0,57,15,16,12,9,'#367d91',10,6,.18);b.box(-4,62,23,13,2,1,'#b6eeeb',.6);b.box(0,37,11.1,13,8,2,'#66857e');b.box(1,38,12.5,4,3,1,'#bff28d',.5);
+    b.sphere(0,56,0,21,21,20,'#f1f3e8',24,14);b.sphere(0,57,15,16,12,9,'#367d91',24,14,.18);b.box(-4,62,23,13,2,1,'#b6eeeb',.6);b.box(0,37,11.1,13,8,2,'#66857e');b.box(1,38,12.5,4,3,1,'#bff28d',.5);
     b.tube([24,23,8],[24,26,24],4,2,'#759b9f',6);
   }
   function spaceshipModel(b,time,space,moving){
-    b.tube([0,28,-52],[0,28,52],21,15,'#d7e6de',10);b.tube([0,28,52],[0,28,79],15,0,'#eff4e5',10);
-    b.sphere(0,41,26,18,13,29,'#33788d',10,6,.1);b.sphere(-5,48,35,7,2,12,'#93d1d2',6,4,.15);
+    b.tube([0,28,-52],[0,28,52],21,15,'#d7e6de',24);b.tube([0,28,52],[0,28,79],15,0,'#eff4e5',24);
+    b.sphere(0,41,26,18,13,29,'#33788d',24,14,.1);b.sphere(-5,48,35,7,2,12,'#93d1d2',12,8,.15);
     for(const sign of[-1,1]){
       b.quad([sign*17,29,27],[sign*79,15,-31],[sign*68,16,-48],[sign*12,28,-40],'#a9c3bd');b.quad([sign*17,32,27],[sign*12,32,-40],[sign*68,20,-48],[sign*79,19,-31],'#d8e5d5');
       b.tube([sign*44,20,-47],[sign*44,20,-4],10,8,'#b8d0c8',8);b.tube([sign*44,20,-50],[sign*44,20,-45],7,8,'#528c97',8,.3);
@@ -150,7 +238,7 @@
       for(const sign of[-1,1]){b.tube([sign*9,29,12],[sign*10,40,14],3,3,s.color,6);b.sphere(sign*10,41,17,3,4,3,'#214650',6,4);b.sphere(sign*31,24,23,8,6,8,s.color,7,4);}
     }else{
       const floating=s.shape==='float',y=floating?41+bob*2:24+Math.abs(bob);
-      b.sphere(0,y,0,22,25,20,s.color,s.shape==='prism'?5:10,7,floating?.12:0);
+      b.sphere(0,y,0,22,25,20,s.color,s.shape==='prism'?5:20,12,floating?.12:0,s.shape!=='prism');
       if(s.shape==='sprout'){b.tube([0,y+20,0],[0,y+38,0],2,1,s.dark,5);b.sphere(-8,y+36,0,10,3,5,'#a0d58b',7,4);b.sphere(7,y+42,0,10,4,6,'#d1f195',7,4);}
       if(s.shape==='fluff')for(const side of[-1,1])b.sphere(side*13,y+27,0,6,19,7,s.color,8,5);
       if(s.shape==='flame'){b.cone(-7,y+18,-3,8,0,26+Math.sin(time*5)*4,'#ffc180',5,.5);b.cone(5,y+18,0,9,0,35,'#ffe0a4',5,.4);}
@@ -163,7 +251,7 @@
   }
   function buildingModel(b,type,t){
     if(type==='habitat'){
-      b.box(0,4,0,115,8,103,'#739889');b.box(0,37,0,91,62,79,'#dce7d7');b.box(0,71,0,101,9,91,'#83aeb0');b.box(0,77,0,86,4,77,'#aec9bc');
+      b.roundedBox(0,4,0,115,8,103,3,'#739889');b.roundedBox(0,37,0,91,62,79,6,'#dce7d7');b.roundedBox(0,71,0,101,9,91,4,'#83aeb0');b.roundedBox(0,77,0,86,4,77,1.8,'#aec9bc');
       b.box(18,28,40,24,47,3,'#396972');b.box(27,25,42,3,3,2,'#d7efa9',.7);b.box(-23,44,40,25,18,3,'#73b5c4',.2);b.box(-46,42,0,2,21,41,'#5c97a4',.1);b.box(46,42,0,2,21,42,'#5895a0',.1);
       b.box(0,10,51,108,3,3,'#c3ef9d',.8);b.box(17,2,61,30,4,25,'#91aa96');b.box(17,6,55,28,4,13,'#bacfb1');b.tube([-31,73,-25],[-31,98,-25],2,1,'#b4d2c0',5);b.sphere(-31,98,-25,3,3,3,'#c6f6a4',7,4,.8);
     }else if(type==='solar'){
@@ -174,23 +262,24 @@
     }
   }
   function terrainBatch(p){
-    const b=new Batch(),random=rand(p.seed+900),step=75,limit=1725;
-    for(let z=-limit;z<limit;z+=step)for(let x=-limit;x<limit;x+=step){const color=p.ground[Math.floor(random()*p.ground.length)],a=[x,heightAt(x,z,p),z],bb=[x+step,heightAt(x+step,z,p),z],c=[x+step,heightAt(x+step,z+step,p),z+step],d=[x,heightAt(x,z+step,p),z+step];b.tri(a,c,bb,color);b.tri(a,d,c,tint(color,.97+random()*.07));}
-    // Distant mountains and trees form a true 3D horizon around each landing zone.
-    for(let i=0;i<32;i++){const a=i/32*TAU,r=1510+random()*140;b.cone(Math.sin(a)*r,-38,Math.cos(a)*r,120+random()*140,0,130+random()*260,tint(p.ground[2],.8+random()*.35),6);}
+    const b=new Batch(),random=rand(p.seed+900),step=50,limit=1750,grid=[];
+    for(let z=-limit;z<=limit;z+=step){const row=[];for(let x=-limit;x<=limit;x+=step)row.push({p:[x,heightAt(x,z,p),z],n:terrainNormal(x,z,p),c:terrainColor(x,z,p)});grid.push(row);}
+    for(let z=0;z<grid.length-1;z++)for(let x=0;x<grid[z].length-1;x++){const a=grid[z][x],bb=grid[z][x+1],c=grid[z+1][x+1],d=grid[z+1][x];b.tri(a.p,c.p,bb.p,a.c,0,[a.n,c.n,bb.n],[a.c,c.c,bb.c]);b.tri(a.p,d.p,c.p,a.c,0,[a.n,d.n,c.n],[a.c,d.c,c.c]);}
+    // Soft overlapping silhouettes blend into the planet's atmospheric horizon.
+    for(let i=0;i<28;i++){const a=i/28*TAU,r=1650+random()*100,h=120+random()*180,w=160+random()*190;b.sphere(Math.sin(a)*r,-65,Math.cos(a)*r,w,h,w*.85,tint(p.ground[2],.88+random()*.17),24,14);}
     for(let i=0;i<125;i++){const x=(random()-.5)*2650,z=(random()-.5)*2650;if(Math.hypot(x,z)<340)continue;treeModel(b,{x,z,s:.55+random()*.9,a:random()*TAU,kind:Math.floor(random()*3)},p);}
     for(let i=0;i<550;i++){const x=(random()-.5)*2850,z=(random()-.5)*2850;if(Math.hypot(x,z)<160)continue;const y=heightAt(x,z,p);b.cone(x,y,z,2.4,0,7+random()*9,tint(p.flora,.8),3);}
     const ground=heightAt(0,0,p);b.cone(0,ground,0,113,113,1.4,tint(p.ground[4],1.04),48);b.ring(0,ground+1.6,0,103,1.2,'#b9d7a1',.15);
     for(let i=0;i<8;i++){const a=i/8*TAU;b.box(Math.sin(a)*109,ground+2.5,Math.cos(a)*109,4,3,4,'#d7f6b5',.6);}
-    b.at(0,ground+2,0,1,Math.PI,()=>spaceshipModel(b,0,false,false));
+    shadow(b,0,ground,0,70,p);b.at(0,ground+2,0,1,Math.PI,()=>spaceshipModel(b,0,false,false));
     // A visible moon is geometry in the same scene, without downloaded textures.
-    b.sphere(-980,690,-1470,285,285,285,tint(p.light,.74),22,16,.55);
+    b.sphere(-980,690,-1470,285,285,285,tint(p.light,.74),40,24,.55);
     return b.array();
   }
   function spaceBatch(){
     const b=new Batch();
     for(const p of PLANETS){
-      b.sphere(p.x,0,p.y,p.r,p.r,p.r,p.color,26,18,.06);
+      b.sphere(p.x,0,p.y,p.r,p.r,p.r,p.color,40,24,.06);
       const r=rand(p.seed);for(let j=0;j<12;j++){const theta=r()*TAU,phi=Math.acos(r()*2-1),v=[Math.sin(phi)*Math.cos(theta),Math.cos(phi),Math.sin(phi)*Math.sin(theta)],rr=p.r*(.08+r()*.12);b.sphere(p.x+v[0]*(p.r-rr*.08),v[1]*(p.r-rr*.08),p.y+v[2]*(p.r-rr*.08),rr,rr*.7,rr,p.id==='verdant'?p.dark:p.light,8,5,.06);}
       if(p.id==='prisma')b.ring(p.x,0,p.y,p.r*1.4,p.r*.2,'#9a83bb',.4);
     }
@@ -300,7 +389,7 @@
       if(!space){if(this.planetId!==p.id){this.planetId=p.id;this.engine.upload('terrain',terrainBatch(p));this.objectKey='';}this.rebuildObjects();}
       this.engine.begin(this.canvas.width,this.canvas.height,this.vp,this.eye,space,p,s.time,this.yaw);
       if(space)this.engine.draw('space');else{this.engine.draw('terrain');this.engine.draw('objects');}
-      this.drawActors();this.engine.upload('dynamic',this.dynamicBatch(dt),true);this.engine.draw('dynamic');this.drawFX();this.radarTimer+=dt;if(this.radarTimer>.1){this.radarTimer=0;this.drawRadar();}
+      this.drawActors();this.engine.upload('dynamic',this.dynamicBatch(dt),true);this.engine.draw('dynamic');this.engine.end();this.drawFX();this.radarTimer+=dt;if(this.radarTimer>.1){this.radarTimer=0;this.drawRadar();}
     }
     drawFX(){
       const c=this.fc,w=this.width,h=this.height,g=this.game,s=g.state,p=g.planet(),amount=this.immersive?this.intensity:0;c.setTransform(this.dpr,0,0,this.dpr,0,0);c.clearRect(0,0,w,h);
@@ -323,6 +412,6 @@
       c.fillStyle='#d9f4ac';c.beginPath();c.moveTo(80,58);c.lineTo(84,69);c.lineTo(80,67);c.lineTo(76,69);c.fill();c.restore();c.strokeStyle='#a5bfb83d';c.beginPath();c.arc(80,64,57,0,TAU);c.stroke();
     }
   }
-  root.Orbit3D={Batch,GLScene,Renderer,shaders,heightAt,terrainBatch,spaceBatch,perspective,lookAt,multiply,transform,resourceModel,buildingModel,spaceshipModel,lifeModel,astronautModel};
+  root.Orbit3D={Batch,GLScene,Renderer,shaders,heightAt,terrainNormal,terrainColor,terrainBatch,spaceBatch,perspective,lookAt,multiply,transform,resourceModel,buildingModel,spaceshipModel,lifeModel,astronautModel};
   root.OrbitRenderer={Renderer,...root.OrbitPortraits};
 })(typeof globalThis!=='undefined'?globalThis:this);

@@ -4,7 +4,7 @@ import shareFeature from "./patch/share-feature.txt";
 import siteReady from "./patch/adsense-ready.txt";
 import {homePage,guidePage,aboutPage,updatesPage,privacyPage,termsPage,contactPage,notFoundPage,robots,sitemap} from "./site.js";
 
-const BUILD="justgame-immersive-20260913-v10";
+const BUILD="justgame-smooth-graphics-20260914-v11";
 const ADSENSE_CLIENT="ca-pub-6073295964667681";
 const ADSENSE_SNIPPET=`<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}" crossorigin="anonymous"></script>`;
 let gameHtmlPromise;

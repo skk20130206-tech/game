@@ -88,7 +88,31 @@ test('every species and biome produces finite 3D mesh data', async () => {
   vm.runInContext(await readFile(new URL('../game/renderer-3d.js',import.meta.url),'utf8'),context);
   const {Batch,lifeModel,terrainBatch}=context.Orbit3D;
   for(const id of Object.keys(SPECIES)){const b=new Batch();lifeModel(b,id,1,true);const data=b.array();assert.ok(data.length>100);assert.ok(data.every(Number.isFinite),id);}
-  for(const p of PLANETS)assert.ok(terrainBatch(p).every(Number.isFinite),p.id);
+  for(const p of PLANETS){const data=terrainBatch(p);assert.ok(data.every(Number.isFinite),p.id);assert.ok(data.shadows.every(Number.isFinite));}
+});
+
+test('curved surfaces have outward, continuous unit normals and shadows fade to zero', async () => {
+  const context=vm.createContext({OrbitCore:require('../game/core.js'),Float32Array,Math});
+  vm.runInContext(await readFile(new URL('../game/renderer-3d.js',import.meta.url),'utf8'),context);
+  const {Batch,resourceModel,terrainNormal,terrainColor}=context.Orbit3D,b=new Batch();
+  b.sphere(0,0,0,30,20,12,'#aabbcc',16,9);
+  const data=b.array(),normals=new Map();
+  for(let i=0;i<data.length;i+=10){
+    const position=Array.from(data.slice(i,i+3)),normal=Array.from(data.slice(i+3,i+6));
+    assert.ok(Math.abs(Math.hypot(...normal)-1)<1e-5);
+    assert.ok(position.reduce((sum,v,k)=>sum+v*normal[k],0)>0,'sphere lighting must face outward');
+    const key=position.map(v=>v.toFixed(4)).join(',');
+    if(normals.has(key))normal.forEach((v,k)=>assert.ok(Math.abs(v-normals.get(key)[k])<1e-5));
+    normals.set(key,normal);
+  }
+  for(const p of PLANETS){
+    const n=terrainNormal(480,300,p);assert.ok(n[1]>0&&Math.abs(Math.hypot(...n)-1)<1e-6);
+    const left=terrainColor(499.999,300,p),right=terrainColor(500.001,300,p);left.forEach((v,i)=>assert.ok(Math.abs(v-right[i])<.0001,'tile boundaries must not change color'));
+  }
+  const rock=new Batch();resourceModel(rock,{x:0,y:0,type:'iron',hp:4,maxHp:4},PLANETS[0]);
+  const shadows=rock.array().shadows;assert.ok(shadows?.length>0);let transparent=false,visible=false;
+  for(let i=9;i<shadows.length;i+=10){const alpha=-shadows[i]-1;assert.ok(alpha>=0&&alpha<=.31);transparent||=alpha===0;visible||=alpha>.2;}
+  assert.ok(transparent&&visible,'contact shadows need both a visible center and a transparent edge');
 });
 
 test('Worker serves current game, all content pages, existing ads separation and health', async () => {
