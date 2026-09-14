@@ -5,7 +5,7 @@ import siteReady from "./patch/adsense-ready.txt";
 import modelPackV2 from "./patch/model-pack-v2.txt";
 import {homePage,guidePage,aboutPage,updatesPage,privacyPage,termsPage,contactPage,notFoundPage,robots,sitemap} from "./site.js";
 
-const BUILD="justgame-procedural-model-pack-20260914-v12";
+const BUILD="justgame-industrial-lander-20260914-v13";
 const ADSENSE_CLIENT="ca-pub-6073295964667681";
 const ADSENSE_SNIPPET=`<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}" crossorigin="anonymous"></script>`;
 let gameHtmlPromise;
@@ -39,12 +39,12 @@ function injectModelPack(html){
   if(shipStart<0||shipEnd<0||shipEnd<=shipStart) throw new Error("3D spaceship model markers not found");
   html=html.slice(0,shipStart)+modelPackV2.trimEnd()+"\n"+html.slice(shipEnd);
 
-  // Keep the gameplay exhaust aligned with the Mk II nacelle positions.
+  // Keep gameplay exhaust aligned with the industrial lander's twin rear engine cores.
   html=html.replace(
     "for(const side of[-1,1])b.cone(side*39,23,-54,5,0,-(32+Math.sin(t*30)*6)*(g.boosting?2:1),'#adeffe',7,1);",
-    "for(const side of[-1,1])b.cone(side*43,22,-63,6,0,-(38+Math.sin(t*30)*7)*(g.boosting?2:1),'#8cecff',9,1);"
+    "for(const side of[-1,1]){b.tube([side*54,45,-123],[side*54,45,-168-(g.boosting?28:0)-Math.sin(t*30)*6],9,0,'#8cecff',9,1);b.tube([side*54,45,-123],[side*54,45,-150],4,0,'#fff1c6',7,1);}"
   );
-  if(!html.includes("ORBIT Explorer Mk II")||!html.includes("#e89a45")) throw new Error("3D model pack injection failed");
+  if(!html.includes("ORBIT Explorer Mk II")||!html.includes("#e89a45")||!html.includes("heavy industrial survey lander")) throw new Error("3D model pack injection failed");
   return html;
 }
 
@@ -80,7 +80,7 @@ export default {
       try{
         if(!gameHtmlPromise) gameHtmlPromise=loadGameHtml();
         const html=await gameHtmlPromise;
-        return new Response(JSON.stringify({ok:true,build:BUILD,rendering:"WebGL 3D",modelSystem:"procedural-v2",spaceshipModel:"ORBIT Explorer Mk II",external3DDependency:false,immersive:true,creatureCare:true,companions:true,relics:15,htmlLength:html.length,creatures:11,mystic:true,startScreen:true,share:true,adsenseReviewReady:true,adsenseClient:ADSENSE_CLIENT,adsenseSnippetOnContentPages:true,gameRoute:"/play",contentPages:["/","/guide","/about","/updates","/privacy","/terms","/contact"],playAds:false,preApprovalAdPlaceholders:false}),{headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store",...securityHeaders}});
+        return new Response(JSON.stringify({ok:true,build:BUILD,rendering:"WebGL 3D",modelSystem:"procedural-reference-v3",spaceshipModel:"ORBIT Explorer Mk II",spaceshipStyle:"heavy industrial survey lander",external3DDependency:false,immersive:true,creatureCare:true,companions:true,relics:15,htmlLength:html.length,creatures:11,mystic:true,startScreen:true,share:true,adsenseReviewReady:true,adsenseClient:ADSENSE_CLIENT,adsenseSnippetOnContentPages:true,gameRoute:"/play",contentPages:["/","/guide","/about","/updates","/privacy","/terms","/contact"],playAds:false,preApprovalAdPlaceholders:false}),{headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store",...securityHeaders}});
       }catch(error){
         gameHtmlPromise=undefined;
         return new Response(JSON.stringify({ok:false,build:BUILD,error:error instanceof Error?error.message:String(error)}),{status:500,headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store",...securityHeaders}});
