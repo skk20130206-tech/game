@@ -1,0 +1,75 @@
+  function spaceshipModel(b,time,space,moving){
+    // ORBIT Explorer Mk II — fully procedural browser-game mesh.
+    // The model intentionally uses only Batch primitives so it needs no downloaded 3D asset.
+    const hull='#e7ece8',hullShade='#aebfc0',panel='#72878b',dark='#263f4a',glass='#285f73',glassHi='#7cc8d5',accent='#e89a45',lime='#c3f379',glow='#8cecff';
+
+    // Main fuselage: layered volumes give the ship a manufactured, panelled silhouette.
+    b.tube([0,29,-47],[0,29,47],24,17,hull,24);
+    b.tube([0,29,43],[0,29,78],17,1,hull,24);
+    b.tube([0,24,-57],[0,24,-30],20,24,hullShade,20);
+    b.roundedBox(0,31,-14,36,16,48,6,hullShade);
+    b.roundedBox(0,20,-20,31,8,34,4,dark);
+
+    // Cockpit canopy and forward sensor brow.
+    b.sphere(0,43,27,20,13,31,glass,28,16,.12);
+    b.sphere(0,45,31,16,8,25,glassHi,24,12,.15);
+    b.roundedBox(0,52,5,17,4,25,2,dark);
+    b.box(0,53,14,10,2,13,lime,.65);
+    b.box(0,33,76,8,3,5,accent,.65);
+
+    // Dorsal spine, antenna and center engine housing.
+    b.roundedBox(0,49,-24,16,9,34,4,panel);
+    b.tube([0,54,-30],[0,68,-38],3,1.3,hullShade,8);
+    b.sphere(0,69,-39,2.8,2.8,2.8,lime,8,5,.75);
+    b.tube([0,27,-63],[0,27,-50],9,12,dark,18);
+    b.tube([0,27,-66],[0,27,-61],7,9,glow,18,.65);
+
+    for(const sign of[-1,1]){
+      // Swept wings: double skins plus an inset dark panel keep the shape readable from above and below.
+      b.quad([sign*16,32,34],[sign*81,19,-20],[sign*72,18,-49],[sign*13,29,-34],hull);
+      b.quad([sign*16,36,30],[sign*13,33,-31],[sign*72,23,-47],[sign*81,24,-18],hullShade);
+      b.quad([sign*29,34,13],[sign*68,24,-20],[sign*61,23,-35],[sign*24,31,-22],dark);
+      b.quad([sign*35,35,4],[sign*64,26,-16],[sign*59,25,-24],[sign*31,32,-12],accent,.18);
+
+      // Main nacelles, intake rim and emissive rear ring.
+      b.tube([sign*43,22,-52],[sign*43,22,-2],13,10,hullShade,18);
+      b.sphere(sign*43,22,-12,14,13,24,hull,18,10);
+      b.tube([sign*43,22,-58],[sign*43,22,-48],10,13,dark,18);
+      b.tube([sign*43,22,-62],[sign*43,22,-57],8.5,10,glow,18,.75);
+      b.ring(sign*43,22,-63,9,2,glow,.9);
+      b.box(sign*43,34,-15,8,3,24,accent,.22);
+      b.box(sign*71,23,-24,6,3,13,lime,.8);
+
+      // Forward maneuvering pods and small navigation lamps.
+      b.sphere(sign*56,22,3,11,9,18,hull,16,9);
+      b.tube([sign*56,22,0],[sign*56,22,11],7,4,dark,12);
+      b.sphere(sign*56,22,12,4.5,4.5,4.5,glow,10,6,.72);
+      b.sphere(sign*76,25,-21,2.4,2.4,2.4,sign<0?'#ff9b77':'#9fffd0',7,5,.9);
+
+      // Landing gear deploys only when the craft is on a surface.
+      if(!space){
+        b.tube([sign*34,16,-24],[sign*43,2,-30],4,3,panel,8);
+        b.tube([sign*43,2,-30],[sign*49,0,-29],3,3,dark,8);
+        b.roundedBox(sign*49,1,-29,19,4,16,2,hullShade);
+      }
+
+      // Optional local exhaust is kept for static previews; gameplay adds a longer dynamic flame separately.
+      if(space&&moving){
+        const flicker=48+Math.sin(time*42)*9;
+        b.tube([sign*43,22,-63],[sign*43,22,-63-flicker],7,0,glow,10,1);
+        b.tube([sign*43,22,-63],[sign*43,22,-82],3,0,'#f1fff2',8,1);
+      }
+    }
+
+    // Ventral details, orange identity stripe, and nose contour.
+    b.roundedBox(0,20,25,18,5,43,2,dark);
+    b.box(0,24,48,6,3,31,accent,.18);
+    b.box(-12,34,55,4,3,16,accent,.25);
+    b.box(12,34,55,4,3,16,accent,.25);
+    b.tri([-9,34,70],[9,34,70],[0,35,82],hullShade);
+
+    if(!space){
+      b.tube([0,15,35],[0,1,43],4,3,panel,8);
+      b.roundedBox(0,1,46,20,4,17,2,hullShade);
+    }
+  }
