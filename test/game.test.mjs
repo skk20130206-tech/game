@@ -5,8 +5,19 @@ import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
 import { loadWorker } from '../scripts/load-worker.mjs';
 const require = createRequire(import.meta.url);
-const {Game, PLANETS, SPECIES, dist} = require('../game/core.js');
+const {Game, PLANETS, SPECIES, SURFACE_MAP_SCALE, WORLD_LIMIT, TERRAIN_LIMIT, dist} = require('../game/core.js');
 const tick = (g, seconds, input={}) => { for(let i=0;i<Math.round(seconds*60);i++)g.tick(1/60,input); };
+
+test('surface exploration map expands by at least 1.5x with matching world content', () => {
+  assert.equal(SURFACE_MAP_SCALE,1.5);
+  assert.equal(WORLD_LIMIT,1980);
+  assert.equal(TERRAIN_LIMIT,2625);
+  const g=new Game(),w=g.world(),maxNodeRadius=Math.max(...w.nodes.map(n=>Math.hypot(n.x,n.y)));
+  assert.ok(maxNodeRadius>1500,'resource field should reach the expanded outer region');
+  assert.deepEqual(w.relics.map(r=>[r.x,r.y]),[[-367.5,607.5],[1080,-735],[-1215,-1065]]);
+  const saved=g.snapshot();saved.player={x:WORLD_LIMIT+120,y:-WORLD_LIMIT-120,angle:0};
+  const loaded=new Game(saved);assert.equal(loaded.state.player.x,WORLD_LIMIT);assert.equal(loaded.state.player.y,-WORLD_LIMIT);
+});
 
 test('all five existing planets and eleven species survive v1 saves', () => {
   const old = new Game().snapshot();

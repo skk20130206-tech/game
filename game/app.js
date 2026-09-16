@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-  const {Game,PLANETS,SPECIES,BUILDINGS,RESOURCE_NAMES,dist,clamp}=window.OrbitCore;
+  const {Game,PLANETS,SPECIES,BUILDINGS,RESOURCE_NAMES,WORLD_LIMIT,dist,clamp}=window.OrbitCore;
   const {Renderer,drawPlanet,creature}=window.OrbitRenderer;
   const $=id=>document.getElementById(id),SAVE_KEY='orbit-frontier-save-v1',SOUND_KEY='orbit-frontier-sound';
   let saved=null,storageAvailable=true;
@@ -223,7 +223,7 @@
       if(target&&dist(target,game.state.player)<145){game.interact(target.id);processEvents();return;}
       if(target){game.pendingInteraction=target.id;game.moveTarget={x:target.x,y:target.y};toast('대상에게 다가가 상호작용합니다.');return;}
     }
-    game.pendingInteraction=null;const limit=game.state.mode==='surface'?1280:2250;game.moveTarget={x:clamp(p.x,-limit,limit),y:clamp(p.y,-limit,limit)};
+    game.pendingInteraction=null;const limit=game.state.mode==='surface'?WORLD_LIMIT-40:2250;game.moveTarget={x:clamp(p.x,-limit,limit),y:clamp(p.y,-limit,limit)};
   }
   $('world').addEventListener('pointerdown',e=>{
     if(e.button!==0||game.paused)return;ensureAudio();viewDrag={id:e.pointerId,x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY,dragged:false};$('world').setPointerCapture?.(e.pointerId);
@@ -259,7 +259,7 @@
     const lifecycle=new AbortController();window.addEventListener('pagehide',()=>lifecycle.abort(),{once:true});
     const register=tool=>{try{Promise.resolve(context.registerTool(tool,{signal:lifecycle.signal})).catch(()=>{});}catch(e){}};
     register({name:'read_exploration_state',title:'탐험 상태 읽기',description:'현재 행성, 위치, 자원, 목표와 가까운 생명체를 읽습니다.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true,untrustedContentHint:false},execute(){return game.nearbyState();}});
-    register({name:'start_explorer_movement',title:'탐험가 이동 시작',description:'현재 지역 안의 좌표로 이동을 시작합니다. 도착 완료를 의미하지 않습니다.',inputSchema:{type:'object',properties:{x:{type:'number'},y:{type:'number'}},required:['x','y'],additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:false},execute(input){if(!input||typeof input.x!=='number'||typeof input.y!=='number'||!Number.isFinite(input.x)||!Number.isFinite(input.y))return{ok:false,reason:'유한한 x, y 좌표가 필요합니다.'};if(game.paused||game.travel)return{ok:false,reason:'일시 정지 또는 항해 중입니다.'};const limit=game.state.mode==='surface'?1280:2250;if(Math.abs(input.x)>limit||Math.abs(input.y)>limit)return{ok:false,reason:'이동 가능 범위 밖입니다.'};game.moveTarget={x:input.x,y:input.y};hud();return{ok:true,status:'이동 시작',destination:{...game.moveTarget}};}});
+    register({name:'start_explorer_movement',title:'탐험가 이동 시작',description:'현재 지역 안의 좌표로 이동을 시작합니다. 도착 완료를 의미하지 않습니다.',inputSchema:{type:'object',properties:{x:{type:'number'},y:{type:'number'}},required:['x','y'],additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:false},execute(input){if(!input||typeof input.x!=='number'||typeof input.y!=='number'||!Number.isFinite(input.x)||!Number.isFinite(input.y))return{ok:false,reason:'유한한 x, y 좌표가 필요합니다.'};if(game.paused||game.travel)return{ok:false,reason:'일시 정지 또는 항해 중입니다.'};const limit=game.state.mode==='surface'?WORLD_LIMIT-40:2250;if(Math.abs(input.x)>limit||Math.abs(input.y)>limit)return{ok:false,reason:'이동 가능 범위 밖입니다.'};game.moveTarget={x:input.x,y:input.y};hud();return{ok:true,status:'이동 시작',destination:{...game.moveTarget}};}});
     register({name:'perform_exploration_action',title:'탐험 행동 실행',description:'주변 대상과 한 번 상호작용하거나 스캔, 이륙, 착륙, 연료 충전을 실행합니다. 자원·연료 등은 화면과 같은 규칙으로 바뀝니다.',inputSchema:{type:'object',properties:{action:{type:'string',enum:['interact','scan','launch','land','refuel']}},required:['action'],additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:false},execute(input){if(!input||!['interact','scan','launch','land','refuel'].includes(input.action))return{ok:false,reason:'지원하지 않는 행동입니다.'};const result=game[input.action]();processEvents();hud();return result;}});
   }
 })();

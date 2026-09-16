@@ -1,6 +1,6 @@
 (function(root){
   'use strict';
-  const{PLANETS,SPECIES,BUILDINGS,rand,clamp,dist}=root.OrbitCore,TAU=Math.PI*2;
+  const{PLANETS,SPECIES,BUILDINGS,SURFACE_MAP_SCALE,TERRAIN_LIMIT,rand,clamp,dist}=root.OrbitCore,TAU=Math.PI*2;
   const rgb=h=>{if(Array.isArray(h))return h;let n=parseInt(h.slice(1,7),16);return[(n>>16&255)/255,(n>>8&255)/255,(n&255)/255];};
   const tint=(h,f)=>rgb(h).map(v=>clamp(v*f,0,1));
   const sub=(a,b)=>a.map((v,i)=>v-b[i]);
@@ -143,7 +143,7 @@
       gl.bindBuffer(gl.ARRAY_BUFFER,this.skyBuffer);gl.enableVertexAttribArray(this.skyAttribute);gl.vertexAttribPointer(this.skyAttribute,2,gl.FLOAT,false,8,0);
       const bottom=space?[.025,.05,.1]:p.id==='ember'?[.28,.17,.18]:p.id==='nix'?[.43,.59,.69]:p.id==='solara'?[.55,.45,.32]:p.id==='prisma'?[.37,.31,.53]:[.34,.5,.48];this.fog=bottom;
       gl.uniform3fv(this.skyUniforms.uTop,space?[.018,.025,.065]:[.045,.105,.17]);gl.uniform3fv(this.skyUniforms.uBottom,bottom);gl.uniform1f(this.skyUniforms.uTime,time);gl.uniform1f(this.skyUniforms.uSpace,space?1:0);gl.uniform1f(this.skyUniforms.uYaw,yaw);gl.drawArrays(gl.TRIANGLES,0,6);gl.disableVertexAttribArray(this.skyAttribute);
-      gl.enable(gl.DEPTH_TEST);gl.useProgram(this.program);gl.uniformMatrix4fv(this.uniforms.uVP,false,vp);gl.uniform3fv(this.uniforms.uEye,eye);gl.uniform3fv(this.uniforms.uFog,bottom);gl.uniform2fv(this.uniforms.uFogRange,space?[1800,5500]:[650,2600]);
+      gl.enable(gl.DEPTH_TEST);gl.useProgram(this.program);gl.uniformMatrix4fv(this.uniforms.uVP,false,vp);gl.uniform3fv(this.uniforms.uEye,eye);gl.uniform3fv(this.uniforms.uFog,bottom);gl.uniform2fv(this.uniforms.uFogRange,space?[1800,5500]:[650,2600*SURFACE_MAP_SCALE]);
     }
     draw(name,model=identity()){const b=this.buffers[name];if(!b)return;if(b.shadow)this.shadowQueue.push([b.shadow,model]);if(!b.count)return;const gl=this.gl,a=this.attributes;gl.uniformMatrix4fv(this.uniforms.uModel,false,model);gl.bindBuffer(gl.ARRAY_BUFFER,b.buffer);for(const[n,size,offset]of[['aPosition',3,0],['aNormal',3,12],['aColor',3,24],['aEmission',1,36]]){gl.enableVertexAttribArray(a[n]);gl.vertexAttribPointer(a[n],size,gl.FLOAT,false,40,offset);}gl.drawArrays(gl.TRIANGLES,0,b.count);}
     end(){
@@ -451,13 +451,13 @@
     }
   }
   function terrainBatch(p){
-    const b=new Batch(),random=rand(p.seed+900),step=50,limit=1750,grid=[];
+    const b=new Batch(),random=rand(p.seed+900),step=50,limit=TERRAIN_LIMIT,grid=[];
     for(let z=-limit;z<=limit;z+=step){const row=[];for(let x=-limit;x<=limit;x+=step)row.push({p:[x,heightAt(x,z,p),z],n:terrainNormal(x,z,p),c:terrainColor(x,z,p)});grid.push(row);}
     for(let z=0;z<grid.length-1;z++)for(let x=0;x<grid[z].length-1;x++){const a=grid[z][x],bb=grid[z][x+1],c=grid[z+1][x+1],d=grid[z+1][x];b.tri(a.p,c.p,bb.p,a.c,0,[a.n,c.n,bb.n],[a.c,c.c,bb.c]);b.tri(a.p,d.p,c.p,a.c,0,[a.n,d.n,c.n],[a.c,d.c,c.c]);}
     // Soft overlapping silhouettes blend into the planet's atmospheric horizon.
-    for(let i=0;i<28;i++){const a=i/28*TAU,r=1650+random()*100,h=120+random()*180,w=160+random()*190;b.sphere(Math.sin(a)*r,-65,Math.cos(a)*r,w,h,w*.85,tint(p.ground[2],.88+random()*.17),24,14);}
-    for(let i=0;i<125;i++){const x=(random()-.5)*2650,z=(random()-.5)*2650;if(Math.hypot(x,z)<340)continue;treeModel(b,{x,z,s:.55+random()*.9,a:random()*TAU,kind:Math.floor(random()*3)},p);}
-    for(let i=0;i<550;i++){const x=(random()-.5)*2850,z=(random()-.5)*2850;if(Math.hypot(x,z)<160)continue;const y=heightAt(x,z,p);b.cone(x,y,z,2.4,0,7+random()*9,tint(p.flora,.8),3);}
+    for(let i=0;i<28;i++){const a=i/28*TAU,r=(TERRAIN_LIMIT-100)+random()*100,h=120+random()*180,w=160+random()*190;b.sphere(Math.sin(a)*r,-65,Math.cos(a)*r,w,h,w*.85,tint(p.ground[2],.88+random()*.17),24,14);}
+    for(let i=0;i<125;i++){const x=(random()-.5)*2650*SURFACE_MAP_SCALE,z=(random()-.5)*2650*SURFACE_MAP_SCALE;if(Math.hypot(x,z)<340)continue;treeModel(b,{x,z,s:.55+random()*.9,a:random()*TAU,kind:Math.floor(random()*3)},p);}
+    for(let i=0;i<550;i++){const x=(random()-.5)*2850*SURFACE_MAP_SCALE,z=(random()-.5)*2850*SURFACE_MAP_SCALE;if(Math.hypot(x,z)<160)continue;const y=heightAt(x,z,p);b.cone(x,y,z,2.4,0,7+random()*9,tint(p.flora,.8),3);}
     const ground=heightAt(0,0,p);b.cone(0,ground,0,113,113,1.4,tint(p.ground[4],1.04),48);b.ring(0,ground+1.6,0,103,1.2,'#b9d7a1',.15);
     for(let i=0;i<8;i++){const a=i/8*TAU;b.box(Math.sin(a)*109,ground+2.5,Math.cos(a)*109,4,3,4,'#d7f6b5',.6);}
     shadow(b,0,ground,0,87,p);b.at(0,ground+2,0,1,Math.PI,()=>spaceshipModel(b,0,false,false));

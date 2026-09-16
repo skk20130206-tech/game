@@ -1,6 +1,6 @@
 (function(root){
   'use strict';
-  const VERSION=1, WORLD_LIMIT=1320, TAU=Math.PI*2;
+  const VERSION=1, SURFACE_MAP_SCALE=1.5, WORLD_LIMIT=Math.round(1320*SURFACE_MAP_SCALE), TERRAIN_LIMIT=Math.round(1750*SURFACE_MAP_SCALE), TAU=Math.PI*2;
   const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
   const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
   function rand(seed){let s=seed>>>0;return()=>{s+=0x6D2B79F5;let t=s;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}
@@ -73,21 +73,22 @@
     planet(){return PLANETS.find(p=>p.id===this.state.planet);}
     makeWorld(p){
       const random=rand(p.seed),nodes=[],creatures=[];
+      const resourceRadius=970*SURFACE_MAP_SCALE, creatureSpread=1900*SURFACE_MAP_SCALE;
       const fixed=[{x:190,y:115,type:'iron'},{x:285,y:65,type:'iron'},{x:185,y:230,type:'biomass'},{x:65,y:265,type:'biomass'},{x:-155,y:90,type:'crystal'},{x:-260,y:-70,type:'crystal'}];
       for(let i=0;i<140;i++){
-        const a=random()*TAU,d=330+Math.sqrt(random())*970;
+        const a=random()*TAU,d=330+Math.sqrt(random())*resourceRadius;
         const special=p.id==='solara'?'iron':(p.id==='nix'||p.id==='prisma')?'crystal':p.id==='verdant'?'biomass':'iron';
         fixed.push({x:Math.cos(a)*d,y:Math.sin(a)*d,type:random()<.36?special:['iron','crystal','biomass'][Math.floor(random()*3)]});
       }
       fixed.forEach((n,i)=>{const maxHp=n.type==='iron'?4:n.type==='crystal'?3:2;nodes.push({...n,id:p.id+'-node-'+i,hp:maxHp,maxHp,respawnAt:0,size:.8+random()*.5,rotation:random()*TAU,seed:Math.floor(random()*10000)});});
       p.species.forEach((species,i)=>{
         for(let j=0;j<3;j++){
-          const x=j===0?([365,-420,430][i%3]):(random()-.5)*1900;
-          const y=j===0?([225,-280,-330][i%3]):(random()-.5)*1900;
+          const x=j===0?([365,-420,430][i%3]):(random()-.5)*creatureSpread;
+          const y=j===0?([225,-280,-330][i%3]):(random()-.5)*creatureSpread;
           creatures.push({id:p.id+'-life-'+i+'-'+j,species,x,y,homeX:x,homeY:y,phase:random()*TAU,angle:random()*TAU});
         }
       });
-      const relics=[[-245,405],[720,-490],[-810,-710]].map(([x,y],i)=>({id:p.id+'-relic-'+i,x,y,name:['별빛 기록석','잊힌 항로 표식','공명 수정 유적'][i]}));
+      const relics=[[-245,405],[720,-490],[-810,-710]].map(([x,y],i)=>({id:p.id+'-relic-'+i,x:x*SURFACE_MAP_SCALE,y:y*SURFACE_MAP_SCALE,name:['별빛 기록석','잊힌 항로 표식','공명 수정 유적'][i]}));
       return{nodes,creatures,buildings:[],relics};
     }
     ensureWorld(id){if(!this.state.worlds[id])this.state.worlds[id]=this.makeWorld(PLANETS.find(p=>p.id===id));return this.state.worlds[id];}
@@ -320,7 +321,7 @@
     goals(){const s=this.state;return[{text:'철광석 12개, 바이오매스 8개 모으기',done:s.stats.collected.iron>=12&&s.stats.collected.biomass>=8},{text:'나만의 집 한 채 짓기',done:Object.values(s.worlds).some(w=>w.buildings.some(b=>b.type==='habitat'))},{text:'낯선 생명체와 친구 되기',done:s.met.length>0},{text:'우주선을 타고 두 번째 행성 탐험',done:s.visited.length>=2}];}
     nearbyState(){return{mode:this.state.mode,planet:this.planet().name,player:{...this.state.player},ship:{...this.state.ship},inventory:{...this.state.inventory},oxygen:Math.round(this.state.oxygen),fuel:Math.round(this.state.fuel),visited:[...this.state.visited],discovered:[...this.state.discovered],met:[...this.state.met],goals:this.goals(),nearby:this.state.mode==='surface'?{resources:this.world().nodes.filter(n=>n.hp>0&&dist(n,this.state.player)<350).map(n=>({id:n.id,type:n.type,x:n.x,y:n.y,hp:n.hp})),creatures:this.world().creatures.filter(c=>dist(c,this.state.player)<500).map(c=>({id:c.id,species:c.species,x:c.x,y:c.y})),buildings:this.world().buildings}:null};}
   }
-  const exports={Game,PLANETS,SPECIES,BUILDINGS,RESOURCE_NAMES,WORLD_LIMIT,rand,clamp,dist};
+  const exports={Game,PLANETS,SPECIES,BUILDINGS,RESOURCE_NAMES,SURFACE_MAP_SCALE,WORLD_LIMIT,TERRAIN_LIMIT,rand,clamp,dist};
   if(typeof module!=='undefined'&&module.exports)module.exports=exports;
   root.OrbitCore=exports;
 })(typeof globalThis!=='undefined'?globalThis:this);
