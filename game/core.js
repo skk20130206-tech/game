@@ -172,8 +172,9 @@
       if(n.kind==='planet')return this.land(n.entity.id);
       if(n.kind==='node'){
         const node=n.entity;this.cooldown=.38;node.hp--;this.beam={x:node.x,y:node.y,life:.28};
-        this.emit('effect',{kind:'mine',x:node.x,y:node.y,color:node.type==='crystal'?'#bccfff':node.type==='biomass'?'#c3f379':'#cad9df'});
-        if(node.hp<=0){const amount=node.type==='iron'?6:node.type==='biomass'?5:4;this.addResource(node.type,amount);this.state.stats.mined++;node.respawnAt=this.state.time+150;this.emit('message',{text:RESOURCE_NAMES[node.type]+' +'+amount});this.emit('effect',{kind:'collect',x:node.x,y:node.y,color:this.planet().accent,label:'+'+amount+' '+RESOURCE_NAMES[node.type]});this.emit('save');}
+        const nodeColor=node.type==='crystal'?'#bccfff':node.type==='biomass'?'#c3f379':'#cad9df',broken=node.hp<=0;
+        this.emit('effect',{kind:'mine',x:node.x,y:node.y,color:nodeColor,nodeType:node.type,remaining:node.hp,maxHp:node.maxHp,broken});
+        if(broken){const amount=node.type==='iron'?6:node.type==='biomass'?5:4;this.addResource(node.type,amount);this.state.stats.mined++;node.respawnAt=this.state.time+150;this.emit('message',{text:RESOURCE_NAMES[node.type]+' +'+amount});this.emit('effect',{kind:'break',x:node.x,y:node.y,color:nodeColor,nodeType:node.type,maxHp:node.maxHp});this.emit('effect',{kind:'collect',x:node.x,y:node.y,color:this.planet().accent,label:'+'+amount+' '+RESOURCE_NAMES[node.type]});this.emit('save');}
         return{ok:true,type:'mine',resource:node.type,remaining:node.hp};
       }
       if(n.kind==='creature')return this.befriend(n.entity);

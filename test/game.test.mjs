@@ -41,6 +41,18 @@ test('mining still awards once, requires range, and depleted nodes regrow', () =
   g.state.player.x=-1000;assert.equal(g.interact(n.id).ok,false);
 });
 
+test('mining emits staged block-break metadata and finite fracture meshes', async () => {
+  const g=new Game(),n=g.world().nodes[0];g.state.player={x:n.x-65,y:n.y,angle:0};g.events=[];
+  for(let i=0;i<n.maxHp;i++){g.cooldown=0;assert.ok(g.interact(n.id).ok);}
+  const effects=g.events.filter(e=>e.type==='effect'),hits=effects.filter(e=>e.kind==='mine'),broken=effects.find(e=>e.kind==='break');
+  assert.equal(hits.length,n.maxHp);assert.equal(hits.at(-1).broken,true);assert.equal(hits.at(-1).remaining,0);
+  assert.equal(broken.nodeType,n.type);assert.equal(broken.maxHp,n.maxHp);assert.equal(broken.x,n.x);assert.equal(broken.y,n.y);
+  const context=vm.createContext({OrbitCore:require('../game/core.js'),Float32Array,Math});
+  vm.runInContext(await readFile(new URL('../game/renderer-3d.js',import.meta.url),'utf8'),context);
+  const {Batch,blockBreakModel}=context.Orbit3D;
+  for(const destroyed of [false,true]){const b=new Batch();blockBreakModel(b,{x:n.x,z:n.y,nodeType:n.type,color:'#cad9df',rotation:.2,seed:7,age:.12,duration:destroyed?.82:.38,destroyed},PLANETS[0],.5);assert.ok(b.array().length>0);assert.ok(b.array().every(Number.isFinite));}
+});
+
 test('friendship has costs, cooldowns, unlocks and persistent companion state', () => {
   const g=new Game(),c=g.world().creatures[0];g.state.player={x:c.x,y:c.y,angle:0};
   g.befriend(c);const gift=g.state.inventory.biomass;g.befriend(c);assert.equal(g.state.inventory.biomass,gift);
