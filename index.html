@@ -747,18 +747,180 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     b.tube([24,23,8],[24,26,24],4,2,'#759b9f',6);
   }
   function spaceshipModel(b,time,space,moving){
-    b.tube([0,28,-52],[0,28,52],21,15,'#d7e6de',24);b.tube([0,28,52],[0,28,79],15,0,'#eff4e5',24);
-    b.sphere(0,41,26,18,13,29,'#33788d',24,14,.1);b.sphere(-5,48,35,7,2,12,'#93d1d2',12,8,.15);
-    for(const sign of[-1,1]){
-      b.quad([sign*17,29,27],[sign*79,15,-31],[sign*68,16,-48],[sign*12,28,-40],'#a9c3bd');b.quad([sign*17,32,27],[sign*12,32,-40],[sign*68,20,-48],[sign*79,19,-31],'#d8e5d5');
-      b.tube([sign*44,20,-47],[sign*44,20,-4],10,8,'#b8d0c8',8);b.tube([sign*44,20,-50],[sign*44,20,-45],7,8,'#528c97',8,.3);
-      b.box(sign*71,21,-33,5,3,7,'#c3f379',.9);
-      if(!space){b.tube([sign*35,16,-26],[sign*44,0,-31],3,3,'#86a69b',6);b.box(sign*44,1,-31,15,3,15,'#b9c7b3');}
-      if(space&&moving){const length=45+Math.sin(time*45)*11;b.tube([sign*44,20,-51],[sign*44,20,-51-length],6,0,'#99e9ff',8,1);b.tube([sign*44,20,-51],[sign*44,20,-72],3,0,'#f0ffeb',6,1);}
+    // PioneerEX7-Mesh-v4: reference-modelled solid 3D geometry, +Z is forward.
+    // Terralink Pioneer EX-7 / heavy industrial survey lander.
+    const C={ivory:'#c9c7be',white:'#e0ddd2',edge:'#969b96',dark:'#20272b',metal:'#465055',rubber:'#11191d',glass:'#17272e',orange:'#d97627',light:'#ffbd61',rust:'#736253'};
+    const TAU=Math.PI*2;
+    const part=(name,fn)=>b.part?b.part(name,fn):fn();
+    const mix=(a,c,t)=>a.map((n,i)=>n+(c[i]-n)*t);
+    const unit=v=>{const d=Math.hypot(...v)||1;return v.map(n=>n/d);};
+    const cross=(a,c)=>[a[1]*c[2]-a[2]*c[1],a[2]*c[0]-a[0]*c[2],a[0]*c[1]-a[1]*c[0]];
+    const plate=(points,color,edge=1.3)=>{b.quad(...points,color);for(let i=0;i<4;i++)b.tube(points[i],points[(i+1)%4],edge,edge,C.edge,6);};
+    const loft=(sections,color)=>{
+      const loop=([z,w,bottom,top,bevel])=>[[-w+bevel,bottom,z],[w-bevel,bottom,z],[w,bottom+bevel,z],[w,top-bevel,z],[w-bevel,top,z],[-w+bevel,top,z],[-w,top-bevel,z],[-w,bottom+bevel,z]];
+      const rings=sections.map(loop);
+      for(let j=0;j<rings.length-1;j++)for(let i=0;i<8;i++){const k=(i+1)%8;b.quad(rings[j][i],rings[j][k],rings[j+1][k],rings[j+1][i],color);}
+      for(const [j,flip]of[[0,true],[rings.length-1,false]]){const r=rings[j],center=[0,(sections[j][2]+sections[j][3])/2,sections[j][0]];for(let i=0;i<8;i++){const k=(i+1)%8;b.tri(center,r[flip?k:i],r[flip?i:k],color);}}
+    };
+    const annulus=(x,y,z,outer,inner,color,emission=0)=>{
+      for(let i=0;i<32;i++){const a=i/32*TAU,c=(i+1)/32*TAU;const pt=(r,t)=>[x+Math.cos(t)*r,y+Math.sin(t)*r,z];b.quad(pt(outer,a),pt(outer,c),pt(inner,c),pt(inner,a),color,emission);}
+    };
+    const barrel=(x,y,z0,z1,r0,r1,color,segments=32)=>{
+      for(let i=0;i<segments;i++){const a=i/segments*TAU,c=(i+1)/segments*TAU,pt=(z,r,t)=>[x+Math.cos(t)*r,y+Math.sin(t)*r,z],slope=(r0-r1)/(z1-z0),na=unit([Math.cos(a),Math.sin(a),slope]),nc=unit([Math.cos(c),Math.sin(c),slope]);
+        const p=pt(z0,r0,a),q=pt(z0,r0,c),r=pt(z1,r1,c),s=pt(z1,r1,a);b.tri(p,q,r,color,0,[na,nc,nc]);b.tri(p,r,s,color,0,[na,nc,na]);}
+    };
+    const glyphs={T:['11111','00100','00100','00100','00100','00100','00100'],E:['11111','10000','10000','11110','10000','10000','11111'],R:['11110','10001','10001','11110','10100','10010','10001'],A:['01110','10001','10001','11111','10001','10001','10001'],L:['10000','10000','10000','10000','10000','10000','11111'],I:['111','010','010','010','010','010','111'],N:['10001','11001','11001','10101','10011','10011','10001'],K:['10001','10010','10100','11000','10100','10010','10001'],P:['11110','10001','10001','11110','10000','10000','10000'],O:['01110','10001','10001','10001','10001','10001','01110'],X:['10001','10001','01010','00100','01010','10001','10001'],'7':['11111','00001','00010','00100','01000','01000','01000'],'-':['000','000','000','111','000','000','000']};
+    const lettering=(word,sign,x,y,z,scale)=>{let offset=0;for(const ch of word){const g=glyphs[ch];if(!g){offset+=3*scale;continue;}for(let row=0;row<7;row++)for(let col=0;col<g[row].length;col++)if(g[row][col]==='1')b.box(sign*x,y-row*scale,z-sign*(offset+col*scale),.18,scale*.8,scale*.8,C.dark);offset+=(g[0].length+1)*scale;}};
+    part('Armoured fuselage',()=>{
+      loft([[-88,39,35,84,7],[-62,52,31,95,7],[35,52,32,99,7],[57,48,33,99,7]],C.ivory);
+      b.roundedBox(0,33,-15,91,12,137,3,C.dark);b.roundedBox(0,27,12,70,10,89,3,C.metal);
+      b.roundedBox(0,97,-18,84,5,100,2,C.white);
+      for(const sign of[-1,1]){
+        b.roundedBox(sign*52.2,68,-8,3,44,78,1,C.dark);
+        for(let i=0;i<3;i++)b.roundedBox(sign*54,69,-33+i*27,3.2,39,25,1,C.ivory);
+        b.box(sign*55.7,85,-6,1,2.5,73,C.orange);
+        for(const z of[-43,-18,10,28])for(const y of[52,84])b.sphere(sign*56.1,y,z,.8,.8,.8,C.metal,6,4);
+        b.roundedBox(sign*53.3,64,39,3.5,28,18,1,C.dark);
+        for(let i=0;i<6;i++)b.box(sign*55.3,54+i*3.5,39,.5,1.5,13,C.metal);
+        b.roundedBox(sign*43,43,-71,20,22,24,2,C.metal);
+        b.box(sign*55.8,60,21,.6,13,8,C.dark);b.box(sign*56.3,61,21,.4,8,3,C.orange);
+        lettering('TERRALINK',sign,55.85,77,22*sign,.72);
+        lettering('EX-7',sign,55.85,66,20*sign,.5);
+      }
+      for(const x of[-26,26]){b.tube([x,28,-74],[x,28,40],8,8,C.metal,16);for(const z of[-58,-21,24])b.tube([x,28,z-2],[x,28,z+2],8.7,8.7,C.edge,16);}
+    });
+    part('Faceted cockpit and canopy',()=>{
+      loft([[44,51,34,100,8],[86,47,33,99,7],[124,35,35,55,5],[136,29,38,50,4]],C.white);
+      // Panes follow the actual sloping shell; narrow frames keep the glass area large.
+      const rowTop=[[-39,99.6,86],[39,99.6,86]],rowBottom=[[-29.5,56.2,123.5],[29.5,56.2,123.5]];
+      for(let col=0;col<3;col++){
+        const u0=col/3+.018,u1=(col+1)/3-.018;
+        const a=mix(rowBottom[0],rowBottom[1],u0),d=mix(rowTop[0],rowTop[1],u0),bb=mix(rowBottom[0],rowBottom[1],u1),c=mix(rowTop[0],rowTop[1],u1);
+        plate([a,bb,c,d],C.glass,1.15);
+        const t0=mix(d,a,.12),t1=mix(c,bb,.12),t2=mix(c,bb,.2),t3=mix(d,a,.2);for(const v of[t0,t1,t2,t3]){v[1]+=.18;v[2]+=.14;}b.quad(t0,t1,t2,t3,'#37454a',.08);
+      }
+      for(let col=0;col<3;col++){
+        const x0=-38+col*25.5,x1=x0+22.5;
+        plate([[x0,100.5,51],[x1,100.5,51],[x1,99.7,83],[x0,99.7,83]],'#26353b',.9);
+      }
+      for(const sign of[-1,1]){
+        const sidePoint=(z,y,offset=.6)=>[sign*((z<=86?51-(z-44)*4/42:47-(z-86)*12/38)+offset),y,z];
+        const side=[[sidePoint(51,60),sidePoint(82,58),sidePoint(82,89),sidePoint(51,91)],[sidePoint(89,55),sidePoint(119,42),sidePoint(119,52),sidePoint(89,86)]];
+        for(const q of side)plate(q,C.glass,1.1);
+        // Broad lower cheek armour and orange survey markings.
+        const q=[sidePoint(60,37),sidePoint(118,37),sidePoint(118,41),sidePoint(60,55)];plate(q,C.ivory,.6);
+        b.quad(sidePoint(66,40.8,.9),sidePoint(113,38.7,.9),sidePoint(113,41.7,.9),sidePoint(66,44,.9),C.orange);
+        b.quad([sign*45.7,57,49],[sign*45.7,75,49],[sign*45.7,75,45],[sign*45.7,57,45],C.dark);
+        for(const y of[40,49])b.sphere(sign*43.8,y,88,.85,.85,.85,C.edge,6,4);
+      }
+      b.roundedBox(0,45,134,63,17,11,3,C.dark);
+      for(const sign of[-1,1]){
+        b.roundedBox(sign*23,49.5,141,15,5,2,1,C.edge);b.box(sign*23,49.5,142.2,11.7,2.3,.8,'#fff1d2',1);
+        b.roundedBox(sign*27,40.5,135,8,4,5,1,C.metal);b.box(sign*27,40.7,138,5,1.6,.6,C.light,.9);
+        b.tube([sign*16,33,132],[sign*16,33,142],3.8,3.8,C.edge,12);b.sphere(sign*16,33,143,2.2,2.2,.8,C.glass,10,6);
+      }
+      b.roundedBox(0,40.7,141,22,7,3,1,C.rubber);
+      for(const x of[-7,0,7])b.box(x,40.8,143,2.4,4,.5,C.metal);
+    });
+    part('Side cargo and service equipment',()=>{
+      for(const sign of[-1,1]){
+        b.roundedBox(sign*70,49,-38,36,41,58,4,C.white);
+        b.roundedBox(sign*70,50,-72,31,32,15,3,C.ivory);
+        b.roundedBox(sign*68,43,27,25,25,65,3,C.ivory);
+        for(const z of[-61,-16,3,40]){b.box(sign*69,56,z,25,2.2,2.5,C.orange);b.box(sign*81.6,44,z,2.2,24,2.5,C.orange);}
+        for(const z of[-56,-24,9,45]){
+          b.roundedBox(sign*88.3,50,z>0?z-24:z,2.4,15,9,1,C.dark);
+          b.box(sign*89.6,50,z>0?z-24:z,.6,9,3,C.metal);
+        }
+        b.roundedBox(sign*66,30,18,24,10,71,2,C.dark);
+        b.tube([sign*75,34,4],[sign*75,34,50],8,8,C.metal,16);
+        annulus(sign*75,34,51,8.3,6.1,C.edge);b.tube([sign*75,34,48],[sign*75,34,52],5.5,5.5,C.dark,16);
+        b.tube([sign*52,62,-29],[sign*71,62,-18],2.2,2.2,C.metal,10);
+        b.tube([sign*59,32,0],[sign*68,32,12],2,2,C.edge,10);
+      }
+    });
+    part('Twin armoured engines',()=>{
+      for(const sign of[-1,1]){
+        const x=sign*63,y=93;
+        b.roundedBox(sign*51,76,-63,26,17,61,3,C.dark);
+        barrel(x,y,-122,-39,29,29,C.metal);
+        // Individual outer armour sectors leave dark panel seams around the nacelle.
+        for(let band=0;band<3;band++)for(let i=0;i<12;i++){
+          const a=i/12*TAU+.026,c=(i+1)/12*TAU-.026,z0=-116+band*23,z1=z0+21,r=29.7;
+          const pt=(t,z)=>[x+Math.cos(t)*r,y+Math.sin(t)*r,z];b.quad(pt(a,z0),pt(c,z0),pt(c,z1),pt(a,z1),i%3?C.ivory:C.white);
+          const t=(a+c)/2;b.sphere(x+Math.cos(t)*30,y+Math.sin(t)*30,z0+3,.8,.8,.8,C.dark,6,4);
+        }
+        barrel(x,y,-49,-45,30.5,30.5,C.orange);barrel(x,y,-44,-35,30.6,30.6,C.dark);annulus(x,y,-34.8,30.7,26,C.edge);
+        barrel(x,y,-55,-34.5,23,26,C.dark);annulus(x,y,-34.4,27,25,C.metal);
+        b.tube([x,y,-57],[x,y,-55],23,23,C.rubber,28);
+        for(let j=-2;j<=2;j++){const yy=y+j*5,w=12-Math.abs(j)*1.8;b.box(x,yy,-53.6,w,2.5,.9,C.light,.95);b.box(x+14,yy,-51.7,2.1,2.9,.8,C.orange,.65);}
+        // Raised intake ribs and a dark, open rear bell.
+        for(let i=0;i<12;i++){const a=i/12*TAU;b.tube([x+Math.cos(a)*25.5,y+Math.sin(a)*25.5,-34],[x+Math.cos(a)*22,y+Math.sin(a)*22,-54],.7,.7,C.metal,6);}
+        barrel(x,y,-121,-130,29,25.5,C.dark);annulus(x,y,-130.3,25.8,20.8,C.edge);barrel(x,y,-130,-112,21,17,C.metal);
+        b.tube([x,y,-114],[x,y,-115],16.5,16.5,C.rubber,24);annulus(x,y,-126,16.5,14.6,C.orange,.45);
+        for(let j=-2;j<=2;j++)b.box(x,y+j*4.7,-124,11-Math.abs(j),1.8,.5,C.light,.95);
+        barrel(x,y,-108,-104,30.4,30.4,C.orange);
+        // Tall swept fins with thickness, orange paint and corner rivets.
+        const xa=sign*62,xb=sign*67,v=[[xa,117,-109],[xa,152,-105],[xa,158,-84],[xa,120,-48],[xb,117,-109],[xb,152,-105],[xb,158,-84],[xb,120,-48]];
+        for(const f of[[0,1,2,3],[7,6,5,4],[0,4,5,1],[1,5,6,2],[2,6,7,3],[3,7,4,0]])b.quad(...f.map(i=>v[i]),C.metal);
+        b.quad([sign*67.3,149,-100],[sign*67.3,151,-91],[sign*67.3,124,-67],[sign*67.3,121,-78],C.orange);
+        for(const z of[-101,-90])b.sphere(sign*68,150,z,.85,.85,.85,C.edge,6,4);
+      }
+    });
+    part('Roof hatch and communications',()=>{
+      b.cone(-16,99,-16,18,18,3,C.dark,32);b.ring(-16,102.2,-16,15,2,C.orange,.1);b.cone(-16,102.4,-16,13,13,2,C.edge,24);
+      for(const x of[-27,-5])b.box(x,105,-16,3,2,8,C.dark);
+      for(const sign of[-1,1]){
+        b.tube([sign*33,99,-48],[sign*33,99,38],1.5,1.5,C.metal,8);
+        for(const z of[-40,-8,30])b.box(sign*33,99.7,z,4,2,3,C.dark);
+        b.roundedBox(sign*27,99,38,11,3,13,1,C.dark);
+      }
+      b.roundedBox(0,100,-61,30,4,20,1,C.dark);for(let i=0;i<8;i++)b.box(-12+i*3.5,103,-61,1.2,1.2,17,C.edge);
+      const x=13,z=14;
+      b.roundedBox(x,102,z,22,8,25,2,C.dark);b.cone(x,106,z,7,6,32,C.metal,16);b.cone(x,138,z,4,3,34,C.dark,12);b.cone(x,172,z,1.4,.6,33,C.edge,10);
+      for(const yy of[113,125,138,155,171])b.cone(x,yy,z,yy<145?7.5:4.8,yy<145?7.5:4.8,2.5,C.dark,12);
+      b.tube([x-8,106,z+2],[x-8,184,z+2],1.2,.55,C.edge,8);b.tube([x+6,108,z-5],[x+6,162,z-5],2.5,2,C.metal,10);
+      b.box(x-6.5,125,z+7,3.3,10,2,C.orange);b.box(x,146,z+4,2,6,1,C.light,.5);
+      b.tube([x-9,112,z-4],[x-9,139,z-4],1,1,C.rubber,6);
+      // A concave tilted parabolic dish, not a flat cone.
+      const c=[-24,122,16],n=unit([-.25,.5,.82]),u=unit(cross([0,1,0],n)),v=cross(n,u),radius=18,depth=5.8;
+      b.tube([-24,100,13],[-24,119,13],2.8,2.3,C.metal,12);b.sphere(-24,119,13,4,4,4,C.dark,12,7);
+      const point=(r,a)=>c.map((p,k)=>p+u[k]*Math.cos(a)*r+v[k]*Math.sin(a)*r+n[k]*depth*(r*r/(radius*radius)-1));
+      for(let j=0;j<5;j++)for(let i=0;i<32;i++){
+        const a=i/32*TAU,aa=(i+1)/32*TAU,r0=radius*j/5,r1=radius*(j+1)/5;
+        if(j)b.tri(point(r0,a),point(r1,aa),point(r0,aa),C.edge);b.tri(point(r0,a),point(r1,a),point(r1,aa),C.edge);
+        if(j===4)b.tube(point(r1,a),point(r1,aa),.65,.65,C.dark,6);
+      }
+      const feed=c.map((p,k)=>p+n[k]*10);
+      for(const a of[0,TAU/3,TAU*2/3])b.tube(point(radius*.9,a),feed,.6,.6,C.dark,6);b.sphere(...feed,1.8,1.8,1.8,C.dark,10,6);
+    });
+    part(space?'Retracted landing hinges':'Articulated landing gear',()=>{
+      for(const sign of[-1,1])for(const z of[-67,90]){
+        const x=sign*(z>0?35:63),knee=[x+sign*12,20,z+5],foot=[x+sign*19,5,z+14];
+        b.tube([x-4,32,z],[x+4,32,z],5.8,5.8,C.dark,12);
+        if(space){b.roundedBox(x,29,z,18,5,23,2,C.metal);continue;}
+        b.tube([x,34,z],knee,4.5,4,C.dark,12);b.sphere(...knee,5,5,5,C.metal,12,7);b.tube(knee,foot,3.6,3.6,C.metal,12);
+        b.tube([x+sign*6,33,z-5],[foot[0],10,foot[2]-6],2.5,2.5,C.edge,10);b.tube([x+sign*6,33,z-5],[knee[0],19,knee[2]-3],3.5,3.5,C.dark,10);
+        b.roundedBox(foot[0],3.5,foot[2],27,6,31,2,C.dark);b.roundedBox(foot[0],7,foot[2],20,2,23,1,C.edge);
+        for(let i=-2;i<=2;i++)b.box(foot[0]+i*4.4,8.2,foot[2],1.5,1.4,23,C.metal);
+        b.box(knee[0]+sign*3.8,19,knee[2],1.5,4,4,C.orange);
+      }
+    });
+    part('Fasteners and weathered armour',()=>{
+      // Small deterministic paint chips are geometry; no network textures are needed.
+      let seed=712;const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
+      for(const sign of[-1,1])for(let i=0;i<42;i++){
+        const z=-43+random()*67,y=50+random()*36,x=sign*55.9,w=.5+random()*1.4,h=.4+random()*1.7;
+        b.quad([x,y,z],[x,y+h,z+.2],[x,y+h*.8,z+w],[x,y,z+w*.6],i%3?C.rust:C.edge);
+      }
+      for(let i=0;i<45;i++){const x=(random()-.5)*70,z=-60+random()*100;b.box(x,100.2,z,.4+random()*2,.15,.4+random()*3,i%4?C.edge:C.rust);}
+      for(const sign of[-1,1])for(const z of[-53,-24,7,33]){b.sphere(sign*40,100.7,z,.85,.6,.85,C.dark,6,4);b.box(sign*48,93,z,3,1,2,C.orange);}
+    });
+    if(space&&moving)for(const sign of[-1,1]){
+      const reach=42+Math.sin(time*40)*6;b.tube([sign*63,93,-131],[sign*63,93,-131-reach],10,0,'#ffb351',16,1);b.tube([sign*63,93,-131],[sign*63,93,-151],4,0,'#fff1d6',12,1);
     }
-    b.tri([0,38,-32],[0,71,-64],[0,33,-57],'#9fbdb7');b.box(0,48,-19,6,2,11,'#bddc97',.5);
-    if(!space){b.tube([0,16,40],[0,0,43],4,3,'#86a69b',6);b.box(0,1,43,17,3,17,'#b9c7b3');}
   }
+  spaceshipModel.info={id:'PioneerEX7-Mesh-v4',name:'Terralink Pioneer EX-7',forwardAxis:'+Z',thrusters:[[-63,93,-131],[63,93,-131]],unitsPerMetre:28.57};
   function lifeModel(b,id,time,met){
     const s=SPECIES[id],bob=Math.sin(time*2.6)*2;
     if(['moth','sunwhorl','aurorayne','cinderwisp','veilfox'].includes(s.shape)){
@@ -827,7 +989,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     for(let i=0;i<550;i++){const x=(random()-.5)*2850,z=(random()-.5)*2850;if(Math.hypot(x,z)<160)continue;const y=heightAt(x,z,p);b.cone(x,y,z,2.4,0,7+random()*9,tint(p.flora,.8),3);}
     const ground=heightAt(0,0,p);b.cone(0,ground,0,113,113,1.4,tint(p.ground[4],1.04),48);b.ring(0,ground+1.6,0,103,1.2,'#b9d7a1',.15);
     for(let i=0;i<8;i++){const a=i/8*TAU;b.box(Math.sin(a)*109,ground+2.5,Math.cos(a)*109,4,3,4,'#d7f6b5',.6);}
-    shadow(b,0,ground,0,70,p);b.at(0,ground+2,0,1,Math.PI,()=>spaceshipModel(b,0,false,false));
+    shadow(b,0,ground,0,87,p);b.at(0,ground+2,0,1,Math.PI,()=>spaceshipModel(b,0,false,false));
     // A visible moon is geometry in the same scene, without downloaded textures.
     b.sphere(-980,690,-1470,285,285,285,tint(p.light,.74),40,24,.55);
     return b.array();
@@ -930,7 +1092,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
         for(const h of w.buildings)if(h.type==='beacon'){const y=heightAt(h.x,h.y,p);b.ring(h.x,y+80,h.y,18+(t*25)%40,1,'#b6f59a',1);}
       }else{
         const actor=s.ship;if(this.firstPerson){b.at(actor.x,actor.altitude||0,actor.y,.7,this.yaw+Math.PI,()=>{b.box(0,4,25,38,8,55,'#8eb3b5');b.box(-24,10,11,6,15,30,'#456777');b.box(24,10,11,6,15,30,'#456777');});}
-        else if(g.moving||g.travel)b.at(actor.x,actor.altitude||0,actor.y,.7,Math.PI/2-actor.angle,()=>{for(const side of[-1,1])b.cone(side*39,23,-54,5,0,-(32+Math.sin(t*30)*6)*(g.boosting?2:1),'#adeffe',7,1);});
+        else if(g.moving||g.travel)b.at(actor.x,actor.altitude||0,actor.y,.7,Math.PI/2-actor.angle,()=>{for(const [x,y,z] of spaceshipModel.info.thrusters){b.tube([x,y,z],[x,y,z-38-(g.boosting?36:0)-Math.sin(t*30)*5],9,0,'#ffb351',12,1);b.tube([x,y,z],[x,y,z-20],4,0,'#fff1d6',10,1);}});
       }
       for(let i=this.particles.length-1;i>=0;i--){const v=this.particles[i];if(!g.paused){v.life-=dt;v.x+=v.vx*dt;v.y+=v.vy*dt;v.z+=v.vz*dt;v.vy-=170*dt;}if(v.life<=0){this.particles.splice(i,1);continue;}b.box(v.x,v.y,v.z,v.size,v.size,v.size,v.color,.5);}
       return b.array();
