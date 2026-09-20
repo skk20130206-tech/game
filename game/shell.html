@@ -41,6 +41,7 @@
         </section>
       </div>
       <aside class="mission-card glass" id="mission-card"><div class="mission-heading"><span class="eyebrow">EXPLORER'S LOG</span><button id="mission-toggle" aria-label="탐험 목표 접기">−</button></div><div id="mission-body"><h2 id="mission-title">작은 발걸음, 새로운 세계</h2><p id="mission-description">우주에 첫 번째 나만의 집을 지어보세요.</p><ol id="mission-list"></ol><div class="mission-progress"><i id="mission-progress-bar"></i></div><span class="mission-note" id="mission-note">천천히 둘러보세요. 모험은 이제 시작이에요.</span></div></aside>
+      <section class="tutorial-card glass" id="tutorial-card" hidden aria-live="polite"><div class="tutorial-heading"><span class="eyebrow">FIRST MISSION / 튜토리얼</span><button id="tutorial-skip" class="tutorial-skip">건너뛰기</button></div><div class="tutorial-step" id="tutorial-step">1 / 5</div><h2 id="tutorial-title">첫걸음: 우주복 조작</h2><p id="tutorial-description">WASD 또는 방향키로 우주복을 움직여 보세요.</p><div class="tutorial-progress"><i id="tutorial-progress-bar"></i></div><span class="tutorial-note" id="tutorial-note">목표를 달성하면 다음 안내가 열립니다.</span></section>
       <div class="world-label" id="world-label" hidden></div>
       <div class="toast-stack" id="toast-stack" aria-live="polite"></div>
       <section class="build-panel glass" id="build-panel" hidden aria-label="건설 메뉴"><div class="panel-heading"><div><span class="eyebrow">MAKE IT HOME</span><h2>나만의 기지 짓기</h2></div><button class="icon-button" id="build-close" aria-label="건설 메뉴 닫기">×</button></div><div id="build-options"></div><p class="muted">건물을 고른 뒤 빈 땅을 클릭하세요.<br>키보드·터치: 이동 후 ‘여기에 건설’</p><button class="primary-button" id="place-building" disabled>건물을 먼저 선택하세요</button></section>
@@ -63,6 +64,8 @@
 
 <script src="core.js"></script>
 <script src="portraits.js"></script>
+<script src="player-rig.js"></script>
+<script src="tutorial.js"></script>
 <script src="renderer-3d.js"></script>
 <script src="app.js"></script>
 </body>

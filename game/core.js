@@ -70,6 +70,12 @@
       return s;
     }
     emit(type,data={}){this.events.push({type,...data});}
+    animate(kind,target){
+      if(this.state.mode!=='surface')return;
+      const p=this.state.player,t=target||{x:p.x+Math.cos(p.angle)*80,y:p.y+Math.sin(p.angle)*80};
+      if(dist(p,t)>1)p.angle=Math.atan2(t.y-p.y,t.x-p.x);
+      this.emit('player-action',{kind,x:t.x,y:t.y,targetId:t.id||null,buildingType:t.type||null});
+    }
     planet(){return PLANETS.find(p=>p.id===this.state.planet);}
     makeWorld(p){
       const random=rand(p.seed),nodes=[],creatures=[];
@@ -172,7 +178,7 @@
       if(!n){this.emit('message',{text:this.state.mode==='surface'?'자원이나 생명체 가까이에서 E를 눌러주세요.':'행성 가까이로 비행하거나 M으로 항로를 설정하세요.'});return{ok:false,reason:'주변에 상호작용할 대상이 없습니다.'};}
       if(n.kind==='planet')return this.land(n.entity.id);
       if(n.kind==='node'){
-        const node=n.entity;this.cooldown=.38;node.hp--;this.beam={x:node.x,y:node.y,life:.28};
+        const node=n.entity;this.cooldown=.38;node.hp--;this.beam={x:node.x,y:node.y,life:.28};this.animate('mine',node);
         const nodeColor=node.type==='crystal'?'#bccfff':node.type==='biomass'?'#c3f379':'#cad9df',broken=node.hp<=0;
         this.emit('effect',{kind:'mine',x:node.x,y:node.y,color:nodeColor,nodeType:node.type,remaining:node.hp,maxHp:node.maxHp,broken});
         if(broken){const amount=node.type==='iron'?6:node.type==='biomass'?5:4;this.addResource(node.type,amount);this.state.stats.mined++;node.respawnAt=this.state.time+150;this.emit('message',{text:RESOURCE_NAMES[node.type]+' +'+amount});this.emit('effect',{kind:'break',x:node.x,y:node.y,color:nodeColor,nodeType:node.type,maxHp:node.maxHp});this.emit('effect',{kind:'collect',x:node.x,y:node.y,color:this.planet().accent,label:'+'+amount+' '+RESOURCE_NAMES[node.type]});this.emit('save');}
@@ -180,7 +186,7 @@
       }
       if(n.kind==='creature')return this.befriend(n.entity);
       if(n.kind==='ship')return this.launch();
-      if(n.kind==='building'){this.emit('building-menu',{id:n.entity.id});return{ok:true,type:'building'};}
+      if(n.kind==='building'){this.animate('use',n.entity);this.emit('building-menu',{id:n.entity.id});return{ok:true,type:'building'};}
       if(n.kind==='relic')return this.studyRelic(n.entity.id);
       return{ok:false};
     }
@@ -188,7 +194,7 @@
     befriend(c){
       const first=!this.state.met.includes(c.species),sp=SPECIES[c.species];this.discover(c.species,false);
       if(first){this.state.met.push(c.species);for(const [r,v]of Object.entries(sp.gift))this.addResource(r,v);}
-      this.cooldown=.8;this.emit('dialogue',{species:c.species,id:c.id,first});this.emit('save');return{ok:true,type:'friend',species:c.species,first};
+      this.animate('greet',c);this.cooldown=.8;this.emit('dialogue',{species:c.species,id:c.id,first});this.emit('save');return{ok:true,type:'friend',species:c.species,first};
     }
     careForCreature(id,action){
       if(this.paused||this.travel||this.state.mode!=='surface')return{ok:false,reason:'탐험 중에 교류할 수 있어요.'};
@@ -217,7 +223,7 @@
         this.emit('effect',{kind:'friend',x:c.x,y:c.y,color:sp.color});
         this.emit('message',{text:sp.name+(action==='feed'?'과 먹이를 나눴어요.':'을 쓰다듬었어요.')+' 친밀도 '+s.friendship[c.species]+' / 3'});
       }else return{ok:false,reason:'알 수 없는 교류예요.'};
-      this.emit('save');return{ok:true,bond:s.friendship[c.species]||0,companion:s.companion};
+      this.animate(action,c);this.emit('save');return{ok:true,bond:s.friendship[c.species]||0,companion:s.companion};
     }
     useBuilding(id,action){
       if(this.paused||this.travel||this.state.mode!=='surface')return{ok:false,reason:'탐험 중에 사용할 수 있어요.'};
@@ -245,14 +251,14 @@
         this.emit('message',{text:target?'비콘이 미탐사 유적의 위치를 표시했어요.':'이 행성의 모든 유적을 조사했어요.'});
         if(!result.ok)return result;
       }else return{ok:false,reason:'이 건물에서 사용할 수 없는 기능이에요.'};
-      this.emit('save');return{ok:true};
+      this.animate(action,b);this.emit('save');return{ok:true};
     }
     studyRelic(id){
       if(this.paused||this.travel||this.state.mode!=='surface')return{ok:false,reason:'착륙 후 조사하세요.'};
       const r=this.world().relics.find(v=>v.id===id),s=this.state;
       if(!r||dist(r,s.player)>160)return{ok:false,reason:'유적 가까이로 이동하세요.'};
       if(s.relics.includes(id)){this.emit('message',{text:'이미 조사한 '+r.name+'입니다. 다음 별빛 기록을 찾아보세요.'});return{ok:false,reason:'조사 완료'};}
-      s.relics.push(id);this.addResource('crystal',5);this.addResource('iron',4);this.cooldown=.8;
+      s.relics.push(id);this.addResource('crystal',5);this.addResource('iron',4);this.cooldown=.8;this.animate('relic',r);
       if(this.waypoint&&dist(this.waypoint,r)<2)this.waypoint=null;
       this.emit('effect',{kind:'relic',x:r.x,y:r.y,color:this.planet().accent});
       this.emit('message',{text:r.name+' 조사 완료 · 수정 +5 · 철광석 +4'});
@@ -264,7 +270,7 @@
       if(this.scanCooldown>0){this.emit('message',{text:'스캐너 충전 중 · '+Math.ceil(this.scanCooldown)+'초'});return{ok:false,reason:'스캐너 충전 중'};}
       this.scanCooldown=5;const pos=this.state.mode==='surface'?this.state.player:this.state.ship;this.scanRing={x:pos.x,y:pos.y,age:0};this.emit('effect',{kind:'scan'});
       if(this.state.mode==='space'){this.emit('message',{text:'행성 5개 감지. M 키로 성계 지도를 열어보세요.'});return{ok:true,planets:PLANETS.length};}
-      const nearby=this.world().creatures.filter(c=>dist(c,pos)<650);let found=0;for(const c of nearby)if(this.discover(c.species))found++;
+      this.animate('scan');const nearby=this.world().creatures.filter(c=>dist(c,pos)<650);let found=0;for(const c of nearby)if(this.discover(c.species))found++;
       const nodes=this.world().nodes.filter(n=>n.hp>0&&dist(n,pos)<650).length;
       this.emit('message',{text:'스캔 완료 · 자원 '+nodes+'곳 · 생명체 '+nearby.length+'마리'+(found?' · 새 도감 +'+found:'')});return{ok:true,nodes,creatures:nearby.length,discovered:found};
     }
@@ -286,7 +292,7 @@
       const result=this.canPlace(type,x,y);if(!result.ok){this.emit('message',{text:result.reason,error:true});return result;}
       for(const[r,n]of Object.entries(BUILDINGS[type].cost))this.state.inventory[r]-=n;
       this.world().buildings.push({id:'building-'+Math.round(this.state.time*1000)+'-'+this.world().buildings.length,type,x,y});this.state.stats.buildings++;
-      this.emit('effect',{kind:'build',x,y,color:'#c3f379'});this.emit('message',{text:BUILDINGS[type].name+' 완성! 이곳이 당신의 새로운 보금자리예요.'});this.selectedBuild=null;this.emit('save');return{ok:true,type};
+      this.animate('build',{x,y,type});this.emit('effect',{kind:'build',x,y,color:'#c3f379'});this.emit('message',{text:BUILDINGS[type].name+' 완성! 이곳이 당신의 새로운 보금자리예요.'});this.selectedBuild=null;this.emit('save');return{ok:true,type};
     }
     launch(){
       if(this.paused||this.travel)return{ok:false,reason:'잠시 기다려주세요.'};
