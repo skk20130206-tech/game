@@ -39,9 +39,6 @@ dialog{color:var(--text);background:#15262b;border:1px solid #54736566;border-ra
 button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4px}
 @media(max-width:680px){.interaction-grid{grid-template-columns:1fr 1fr}.interaction-grid button{padding:12px;font-size:12px}.field-status{bottom:10px;left:12px;font-size:9px}.camera-controls{gap:4px}.camera-controls button{font-size:10px}}
 @media(prefers-reduced-motion:reduce){.orbit-start-orbit{animation:none!important}*,*:before,*:after{scroll-behavior:auto!important;transition-duration:0s!important}}
-.tutorial-card{position:absolute;right:28px;top:204px;width:310px;padding:18px 20px;border-radius:var(--radius);z-index:5;pointer-events:auto;border-color:#c3f37955;background:linear-gradient(145deg,rgba(24,50,43,.95),rgba(15,31,38,.94));box-shadow:0 14px 42px #06191255,0 0 0 1px #c3f37912}.tutorial-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}.tutorial-heading .eyebrow{font-size:10px;color:var(--accent);letter-spacing:1.7px}.tutorial-skip{font-size:11px;color:#a9c3b5;padding:4px 0}.tutorial-skip:hover{color:var(--accent)}.tutorial-step{margin-top:18px;color:#8fb9a7;font-size:11px;letter-spacing:1.5px}.tutorial-card h2{font-size:20px;letter-spacing:-.5px;margin:7px 0 9px}.tutorial-card p{font-size:13px;line-height:1.75;color:#d4e7da}.tutorial-progress{height:4px;background:#405950;border-radius:3px;margin-top:18px;overflow:hidden}.tutorial-progress i{display:block;width:20%;height:100%;background:var(--accent);transition:width .35s}.tutorial-note{display:block;margin-top:11px;color:#9eb9ad;font-size:11px;line-height:1.55}@media(max-width:1150px){.tutorial-card{right:20px;top:185px;width:270px}}@media(max-width:850px){.tutorial-card{top:157px;right:20px;width:235px;padding:15px 16px}.tutorial-card h2{font-size:16px}.tutorial-card p{font-size:12px}.tutorial-heading .eyebrow{font-size:8px}}@media(max-width:600px){.tutorial-card{left:12px;right:12px;top:244px;width:auto;padding:12px 14px}.tutorial-step{margin-top:10px}.tutorial-card h2{font-size:15px;margin:5px 0}.tutorial-card p{font-size:11px;line-height:1.55}.tutorial-progress{margin-top:10px}.tutorial-note{font-size:10px;margin-top:7px}.tutorial-skip{font-size:10px}}
-
-.tutorial-card{left:28px;right:auto;max-height:calc(100% - 365px);overflow:auto}.tutorial-card[hidden]{display:none}@media(max-width:850px){.tutorial-card{left:20px;width:235px}}@media(max-width:600px){.tutorial-card{left:12px;right:auto;top:169px;width:155px;max-height:calc(100% - 320px);padding:10px}.tutorial-heading{flex-wrap:wrap;gap:3px}.tutorial-step{margin-top:6px}.tutorial-card h2{font-size:13px}.tutorial-card p{font-size:10px}.tutorial-note{font-size:9px;line-height:1.45}.tutorial-progress{margin-top:7px}}@media(max-height:560px){.tutorial-card{top:148px;width:205px;max-height:calc(100% - 235px)}.tutorial-note{display:none}}
 </style>
 </head>
 <body>
@@ -76,7 +73,6 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
         </section>
       </div>
       <aside class="mission-card glass" id="mission-card"><div class="mission-heading"><span class="eyebrow">EXPLORER'S LOG</span><button id="mission-toggle" aria-label="탐험 목표 접기">−</button></div><div id="mission-body"><h2 id="mission-title">작은 발걸음, 새로운 세계</h2><p id="mission-description">우주에 첫 번째 나만의 집을 지어보세요.</p><ol id="mission-list"></ol><div class="mission-progress"><i id="mission-progress-bar"></i></div><span class="mission-note" id="mission-note">천천히 둘러보세요. 모험은 이제 시작이에요.</span></div></aside>
-      <section class="tutorial-card glass" id="tutorial-card" hidden aria-live="polite"><div class="tutorial-heading"><span class="eyebrow">FIRST MISSION / 튜토리얼</span><button id="tutorial-skip" class="tutorial-skip">건너뛰기</button></div><div class="tutorial-step" id="tutorial-step">1 / 5</div><h2 id="tutorial-title">첫걸음: 우주복 조작</h2><p id="tutorial-description">WASD 또는 방향키로 우주복을 움직여 보세요.</p><div class="tutorial-progress"><i id="tutorial-progress-bar"></i></div><span class="tutorial-note" id="tutorial-note">목표를 달성하면 다음 안내가 열립니다.</span></section>
       <div class="world-label" id="world-label" hidden></div>
       <div class="toast-stack" id="toast-stack" aria-live="polite"></div>
       <section class="build-panel glass" id="build-panel" hidden aria-label="건설 메뉴"><div class="panel-heading"><div><span class="eyebrow">MAKE IT HOME</span><h2>나만의 기지 짓기</h2></div><button class="icon-button" id="build-close" aria-label="건설 메뉴 닫기">×</button></div><div id="build-options"></div><p class="muted">건물을 고른 뒤 빈 땅을 클릭하세요.<br>키보드·터치: 이동 후 ‘여기에 건설’</p><button class="primary-button" id="place-building" disabled>건물을 먼저 선택하세요</button></section>
@@ -170,12 +166,6 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
       return s;
     }
     emit(type,data={}){this.events.push({type,...data});}
-    animate(kind,target){
-      if(this.state.mode!=='surface')return;
-      const p=this.state.player,t=target||{x:p.x+Math.cos(p.angle)*80,y:p.y+Math.sin(p.angle)*80};
-      if(dist(p,t)>1)p.angle=Math.atan2(t.y-p.y,t.x-p.x);
-      this.emit('player-action',{kind,x:t.x,y:t.y,targetId:t.id||null,buildingType:t.type||null});
-    }
     planet(){return PLANETS.find(p=>p.id===this.state.planet);}
     makeWorld(p){
       const random=rand(p.seed),nodes=[],creatures=[];
@@ -278,7 +268,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
       if(!n){this.emit('message',{text:this.state.mode==='surface'?'자원이나 생명체 가까이에서 E를 눌러주세요.':'행성 가까이로 비행하거나 M으로 항로를 설정하세요.'});return{ok:false,reason:'주변에 상호작용할 대상이 없습니다.'};}
       if(n.kind==='planet')return this.land(n.entity.id);
       if(n.kind==='node'){
-        const node=n.entity;this.cooldown=.38;node.hp--;this.beam={x:node.x,y:node.y,life:.28};this.animate('mine',node);
+        const node=n.entity;this.cooldown=.38;node.hp--;this.beam={x:node.x,y:node.y,life:.28};
         const nodeColor=node.type==='crystal'?'#bccfff':node.type==='biomass'?'#c3f379':'#cad9df',broken=node.hp<=0;
         this.emit('effect',{kind:'mine',x:node.x,y:node.y,color:nodeColor,nodeType:node.type,remaining:node.hp,maxHp:node.maxHp,broken});
         if(broken){const amount=node.type==='iron'?6:node.type==='biomass'?5:4;this.addResource(node.type,amount);this.state.stats.mined++;node.respawnAt=this.state.time+150;this.emit('message',{text:RESOURCE_NAMES[node.type]+' +'+amount});this.emit('effect',{kind:'break',x:node.x,y:node.y,color:nodeColor,nodeType:node.type,maxHp:node.maxHp});this.emit('effect',{kind:'collect',x:node.x,y:node.y,color:this.planet().accent,label:'+'+amount+' '+RESOURCE_NAMES[node.type]});this.emit('save');}
@@ -286,7 +276,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
       }
       if(n.kind==='creature')return this.befriend(n.entity);
       if(n.kind==='ship')return this.launch();
-      if(n.kind==='building'){this.animate('use',n.entity);this.emit('building-menu',{id:n.entity.id});return{ok:true,type:'building'};}
+      if(n.kind==='building'){this.emit('building-menu',{id:n.entity.id});return{ok:true,type:'building'};}
       if(n.kind==='relic')return this.studyRelic(n.entity.id);
       return{ok:false};
     }
@@ -294,7 +284,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     befriend(c){
       const first=!this.state.met.includes(c.species),sp=SPECIES[c.species];this.discover(c.species,false);
       if(first){this.state.met.push(c.species);for(const [r,v]of Object.entries(sp.gift))this.addResource(r,v);}
-      this.animate('greet',c);this.cooldown=.8;this.emit('dialogue',{species:c.species,id:c.id,first});this.emit('save');return{ok:true,type:'friend',species:c.species,first};
+      this.cooldown=.8;this.emit('dialogue',{species:c.species,id:c.id,first});this.emit('save');return{ok:true,type:'friend',species:c.species,first};
     }
     careForCreature(id,action){
       if(this.paused||this.travel||this.state.mode!=='surface')return{ok:false,reason:'탐험 중에 교류할 수 있어요.'};
@@ -323,7 +313,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
         this.emit('effect',{kind:'friend',x:c.x,y:c.y,color:sp.color});
         this.emit('message',{text:sp.name+(action==='feed'?'과 먹이를 나눴어요.':'을 쓰다듬었어요.')+' 친밀도 '+s.friendship[c.species]+' / 3'});
       }else return{ok:false,reason:'알 수 없는 교류예요.'};
-      this.animate(action,c);this.emit('save');return{ok:true,bond:s.friendship[c.species]||0,companion:s.companion};
+      this.emit('save');return{ok:true,bond:s.friendship[c.species]||0,companion:s.companion};
     }
     useBuilding(id,action){
       if(this.paused||this.travel||this.state.mode!=='surface')return{ok:false,reason:'탐험 중에 사용할 수 있어요.'};
@@ -351,14 +341,14 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
         this.emit('message',{text:target?'비콘이 미탐사 유적의 위치를 표시했어요.':'이 행성의 모든 유적을 조사했어요.'});
         if(!result.ok)return result;
       }else return{ok:false,reason:'이 건물에서 사용할 수 없는 기능이에요.'};
-      this.animate(action,b);this.emit('save');return{ok:true};
+      this.emit('save');return{ok:true};
     }
     studyRelic(id){
       if(this.paused||this.travel||this.state.mode!=='surface')return{ok:false,reason:'착륙 후 조사하세요.'};
       const r=this.world().relics.find(v=>v.id===id),s=this.state;
       if(!r||dist(r,s.player)>160)return{ok:false,reason:'유적 가까이로 이동하세요.'};
       if(s.relics.includes(id)){this.emit('message',{text:'이미 조사한 '+r.name+'입니다. 다음 별빛 기록을 찾아보세요.'});return{ok:false,reason:'조사 완료'};}
-      s.relics.push(id);this.addResource('crystal',5);this.addResource('iron',4);this.cooldown=.8;this.animate('relic',r);
+      s.relics.push(id);this.addResource('crystal',5);this.addResource('iron',4);this.cooldown=.8;
       if(this.waypoint&&dist(this.waypoint,r)<2)this.waypoint=null;
       this.emit('effect',{kind:'relic',x:r.x,y:r.y,color:this.planet().accent});
       this.emit('message',{text:r.name+' 조사 완료 · 수정 +5 · 철광석 +4'});
@@ -370,7 +360,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
       if(this.scanCooldown>0){this.emit('message',{text:'스캐너 충전 중 · '+Math.ceil(this.scanCooldown)+'초'});return{ok:false,reason:'스캐너 충전 중'};}
       this.scanCooldown=5;const pos=this.state.mode==='surface'?this.state.player:this.state.ship;this.scanRing={x:pos.x,y:pos.y,age:0};this.emit('effect',{kind:'scan'});
       if(this.state.mode==='space'){this.emit('message',{text:'행성 5개 감지. M 키로 성계 지도를 열어보세요.'});return{ok:true,planets:PLANETS.length};}
-      this.animate('scan');const nearby=this.world().creatures.filter(c=>dist(c,pos)<650);let found=0;for(const c of nearby)if(this.discover(c.species))found++;
+      const nearby=this.world().creatures.filter(c=>dist(c,pos)<650);let found=0;for(const c of nearby)if(this.discover(c.species))found++;
       const nodes=this.world().nodes.filter(n=>n.hp>0&&dist(n,pos)<650).length;
       this.emit('message',{text:'스캔 완료 · 자원 '+nodes+'곳 · 생명체 '+nearby.length+'마리'+(found?' · 새 도감 +'+found:'')});return{ok:true,nodes,creatures:nearby.length,discovered:found};
     }
@@ -392,7 +382,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
       const result=this.canPlace(type,x,y);if(!result.ok){this.emit('message',{text:result.reason,error:true});return result;}
       for(const[r,n]of Object.entries(BUILDINGS[type].cost))this.state.inventory[r]-=n;
       this.world().buildings.push({id:'building-'+Math.round(this.state.time*1000)+'-'+this.world().buildings.length,type,x,y});this.state.stats.buildings++;
-      this.animate('build',{x,y,type});this.emit('effect',{kind:'build',x,y,color:'#c3f379'});this.emit('message',{text:BUILDINGS[type].name+' 완성! 이곳이 당신의 새로운 보금자리예요.'});this.selectedBuild=null;this.emit('save');return{ok:true,type};
+      this.emit('effect',{kind:'build',x,y,color:'#c3f379'});this.emit('message',{text:BUILDINGS[type].name+' 완성! 이곳이 당신의 새로운 보금자리예요.'});this.selectedBuild=null;this.emit('save');return{ok:true,type};
     }
     launch(){
       if(this.paused||this.travel)return{ok:false,reason:'잠시 기다려주세요.'};
@@ -568,154 +558,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
 <script>
 (function(root){
   'use strict';
-  // K-17: original reference pixels, skinned in the 3D scene. No generated face.
-  // A front-view image cannot supply a real back view; this is an articulated billboard.
-  const HEIGHT=96, SCALE=HEIGHT/1536, clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
-  const smooth=(a,b,x)=>{const t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t);};
-  const BONES=[
-    ['hips',-1,512,753],['waist',0,512,639],['chest',1,511,452],['head',2,510,278],
-    ['leftArm',2,360,335],['leftForearm',4,333,527],['leftHand',5,277,716],
-    ['rightArm',2,652,335],['rightForearm',7,682,529],['rightHand',8,738,728],
-    ['leftThigh',0,430,758],['leftShin',10,423,1029],['leftFoot',11,416,1324],
-    ['rightThigh',0,588,757],['rightShin',13,650,1036],['rightFoot',14,685,1335]
-  ];
-  const point=(x,y,z=0)=>[(x-512)*SCALE,(1536-y)*SCALE,z];
-  const REST=BONES.map(b=>point(b[2],b[3]));
-  const DURATIONS={mine:.38,scan:1.15,build:1.35,upgrade:1.35,greet:.95,pet:1.35,feed:1.25,follow:.95,guide:1.05,relic:1.4,rest:1.6,use:.75,lights:.75,charge:.95};
-  const identity=()=>new Float32Array([1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]);
-  function multiply(a,b,out){for(let j=0;j<4;j++)for(let i=0;i<4;i++)out[j*4+i]=a[i]*b[j*4]+a[4+i]*b[j*4+1]+a[8+i]*b[j*4+2]+a[12+i]*b[j*4+3];return out;}
-  function transform(m,p){return[m[0]*p[0]+m[4]*p[1]+m[8]*p[2]+m[12],m[1]*p[0]+m[5]*p[1]+m[9]*p[2]+m[13],m[2]*p[0]+m[6]*p[1]+m[10]*p[2]+m[14]];}
-  function blend(a,b,t){return[a,b,clamp(t,0,1)];}
-  function weights(x,y,region){
-    const left=400-(clamp(y,285,745)-285)*.17,right=628+(clamp(y,285,745)-285)*.18;
-    if(region==='leftArm'||region==='rightArm'||(!region&&y>=285&&y<856&&(x<left||x>right))){
-      const arm=region==='leftArm'?4:region==='rightArm'?7:x<512?4:7;
-      if(y<350)return blend(2,arm,smooth(285,342,y));
-      if(y<605)return blend(arm,arm+1,smooth(490,570,y));
-      return blend(arm+1,arm+2,smooth(691,748,y));
-    }
-    if(y<315)return blend(3,2,smooth(266,311,y));
-    if(y<580)return blend(2,1,smooth(470,570,y));
-    if(y<760)return blend(1,0,smooth(620,726,y));
-    const leg=x<514?10:13;
-    if(y<834)return blend(0,leg,smooth(760,827,y));
-    if(y<1190)return blend(leg,leg+1,smooth(983,1082,y));
-    return blend(leg+1,leg+2,smooth(1280,1370,y));
-  }
-  function mesh(columns=48,rows=72){
-    // Separate topology at the arm/body silhouettes. Sharing triangles across a
-    // cutout's transparent gaps would stretch torso pixels when a hand is raised.
-    const cuts=[[280,398,628],[340,400,642],[400,394,636],[430,390,630],[480,384.5,625],[500,381,624],[520,385,628],[540,378,644],[560,368,652],[580,352,656],[600,345,663],[630,340,669],[660,337,682],[690,327,691],[710,326,698],[740,313,702],[770,314,682],[800,318,681],[830,316,689],[850,316,688],[880,320,685]];
-    const edge=(y,side)=>{let i=0;while(i<cuts.length-2&&y>cuts[i+1][0])i++;const a=cuts[i],b=cuts[i+1],t=clamp((y-a[0])/(b[0]-a[0]),0,1);return a[side]+(b[side]-a[side])*t;};
-    const data=[],vertex=(x,y,region)=>{data.push(...point(x,y),x/1024,1-y/1536,...weights(x,y,region));};
-    const strip=(from,to,left,right,region)=>{
-      const levels=[from,to,...cuts.map(c=>c[0]).filter(y=>y>from&&y<to)];
-      for(let y=from+1536/rows;y<to;y+=1536/rows)levels.push(y);levels.sort((a,b)=>a-b);
-      for(let j=0;j<levels.length-1;j++){
-        const y=levels[j],yy=levels[j+1],lo=left(y),hi=right(y),loo=left(yy),hii=right(yy),n=Math.max(1,Math.ceil(Math.max(hi-lo,hii-loo)/1024*columns));
-        for(let i=0;i<n;i++){const x=lo+(hi-lo)*i/n,xx=lo+(hi-lo)*(i+1)/n,bx=loo+(hii-loo)*i/n,bxx=loo+(hii-loo)*(i+1)/n;
-          vertex(x,y,region);vertex(xx,y,region);vertex(bxx,yy,region);vertex(x,y,region);vertex(bxx,yy,region);vertex(bx,yy,region);
-        }
-      }
-    };
-    strip(0,280,()=>0,()=>1024,'body');
-    strip(280,880,()=>0,y=>edge(y,1),'leftArm');
-    strip(280,880,y=>edge(y,2),()=>1024,'rightArm');
-    strip(280,880,y=>edge(y,1),()=>514,'body');
-    strip(280,880,()=>514,y=>edge(y,2),'body');
-    strip(880,1536,()=>0,()=>514,'body');strip(880,1536,()=>514,()=>1024,'body');
-    return new Float32Array(data);
-  }
-  class Animator{
-    constructor(){this.palette=new Float32Array(16*16);this.matrices=BONES.map(identity);this.local=identity();this.angles=new Float32Array(16);this.previous=new Float32Array(16);this.action=null;this.walk=0;this.clock=0;this.phase=0;this.rootX=0;this.rootY=0;this.targetSide=1;this.hand=point(741,790);this.leftHand=point(278,786);this.evaluate(0,{state:{mode:'surface',time:0,player:{x:0,y:0}},velocity:{x:0,y:0}},0);}
-    start(event){if(!DURATIONS[event.kind])return false;this.previous.set(this.angles);this.action={...event,age:0,duration:DURATIONS[event.kind]};return true;}
-    reset(){this.action=null;this.walk=0;this.phase=0;this.rootX=this.rootY=0;this.angles.fill(0);this.previous.fill(0);}
-    evaluate(dt,game,yaw=0){
-      const frozen=!!game.paused,step=frozen?0:clamp(dt,0,.1),s=game.state,p=s.player;
-      if(s.mode!=='surface'){this.reset();return this;}
-      this.clock+=step;const speed=Math.hypot(game.velocity?.x||0,game.velocity?.y||0),walkTarget=clamp(speed/144,0,1.35);
-      this.walk+=(walkTarget-this.walk)*(1-Math.exp(-step*13));this.phase+=step*(speed/144)*8.8;
-      if(this.action){this.action.age+=step;if(this.action.age>=this.action.duration)this.action=null;}
-      const a=this.angles;a.fill(0);const swing=Math.sin(this.phase)*this.walk,bob=Math.abs(Math.cos(this.phase))*this.walk;
-      a[1]=Math.sin(this.clock*1.7)*.009;a[2]=Math.sin(this.clock*1.7+.6)*.012;a[3]=-a[2]*.5;
-      a[4]=swing*.09;a[7]=-swing*.09;a[5]=-.025-Math.max(0,swing)*.07;a[8]=.025+Math.max(0,-swing)*.07;
-      a[10]=swing*.1;a[13]=-swing*.1;a[11]=Math.max(0,-swing)*.16;a[14]=-Math.max(0,swing)*.16;a[12]=-a[11]*.55;a[15]=-a[14]*.55;
-      this.rootX=Math.sin(this.phase*.5)*.22*this.walk;this.rootY=bob*.85;
-      const action=this.action;
-      if(action){
-        const t=action.age/action.duration,envelope=smooth(0,.15,t)*(1-smooth(.7,1,t));
-        const projected=(Number.isFinite(action.x)?action.x-p.x:40)*Math.cos(yaw)-(Number.isFinite(action.y)?action.y-p.y:0)*Math.sin(yaw);
-        this.targetSide=projected<-3?-1:1;const side=this.targetSide,arm=side>0?7:4,fore=arm+1,hand=arm+2;
-        const reach=(upper,lower)=>{a[arm]+=side*upper*envelope;a[fore]+=side*lower*envelope;};
-        const bend=amount=>{a[1]-=side*amount*envelope;a[3]+=side*amount*.65*envelope;this.rootX+=side*envelope*1.7;};
-        switch(action.kind){
-          case 'mine':{
-            // Tool starts extended on contact, recoils, then recovers before the next hit.
-            const hit=1-smooth(.38,1,t);a[arm]+=side*(.52+.15*Math.sin(t*6.28))*hit;a[fore]+=side*(.64-.38*smooth(0,.25,t))*hit;bend(.055);break;
-          }
-          case 'scan':a[4]+=.22*envelope;a[5]+=1.65*envelope;a[7]-=.20*envelope;a[8]-=1.15*envelope;a[3]-=.1*envelope;break;
-          case 'build':case 'upgrade':reach(.52,.68+Math.sin(t*18)*.12);a[side>0?4:7]-=side*.25*envelope;bend(.07);this.rootY-=envelope*2;break;
-          case 'pet':reach(.45,.3+Math.sin(t*13)*.22);a[hand]+=side*Math.sin(t*13)*.14*envelope;bend(.17);this.rootY-=envelope*3;break;
-          case 'feed':reach(.5,.56+Math.sin(t*Math.PI)*.27);a[hand]+=side*.18*envelope;bend(.1);break;
-          case 'greet':case 'follow':reach(.95,1.45+Math.sin(t*22)*.17);a[hand]+=side*Math.sin(t*22)*.18*envelope;break;
-          case 'guide':reach(1.1,.05);a[3]+=side*.09*envelope;break;
-          case 'relic':reach(.5,.6);bend(.17);a[10]+=.10*envelope;a[13]-=.10*envelope;this.rootY-=3*envelope;break;
-          case 'rest':a[4]-=.17*envelope;a[7]+=.17*envelope;a[3]+=.06*envelope;this.rootY-=2.4*envelope;break;
-          default:reach(.62,.62);a[hand]+=side*Math.sin(t*16)*.08*envelope;bend(.06);
-        }
-        const mix=smooth(0,.07,action.age);for(let i=0;i<16;i++)a[i]=this.previous[i]+(a[i]-this.previous[i])*mix;
-      }
-      for(let i=0;i<16;i++){
-        const m=this.local,c=Math.cos(a[i]),sn=Math.sin(a[i]),v=REST[i];m.set([c,sn,0,0,-sn,c,0,0,0,0,1,0,v[0]-c*v[0]+sn*v[1],v[1]-sn*v[0]-c*v[1],0,1]);
-        // Lift articulated arms slightly toward the viewer so a wrist held over
-        // the chest is visible instead of failing the torso's depth test.
-        if(i===4||i===7)m[14]=.7;else if(i===5||i===8)m[14]=.2;else if(i===6||i===9)m[14]=.2;
-        if(i===0){m[12]+=this.rootX;m[13]+=this.rootY;this.matrices[i].set(m);}else multiply(this.matrices[BONES[i][1]],m,this.matrices[i]);
-        this.palette.set(this.matrices[i],i*16);
-      }
-      this.leftHand=transform(this.matrices[6],point(278,786));this.rightHand=transform(this.matrices[9],point(741,790));this.hand=this.targetSide<0?this.leftHand:this.rightHand;
-      return this;
-    }
-  }
-  root.OrbitPlayer={HEIGHT,SCALE,BONES,REST,DURATIONS,mesh,weights,point,transform,Animator};
-  if(typeof module!=='undefined')module.exports=root.OrbitPlayer;
-})(typeof globalThis!=='undefined'?globalThis:this);
-
-</script>
-<script>
-(function(root){
-  'use strict';
-  class Tutorial{
-    constructor(saved){this.done=Array.from({length:5},(_,i)=>saved?.done?.[i]===true);this.walked=Math.max(0,Math.min(60,Number(saved?.walked)||0));this.skipped=saved?.skipped===true;this.previous=null;}
-    get step(){const n=this.done.indexOf(false);return n<0?5:n;}
-    get active(){return !this.skipped&&this.step<5;}
-    tick(game){
-      const s=game.state,p=s.player;
-      if(!this.active||game.paused||s.mode!=='surface'){this.previous=null;return;}
-      if(this.previous&&this.previous.planet===s.planet){const d=Math.hypot(p.x-this.previous.x,p.y-this.previous.y);if(d<12)this.walked=Math.min(60,this.walked+d);}
-      this.previous={x:p.x,y:p.y,planet:s.planet};if(this.walked>=60)this.done[0]=true;
-    }
-    event(e){
-      if(!this.active)return;
-      if(e.type==='effect'&&e.kind==='break')this.done[1]=true;
-      if(e.type==='player-action'){
-        if(e.kind==='scan')this.done[2]=true;
-        if(e.kind==='build'&&e.buildingType==='habitat')this.done[3]=true;
-        if(e.kind==='greet')this.done[4]=true;
-      }
-    }
-    snapshot(){return{done:[...this.done],walked:this.walked,skipped:this.skipped};}
-  }
-  root.OrbitTutorial={Tutorial};if(typeof module!=='undefined')module.exports=root.OrbitTutorial;
-})(typeof globalThis!=='undefined'?globalThis:this);
-
-</script>
-<script>
-(function(root){
-  'use strict';
   const{PLANETS,SPECIES,BUILDINGS,SURFACE_MAP_SCALE,TERRAIN_LIMIT,rand,clamp,dist}=root.OrbitCore,TAU=Math.PI*2;
-  // Replaced by scripts/build.mjs with the supplied transparent K-17 explorer portrait.
-  const PLAYER_IMAGE_DATA="/assets/player-k17.webp?v=20260919";
   const rgb=h=>{if(Array.isArray(h))return h;let n=parseInt(h.slice(1,7),16);return[(n>>16&255)/255,(n>>8&255)/255,(n&255)/255];};
   const tint=(h,f)=>rgb(h).map(v=>clamp(v*f,0,1));
   const sub=(a,b)=>a.map((v,i)=>v-b[i]);
@@ -804,18 +647,6 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
       varying vec2 vUV;uniform vec3 uTop;uniform vec3 uBottom;uniform float uTime;uniform float uSpace;uniform float uYaw;
       float hash(vec2 p){return fract(sin(dot(mod(p,64.0),vec2(127.1,311.7)))*43758.5453);}
       void main(){vec3 col=mix(uBottom,uTop,smoothstep(0.05,1.0,vUV.y));vec2 grid=(vUV+vec2(uYaw*0.12,0.0))*vec2(220.0,125.0);float r=hash(floor(grid));float star=(1.0-smoothstep(0.0,0.10,length(fract(grid)-0.5)))*step(0.982,r);col+=star*(0.35+uSpace*0.65)*(0.7+0.3*sin(uTime+r*100.0));float haze=exp(-length((vUV-vec2(0.66,0.54))*vec2(1.2,2.0))*3.5);col+=vec3(0.02,0.06,0.08)*haze;gl_FragColor=vec4(col,1.0);}`,
-    spriteVertex:`precision highp float;
-      attribute vec3 aPosition; attribute vec2 aUV; attribute vec2 aBones; attribute float aMix;
-      uniform mat4 uVP; uniform mat4 uModel; uniform mat4 uBones[16]; uniform vec3 uEye;
-      varying vec2 vUV; varying float vDistance;
-      void main(){vec4 rest=vec4(aPosition,1.0);vec4 skinned=mix(uBones[int(aBones.x)]*rest,uBones[int(aBones.y)]*rest,aMix);vec3 position=(uModel*skinned).xyz;vUV=aUV;vDistance=distance(uEye,position);gl_Position=uVP*vec4(position,1.0);}`,
-    spriteFragment:`#ifdef GL_FRAGMENT_PRECISION_HIGH
-      precision highp float;
-      #else
-      precision mediump float;
-      #endif
-      varying vec2 vUV; varying float vDistance; uniform sampler2D uTexture; uniform vec3 uFog; uniform vec2 uFogRange;
-      void main(){vec4 color=texture2D(uTexture,vUV);if(color.a<0.06)discard;float fog=smoothstep(uFogRange.x,uFogRange.y,vDistance);gl_FragColor=vec4(mix(color.rgb,uFog,fog),color.a*(1.0-fog));}`,
     // An edge-only pass preserves surface detail and never filters the HTML HUD.
     postFragment:`#ifdef GL_FRAGMENT_PRECISION_HIGH
       precision highp float;
@@ -841,24 +672,17 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     constructor(canvas){
       this.gl=canvas.getContext('webgl',{alpha:false,antialias:true,powerPreference:'high-performance',preserveDrawingBuffer:false})||canvas.getContext('experimental-webgl',{alpha:false,antialias:true});
       if(!this.gl)throw Error('WebGL 3D 그래픽을 사용할 수 없어요. 브라우저의 하드웨어 가속을 켜고 최신 Chrome 또는 Edge에서 다시 열어주세요.');
-      const gl=this.gl;this.program=this.programFor(shaders.vertex,shaders.fragment);this.skyProgram=this.programFor(shaders.skyVertex,shaders.skyFragment);this.spriteProgram=this.programFor(shaders.spriteVertex,shaders.spriteFragment);this.uniforms={};
+      const gl=this.gl;this.program=this.programFor(shaders.vertex,shaders.fragment);this.skyProgram=this.programFor(shaders.skyVertex,shaders.skyFragment);this.uniforms={};
       for(const n of['uVP','uModel','uEye','uFog','uFogRange'])this.uniforms[n]=gl.getUniformLocation(this.program,n);
       this.attributes={};for(const n of['aPosition','aNormal','aColor','aEmission'])this.attributes[n]=gl.getAttribLocation(this.program,n);
       this.skyUniforms={};for(const n of['uTop','uBottom','uTime','uSpace','uYaw'])this.skyUniforms[n]=gl.getUniformLocation(this.skyProgram,n);
-      this.spriteUniforms={};for(const n of['uVP','uModel','uEye','uTexture','uFog','uFogRange'])this.spriteUniforms[n]=gl.getUniformLocation(this.spriteProgram,n);
-      this.spriteUniforms.uBones=gl.getUniformLocation(this.spriteProgram,'uBones[0]');
-      this.spriteAttributes={};for(const n of['aPosition','aUV','aBones','aMix'])this.spriteAttributes[n]=gl.getAttribLocation(this.spriteProgram,n);
       this.skyAttribute=gl.getAttribLocation(this.skyProgram,'aPosition');this.buffers={};
       this.skyBuffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,this.skyBuffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);
-      const rigMesh=root.OrbitPlayer.mesh();this.spriteCount=rigMesh.length/8;
-      this.spriteBuffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,this.spriteBuffer);gl.bufferData(gl.ARRAY_BUFFER,rigMesh,gl.STATIC_DRAW);
-      this.spriteTexture=null;this.spriteReady=false;this.currentVP=null;this.currentEye=null;this.currentFog=null;this.currentFogRange=null;this.loadPlayerSprite();
       this.shadowQueue=[];this.postSize='';this.postReady=false;
       try{this.postProgram=this.programFor(shaders.skyVertex,shaders.postFragment);this.postAttribute=gl.getAttribLocation(this.postProgram,'aPosition');this.postPixel=gl.getUniformLocation(this.postProgram,'uPixel');this.postScene=gl.getUniformLocation(this.postProgram,'uScene');}catch(e){this.postProgram=null;}
       gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);gl.disable(gl.CULL_FACE);
     }
     programFor(vs,fs){const gl=this.gl,compile=(type,source)=>{const s=gl.createShader(type);gl.shaderSource(s,source);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)){const e=gl.getShaderInfoLog(s);gl.deleteShader(s);throw Error('3D 셰이더 오류: '+e);}return s;};const v=compile(gl.VERTEX_SHADER,vs),f=compile(gl.FRAGMENT_SHADER,fs),p=gl.createProgram();gl.attachShader(p,v);gl.attachShader(p,f);gl.linkProgram(p);gl.deleteShader(v);gl.deleteShader(f);if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw Error('3D 그래픽 연결 오류');return p;}
-    loadPlayerSprite(){if(PLAYER_IMAGE_DATA.startsWith('__')||!root.Image)return;const image=new root.Image();image.onload=()=>{const gl=this.gl;this.spriteTexture=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,this.spriteTexture);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,image);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);gl.bindTexture(gl.TEXTURE_2D,null);this.spriteReady=true;};image.onerror=()=>{this.spriteReady=false;};image.src=PLAYER_IMAGE_DATA;}
     upload(name,data,dynamic=false){const gl=this.gl;let b=this.buffers[name];if(!b)b=this.buffers[name]={buffer:gl.createBuffer(),count:0,capacity:0};b.count=data.length/10;gl.bindBuffer(gl.ARRAY_BUFFER,b.buffer);if(dynamic){if(data.byteLength>b.capacity){b.capacity=2**Math.ceil(Math.log2(Math.max(1024,data.byteLength)));gl.bufferData(gl.ARRAY_BUFFER,b.capacity,gl.DYNAMIC_DRAW);}if(data.byteLength)gl.bufferSubData(gl.ARRAY_BUFFER,0,data);}else gl.bufferData(gl.ARRAY_BUFFER,data,gl.STATIC_DRAW);if(data.shadows?.length){b.shadow=name+'-shadow';this.upload(b.shadow,data.shadows,dynamic);}else b.shadow=null;}
     resizeTarget(w,h){
       const gl=this.gl,size=w+'x'+h;if(!this.postProgram||size===this.postSize)return;this.postSize=size;this.postReady=false;
@@ -877,20 +701,9 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
       gl.bindBuffer(gl.ARRAY_BUFFER,this.skyBuffer);gl.enableVertexAttribArray(this.skyAttribute);gl.vertexAttribPointer(this.skyAttribute,2,gl.FLOAT,false,8,0);
       const bottom=space?[.025,.05,.1]:p.id==='ember'?[.28,.17,.18]:p.id==='nix'?[.43,.59,.69]:p.id==='solara'?[.55,.45,.32]:p.id==='prisma'?[.37,.31,.53]:[.34,.5,.48];this.fog=bottom;
       gl.uniform3fv(this.skyUniforms.uTop,space?[.018,.025,.065]:[.045,.105,.17]);gl.uniform3fv(this.skyUniforms.uBottom,bottom);gl.uniform1f(this.skyUniforms.uTime,time);gl.uniform1f(this.skyUniforms.uSpace,space?1:0);gl.uniform1f(this.skyUniforms.uYaw,yaw);gl.drawArrays(gl.TRIANGLES,0,6);gl.disableVertexAttribArray(this.skyAttribute);
-      this.currentVP=vp;this.currentEye=eye;this.currentFog=bottom;this.currentFogRange=space?[1800,5500]:[650,2600*SURFACE_MAP_SCALE];gl.enable(gl.DEPTH_TEST);gl.useProgram(this.program);gl.uniformMatrix4fv(this.uniforms.uVP,false,vp);gl.uniform3fv(this.uniforms.uEye,eye);gl.uniform3fv(this.uniforms.uFog,bottom);gl.uniform2fv(this.uniforms.uFogRange,this.currentFogRange);
+      gl.enable(gl.DEPTH_TEST);gl.useProgram(this.program);gl.uniformMatrix4fv(this.uniforms.uVP,false,vp);gl.uniform3fv(this.uniforms.uEye,eye);gl.uniform3fv(this.uniforms.uFog,bottom);gl.uniform2fv(this.uniforms.uFogRange,space?[1800,5500]:[650,2600*SURFACE_MAP_SCALE]);
     }
     draw(name,model=identity()){const b=this.buffers[name];if(!b)return;if(b.shadow)this.shadowQueue.push([b.shadow,model]);if(!b.count)return;const gl=this.gl,a=this.attributes;gl.uniformMatrix4fv(this.uniforms.uModel,false,model);gl.bindBuffer(gl.ARRAY_BUFFER,b.buffer);for(const[n,size,offset]of[['aPosition',3,0],['aNormal',3,12],['aColor',3,24],['aEmission',1,36]]){gl.enableVertexAttribArray(a[n]);gl.vertexAttribPointer(a[n],size,gl.FLOAT,false,40,offset);}gl.drawArrays(gl.TRIANGLES,0,b.count);}
-    drawSprite(model,rig){
-      if(!this.spriteReady||!this.spriteTexture)return false;
-      const gl=this.gl,a=this.spriteAttributes;for(const i of Object.values(this.attributes))gl.disableVertexAttribArray(i);
-      gl.useProgram(this.spriteProgram);gl.uniformMatrix4fv(this.spriteUniforms.uVP,false,this.currentVP);gl.uniformMatrix4fv(this.spriteUniforms.uModel,false,model);gl.uniformMatrix4fv(this.spriteUniforms.uBones,false,rig.palette);
-      gl.uniform3fv(this.spriteUniforms.uEye,this.currentEye);gl.uniform3fv(this.spriteUniforms.uFog,this.currentFog);gl.uniform2fv(this.spriteUniforms.uFogRange,this.currentFogRange);gl.uniform1i(this.spriteUniforms.uTexture,0);
-      gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,this.spriteTexture);gl.bindBuffer(gl.ARRAY_BUFFER,this.spriteBuffer);
-      for(const[name,size,offset]of[['aPosition',3,0],['aUV',2,12],['aBones',2,20],['aMix',1,28]]){gl.enableVertexAttribArray(a[name]);gl.vertexAttribPointer(a[name],size,gl.FLOAT,false,32,offset);}
-      gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.drawArrays(gl.TRIANGLES,0,this.spriteCount);gl.disable(gl.BLEND);
-      for(const i of Object.values(a))gl.disableVertexAttribArray(i);gl.bindTexture(gl.TEXTURE_2D,null);gl.useProgram(this.program);
-      gl.uniformMatrix4fv(this.uniforms.uVP,false,this.currentVP);gl.uniform3fv(this.uniforms.uEye,this.currentEye);gl.uniform3fv(this.uniforms.uFog,this.currentFog);gl.uniform2fv(this.uniforms.uFogRange,this.currentFogRange);return true;
-    }
     end(){
       const gl=this.gl;gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.depthMask(false);gl.enable(gl.POLYGON_OFFSET_FILL);gl.polygonOffset(-1,-1);
       for(const[name,model]of this.shadowQueue)this.draw(name,model);
@@ -1225,7 +1038,6 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
       this.canvas=canvas;this.radar=radar;this.rc=radar.getContext('2d');this.game=game;this.engine=new GLScene(canvas);this.width=1;this.height=1;this.mode=game.state.mode;this.planetId=null;this.camera={x:game.state.player.x,y:game.state.player.y};this.yaw=.24;this.pitch=.58;this.distance=420;this.firstPerson=false;this.mouse=null;this.particles=[];this.breakAnimations=[];this.objectKey='';this.shake=0;this.flash=0;this.transition=0;this.jumpHeight=0;this.jumpVelocity=0;this.speed=0;this.time=0;
       this.immersive=!(root.matchMedia&&root.matchMedia('(prefers-reduced-motion: reduce)').matches);this.intensity=.5;this.haptics=false;
       this.targetYaw=this.yaw;this.targetPitch=this.pitch;this.targetDistance=this.distance;this.resolution=1;this.frameMs=16.7;this.qualityTimer=0;this.radarTimer=0;
-      this.playerRig=new root.OrbitPlayer.Animator();
       try{const s=JSON.parse(localStorage.getItem('orbit-immersive-settings')||'null');if(s){this.immersive=typeof s.enabled==='boolean'?s.enabled:this.immersive;this.intensity=clamp(Number(s.intensity)||0,0,1);this.haptics=!!s.haptics;}}catch(e){}
       this.fx=document.createElement('canvas');this.fx.className='fx-canvas';this.fx.setAttribute('aria-hidden','true');canvas.after(this.fx);this.fc=this.fx.getContext('2d');
       this.stars=Array.from({length:85},(_,i)=>{const r=rand(i*61+51);return{a:r()*TAU,r:r(),speed:r()*.8+.3};});
@@ -1238,13 +1050,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     stopHaptics(){if(root.navigator?.vibrate)try{root.navigator.vibrate(0);}catch(e){}}
     pulse(pattern){if(this.immersive&&this.haptics&&root.navigator?.vibrate)try{root.navigator.vibrate(pattern);}catch(e){}}
     resize(){const r=this.canvas.getBoundingClientRect();this.width=Math.max(1,r.width);this.height=Math.max(1,r.height);this.dpr=Math.min(root.devicePixelRatio||1,1.5)*this.resolution;for(const c of[this.canvas,this.fx]){c.width=Math.round(this.width*this.dpr);c.height=Math.round(this.height*this.dpr);}this.zoom=1;}
-    reset(){this.camera={...(this.game.state.mode==='surface'?this.game.state.player:this.game.state.ship)};this.planetId=null;this.objectKey='';this.particles=[];this.breakAnimations=[];this.playerRig.reset();this.jumpHeight=0;this.jumpVelocity=0;this.mouse=null;this.updateCamera(0);}
-    action(event){this.playerRig.start(event);}
-    playerHandWorld(){
-      const p=this.game.state.player,y=heightAt(p.x,p.y,this.game.planet())+this.jumpHeight,rig=this.playerRig;
-      if(this.firstPerson){const a=rig.action,raise=a?Math.sin(Math.min(1,a.age/a.duration)*Math.PI):0;return transform(modelMatrix(p.x,y+58,p.y,1,this.yaw),[rig.targetSide*14,-15+raise*8,-35-raise*3]);}
-      return transform(modelMatrix(p.x,y,p.y,1,this.yaw),rig.hand);
-    }
+    reset(){this.camera={...(this.game.state.mode==='surface'?this.game.state.player:this.game.state.ship)};this.planetId=null;this.objectKey='';this.particles=[];this.breakAnimations=[];this.jumpHeight=0;this.jumpVelocity=0;this.mouse=null;this.updateCamera(0);}
     input(keys){const x=(keys.right?1:0)-(keys.left?1:0),z=(keys.down?1:0)-(keys.up?1:0),co=Math.cos(this.yaw),si=Math.sin(this.yaw);return{...keys,dx:co*x+si*z,dy:-si*x+co*z};}
     orbit(dx,dy){this.targetYaw-=dx*.005;this.targetPitch=clamp(this.targetPitch+dy*.004,this.firstPerson?-.85:.16,this.firstPerson?.85:1.35);}
     zoomBy(delta){if(this.firstPerson)return;this.targetDistance=clamp(this.targetDistance+delta*.35,210,770);}
@@ -1297,17 +1103,13 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
         for(const c of g.world().creatures){
           if(dist(c,s.player)>1250)continue;
           const angle=dist(c,s.player)<190?Math.atan2(s.player.x-c.x,s.player.y-c.y):Math.atan2(c.homeX-c.x,c.homeY-c.y);
-          const action=this.playerRig?.action,react=action?.targetId===c.id&&['pet','feed'].includes(action.kind)?Math.sin(action.age/action.duration*Math.PI)*4:0;
-          const bob=Math.sin(s.time*2.6+c.phase)*(s.companion===c.id?3:1.8)+react;
+          const bob=Math.sin(s.time*2.6+c.phase)*(s.companion===c.id?3:1.8);
           cached('life-'+c.species,b=>lifeModel(b,c.species,0,false),modelMatrix(c.x,heightAt(c.x,c.y,p)+bob,c.y,1,angle));
         }
         if(!this.firstPerson){
-          // Original pixels follow a sixteen-bone rig; upright billboard faces the camera.
-          const sprite=modelMatrix(s.player.x,heightAt(s.player.x,s.player.y,p)+this.jumpHeight,s.player.y,1,this.yaw);
-          if(!(this.engine.drawSprite&&this.engine.drawSprite(sprite,this.playerRig))){
-            const phase=g.moving?Math.floor((s.time*12%(TAU))/TAU*24):-1;
-            cached('astronaut-'+phase,b=>astronautModel(b,phase<0?0:phase/24*TAU/12,g.moving),modelMatrix(s.player.x,heightAt(s.player.x,s.player.y,p)+this.jumpHeight,s.player.y,1,Math.PI/2-s.player.angle));
-          }
+          // A small repeating pose cache keeps mesh allocation out of the frame loop.
+          const phase=g.moving?Math.floor((s.time*12%(TAU))/TAU*24):-1;
+          cached('astronaut-'+phase,b=>astronautModel(b,phase<0?0:phase/24*TAU/12,g.moving),modelMatrix(s.player.x,heightAt(s.player.x,s.player.y,p)+this.jumpHeight,s.player.y,1,Math.PI/2-s.player.angle));
         }
       }else if(!this.firstPerson)cached('ship-model',b=>spaceshipModel(b,0,true,false),modelMatrix(s.ship.x,s.ship.altitude||0,s.ship.y,.7,Math.PI/2-s.ship.angle));
     }
@@ -1320,8 +1122,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
         if(g.waypoint){const w=g.waypoint,y=heightAt(w.x,w.y,p);b.tube([w.x,y+70,w.y],[w.x,y+350,w.y],1.2,1,p.accent,5,1);b.ring(w.x,y+2,w.y,42,2,p.accent,1);}
         for(const fx of this.breakAnimations)blockBreakModel(b,fx,p,t);
         const nearest=g.nearest();if(nearest&&nearest.kind!=='ship'){const n=nearest.entity;b.ring(n.x,heightAt(n.x,n.y,p)+1.3,n.y,nearest.kind==='building'?72:35,1.7,p.accent,.8);}
-        if(g.beam)b.tube(this.playerRig?this.playerHandWorld():[player.x,h+31,player.y],[g.beam.x,heightAt(g.beam.x,g.beam.y,p)+24,g.beam.y],1.4,.8,'#e5ffc2',5,1);
-        if(this.playerRig)this.playerActionModel(b,h);
+        if(g.beam)b.tube([player.x+Math.cos(player.angle)*15,h+31+this.jumpHeight,player.y+Math.sin(player.angle)*15],[g.beam.x,heightAt(g.beam.x,g.beam.y,p)+24,g.beam.y],1.4,.8,'#e5ffc2',5,1);
         if(g.scanRing){const radius=g.scanRing.age*330;for(let i=0;i<96;i++){const a=i/96*TAU,bb=(i+1)/96*TAU;const x=g.scanRing.x+Math.sin(a)*radius,z=g.scanRing.y+Math.cos(a)*radius,xx=g.scanRing.x+Math.sin(bb)*radius,zz=g.scanRing.y+Math.cos(bb)*radius;b.tube([x,heightAt(x,z,p)+5,z],[xx,heightAt(xx,zz,p)+5,zz],1,1,'#b7f1d1',4,1);}}
         if(g.selectedBuild){const target=this.mouse||{x:player.x+Math.cos(player.angle)*105,y:player.y+Math.sin(player.angle)*105},check=g.canPlace(g.selectedBuild,target.x,target.y),y=heightAt(target.x,target.y,p);b.ring(target.x,y+1,target.y,BUILDINGS[g.selectedBuild].radius+8,3,check.ok?'#c3f379':'#ff9a80',1);b.at(target.x,y,target.y,1,0,()=>buildingModel(b,g.selectedBuild,t));}
         if(g.moveTarget)b.ring(g.moveTarget.x,heightAt(g.moveTarget.x,g.moveTarget.y,p)+1,g.moveTarget.y,10,2,'#e0edcf',.8);
@@ -1333,29 +1134,6 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
       for(let i=this.particles.length-1;i>=0;i--){const v=this.particles[i];if(!g.paused){v.life-=dt;v.x+=v.vx*dt;v.y+=v.vy*dt;v.z+=v.vz*dt;v.vy-=170*dt;}if(v.life<=0){this.particles.splice(i,1);continue;}b.box(v.x,v.y,v.z,v.size,v.size,v.size,v.color,.5);}
       return b.array();
     }
-    playerActionModel(b,ground){
-      const rig=this.playerRig,a=rig.action,p=this.game.state.player,hand=this.playerHandWorld(),t=a?a.age/a.duration:0,reach=Math.sin(t*Math.PI),side=rig.targetSide;
-      if(this.firstPerson){
-        b.at(p.x,ground+this.jumpHeight+58,p.y,1,this.yaw,()=>{
-          for(const sign of[-1,1]){const active=a&&(sign===side||a.kind==='scan'),lift=active?reach*8:0;
-            b.tube([sign*24,-32,-16],[sign*15,-19+lift,-31],5.5,4.6,'#dddcd4',12);
-            b.tube([sign*23,-29,-18],[sign*15,-19+lift,-31],1.2,1.1,'#e98a32',8);
-            b.roundedBox(sign*14,-15+lift,-35,8,7,10,2,'#242f35');b.roundedBox(sign*15,-17+lift,-31,6,2,7,.7,'#f0e9df');
-            b.box(sign*15,-15.7+lift,-31,3.5,.5,5,'#80d8ff',.8);
-          }
-        });
-      }
-      if(!a)return;
-      const target=[a.x,heightAt(a.x,a.y,this.game.planet())+(a.kind==='relic'?60:30),a.y];
-      if(['mine','build','upgrade','relic','use','lights','charge'].includes(a.kind)){
-        const direction=norm(sub(target,hand)),tip=hand.map((v,i)=>v+direction[i]*9),glow=a.kind==='mine'?'#c5f8a5':'#8fe4ff';
-        b.tube(hand,tip,2.7,2,'#263941',10);b.sphere(...tip,2.7,2.7,2.7,glow,8,5,.8);
-        if(['build','upgrade','relic'].includes(a.kind)&&t<.85){b.tube(tip,target,.5,.3,glow,5,1);b.at(...hand,1,this.time*2,()=>{b.box(0,7,0,5,5,5,'#91ebdf',.8);});}
-      }
-      if(a.kind==='scan'){const wrist=transform(modelMatrix(p.x,ground+this.jumpHeight,p.y,1,this.yaw),rig.leftHand);b.ring(...(this.firstPerson?hand:wrist),5+reach*5,.7,'#8be1ff',1);}
-      if(a.kind==='feed'&&t>.14&&t<.8){const f=clamp((t-.14)/.66,0,1),v=hand.map((n,i)=>n+(target[i]-n)*f);v[1]+=Math.sin(f*Math.PI)*20;b.sphere(...v,3.5,3.5,3.5,'#d3f291',8,5,.6);}
-      if(a.kind==='pet'||a.kind==='feed'){const y=target[1]+18+reach*10;b.sphere(target[0]-3,y,target[2],4,4,3,'#ffb7ce',8,5,.7);b.sphere(target[0]+3,y,target[2],4,4,3,'#ffb7ce',8,5,.7);b.cone(target[0],y-9,target[2],0,6,10,'#ffb7ce',6,.7);}
-    }
     draw(dt){
       if(this.lost)return;const g=this.game,s=g.state,p=g.planet(),space=s.mode==='space';
       if(!g.paused&&dt>0){this.frameMs+=(dt*1000-this.frameMs)*.04;this.qualityTimer+=dt;if(this.qualityTimer>3){this.qualityTimer=0;const next=this.frameMs>29?Math.max(.7,this.resolution-.1):this.frameMs<19?Math.min(1,this.resolution+.05):this.resolution;if(next!==this.resolution){this.resolution=next;this.resize();}}}
@@ -1363,7 +1141,6 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
         if(this.jumpHeight>0){this.jumpVelocity-=370*dt;this.jumpHeight+=this.jumpVelocity*dt;if(this.jumpHeight<=0){this.jumpHeight=0;this.jumpVelocity=0;this.shake=Math.max(this.shake,1.7);this.pulse(15);}}
       }
       this.updateCamera(dt);
-      this.playerRig.evaluate(dt,g,this.yaw);
       if(!space){if(this.planetId!==p.id){this.planetId=p.id;this.engine.upload('terrain',terrainBatch(p));this.objectKey='';}this.rebuildObjects();}
       this.engine.begin(this.canvas.width,this.canvas.height,this.vp,this.eye,space,p,s.time,this.yaw);
       if(space)this.engine.draw('space');else{this.engine.draw('terrain');this.engine.draw('objects');}
@@ -1400,14 +1177,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
   'use strict';
   const {Game,PLANETS,SPECIES,BUILDINGS,RESOURCE_NAMES,WORLD_LIMIT,dist,clamp}=window.OrbitCore;
   const {Renderer,drawPlanet,creature}=window.OrbitRenderer;
-  const $=id=>document.getElementById(id),SAVE_KEY='orbit-frontier-save-v1',SOUND_KEY='orbit-frontier-sound',TUTORIAL_KEY='orbit-frontier-tutorial-v1';
-  const TUTORIAL_STEPS=[
-    {title:'첫걸음: 우주복 조작',text:'WASD/방향키 또는 터치 패드로 우주복을 60m 이상 움직여 보세요.',note:'화면을 드래그하면 시점을 돌릴 수 있어요.'},
-    {title:'첫 자원 채굴',text:'자원 가까이 다가가 E를 눌러 채굴하세요. 여러 번 누르면 블록이 부서져요.',note:'철광석과 바이오매스를 모아야 집을 지을 수 있어요.'},
-    {title:'주변 스캔',text:'Q 키나 스캔 버튼으로 주변 자원과 생명체를 탐지하세요.',note:'스캔 링이 주변으로 퍼지면 완료예요.'},
-    {title:'첫 기지 건설',text:'철광석 12개와 바이오매스 8개를 모은 뒤 B로 건설 메뉴를 열어 집을 지으세요.',note:'빈 땅을 선택하거나 이동 후 “여기에 건설”을 누르세요.'},
-    {title:'생명체 만나기',text:'생명체에게 다가가 E를 눌러 인사하세요. 첫 만남 선물을 받을 수 있어요.',note:'Q로 발견하고 E로 교류하면 도감에도 기록됩니다.'}
-  ];
+  const $=id=>document.getElementById(id),SAVE_KEY='orbit-frontier-save-v1',SOUND_KEY='orbit-frontier-sound';
   let saved=null,storageAvailable=true;
   try{const raw=localStorage.getItem(SAVE_KEY);if(raw)saved=JSON.parse(raw);}catch(e){storageAvailable=false;}
   let game=new Game(saved);
@@ -1421,20 +1191,6 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
   }
   const keys={};let startOpen=true;game.paused=true;
   const modal=$('modal');let buildOpen=false,missionOpen=true,lastHud=0,lastSave=0,lastFrame=performance.now(),missionSignature='',locationSignature='',bannerTimer=null,lowOxygenWarned=false;
-  let tutorialData=null;try{tutorialData=JSON.parse(localStorage.getItem(TUTORIAL_KEY)||'null');}catch(e){}
-  let tutorial=new window.OrbitTutorial.Tutorial(tutorialData),tutorialSignature='',deferredMenu=null;
-  function saveTutorial(){try{localStorage.setItem(TUTORIAL_KEY,JSON.stringify(tutorial.snapshot()));}catch(e){}}
-  function updateTutorial(){
-    const visible=tutorial.active&&!startOpen&&!modal.open&&!buildOpen&&game.state.mode==='surface';$('tutorial-card').hidden=!visible;
-    const signature=JSON.stringify(tutorial.snapshot())+(tutorial.step===3?JSON.stringify(game.state.inventory):'');if(signature!==tutorialSignature){
-      const previous=tutorialSignature;tutorialSignature=signature;
-      if(!tutorial.active){if(previous&&!tutorial.skipped)toast('튜토리얼 완료! 이제 자유롭게 탐험하세요.');saveTutorial();return;}
-      const step=tutorial.step,info=TUTORIAL_STEPS[step];setText('tutorial-step',(step+1)+' / 5');setText('tutorial-title',info.title);setText('tutorial-description',info.text);
-      setText('tutorial-note',step===0?Math.floor(tutorial.walked)+' / 60m · '+info.note:step===3?'현재 철광석 '+game.state.inventory.iron+' / 12 · 바이오매스 '+game.state.inventory.biomass+' / 8':info.note);
-      $('tutorial-progress-bar').style.width=(tutorial.done.filter(Boolean).length/5*100)+'%';
-    }
-  }
-  $('tutorial-skip').onclick=()=>{tutorial.skipped=true;saveTutorial();hud(true);};
   let audioContext=null,soundEnabled=true,audioBus=null,engineSound=null,lastFootstep=0;
   try{soundEnabled=localStorage.getItem(SOUND_KEY)!=='off';}catch(e){}
   function setText(id,text){const e=$(id);if(e.textContent!==String(text))e.textContent=text;}
@@ -1486,11 +1242,9 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     $('fx-resume').onclick=closeModal;
   }
   function save(silent=true){
-    saveTutorial();
     try{localStorage.setItem(SAVE_KEY,JSON.stringify(game.snapshot()));storageAvailable=true;setText('save-indicator','자동 저장됨');if(!silent)toast('이 브라우저에 탐험 기록을 저장했어요.');return true;}catch(e){storageAvailable=false;setText('save-indicator','저장 불가 · 파일로 백업');if(!silent)toast('브라우저 저장 공간을 사용할 수 없어요. 저장 파일을 내보내 주세요.',true);return false;}
   }
   function showModal(title,eyebrow,html){
-    deferredMenu=null;
     clearInput();game.paused=true;renderer.stopHaptics();updateEngineAudio();game.moveTarget=null;$('modal-title').textContent=title;$('modal-eyebrow').textContent=eyebrow;$('modal-content').innerHTML=html;if(!modal.open)modal.showModal();
   }
   function closeModal(){if(modal.open)modal.close();game.paused=startOpen||document.hidden;clearInput();$('map-tab').classList.remove('active');$('journal-tab').classList.remove('active');$('explore-tab').classList.add('active');if(!startOpen)$('world').focus({preventScroll:true});}
@@ -1516,7 +1270,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     for(const[id,sp]of Object.entries(SPECIES)){const c=$('species-'+id).getContext('2d');c.translate(70,123);c.scale(1.7,1.7);if(s.discovered.includes(id))creature(c,id,0,1,s.met.includes(id));else{c.fillStyle='#9eb2aa';c.font='28px system-ui';c.textAlign='center';c.fillText('?',0,-12);}}
   }
   function showHelp(){
-    showModal('탐험가를 위한 작은 안내서','FLIGHT MANUAL / 조작 방법','<p class="modal-intro">서두르지 않아도 괜찮아요. 자원을 모으고 작은 집을 지으며 나만의 속도로 우주를 탐험하세요.</p><div class="help-grid"><div class="help-item"><strong>걷기 · 달리기</strong><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 또는 방향키<br><kbd>Shift</kbd>를 누르면 더 빠르게 이동해요.<br>빈 땅 클릭으로 이동, 드래그로 시점 회전<br>휠로 거리 조절, V로 1인칭 전환, Space로 점프</div><div class="help-item"><strong>채굴 · 생명체와 교류</strong>가까이 다가가 <kbd>E</kbd>를 누르세요.<br>계속 누르면 자원을 연속 채굴해요.<br>터치 화면에서는 ‘채굴 / 교류’를 누르세요.</div><div class="help-item"><strong>나만의 집 짓기</strong><kbd>B</kbd> → 건물 선택 → 빈 땅 클릭<br>또는 이동 후 ‘여기에 건설’을 누르세요.<br>집: 철광석 12개 + 바이오매스 8개</div><div class="help-item"><strong>새로운 행성으로 떠나기</strong>우주선 근처에서 <kbd>F</kbd>로 이륙<br><kbd>M</kbd> → 행성 선택 → <kbd>E</kbd> 착륙<br>Space / C로 상승·하강, Shift로 가속<br>드래그로 시점을 돌리며 직접 비행할 수 있어요.</div><div class="help-item"><strong>스캔 · 도감</strong><kbd>Q</kbd>로 주변 자원과 생명체 탐지<br>발견한 생명체는 도감에 기록됩니다.<br>교류하면 첫 만남 선물을 받아요.</div><div class="help-item"><strong>산소 · 연료</strong>우주선과 집 근처에서는 산소 충전<br><kbd>R</kbd>로 바이오 연료 합성<br>재료가 없으면 6초 비상 충전이 가능해요.</div></div><p class="help-tips">진행 상황은 이 기기의 브라우저에 자동 저장돼요. 다른 기기로 옮기려면 ‘저장 관리’에서 저장 파일을 내보내세요. 산소가 떨어지면 자원을 보존한 채 우주선으로 돌아옵니다. 채굴한 자원은 150초 후 다시 자랍니다.</p><button class="primary-button" id="help-resume" style="margin-top:22px">탐험으로 돌아가기</button>');$('help-resume').onclick=closeModal;const replay=document.createElement('button');replay.className='subtle-button';replay.textContent='튜토리얼 다시 시작';replay.onclick=()=>{tutorial=new window.OrbitTutorial.Tutorial();tutorialSignature='';saveTutorial();closeModal();hud(true);};$('modal-content').append(replay);
+    showModal('탐험가를 위한 작은 안내서','FLIGHT MANUAL / 조작 방법','<p class="modal-intro">서두르지 않아도 괜찮아요. 자원을 모으고 작은 집을 지으며 나만의 속도로 우주를 탐험하세요.</p><div class="help-grid"><div class="help-item"><strong>걷기 · 달리기</strong><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 또는 방향키<br><kbd>Shift</kbd>를 누르면 더 빠르게 이동해요.<br>빈 땅 클릭으로 이동, 드래그로 시점 회전<br>휠로 거리 조절, V로 1인칭 전환, Space로 점프</div><div class="help-item"><strong>채굴 · 생명체와 교류</strong>가까이 다가가 <kbd>E</kbd>를 누르세요.<br>계속 누르면 자원을 연속 채굴해요.<br>터치 화면에서는 ‘채굴 / 교류’를 누르세요.</div><div class="help-item"><strong>나만의 집 짓기</strong><kbd>B</kbd> → 건물 선택 → 빈 땅 클릭<br>또는 이동 후 ‘여기에 건설’을 누르세요.<br>집: 철광석 12개 + 바이오매스 8개</div><div class="help-item"><strong>새로운 행성으로 떠나기</strong>우주선 근처에서 <kbd>F</kbd>로 이륙<br><kbd>M</kbd> → 행성 선택 → <kbd>E</kbd> 착륙<br>Space / C로 상승·하강, Shift로 가속<br>드래그로 시점을 돌리며 직접 비행할 수 있어요.</div><div class="help-item"><strong>스캔 · 도감</strong><kbd>Q</kbd>로 주변 자원과 생명체 탐지<br>발견한 생명체는 도감에 기록됩니다.<br>교류하면 첫 만남 선물을 받아요.</div><div class="help-item"><strong>산소 · 연료</strong>우주선과 집 근처에서는 산소 충전<br><kbd>R</kbd>로 바이오 연료 합성<br>재료가 없으면 6초 비상 충전이 가능해요.</div></div><p class="help-tips">진행 상황은 이 기기의 브라우저에 자동 저장돼요. 다른 기기로 옮기려면 ‘저장 관리’에서 저장 파일을 내보내세요. 산소가 떨어지면 자원을 보존한 채 우주선으로 돌아옵니다. 채굴한 자원은 150초 후 다시 자랍니다.</p><button class="primary-button" id="help-resume" style="margin-top:22px">탐험으로 돌아가기</button>');$('help-resume').onclick=closeModal;
   }
   function toggleBuild(force){
     if(game.state.mode!=='surface'){toast('행성에 착륙한 뒤 건설할 수 있어요.');return;}
@@ -1548,7 +1302,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
       $('confirm-import').onclick=()=>{replaceGame(new Game(valid));closeModal();save();toast('저장 기록을 가져왔어요. 탐험을 이어가세요!');};$('cancel-import').onclick=showSettings;
     }catch(e){toast('올바른 오르빗 저장 파일이 아니에요. JSON 파일을 확인해 주세요.',true);}
   }
-  function replaceGame(next){deferredMenu=null;tutorial=new window.OrbitTutorial.Tutorial();tutorialSignature='';saveTutorial();game=next;renderer.game=next;renderer.reset();buildOpen=false;$('build-panel').hidden=true;$('build-button').classList.remove('selected');$('interact-button').classList.add('selected');missionSignature='';locationSignature='';clearInput();hud(true);}
+  function replaceGame(next){game=next;renderer.game=next;renderer.reset();buildOpen=false;$('build-panel').hidden=true;$('build-button').classList.remove('selected');$('interact-button').classList.add('selected');missionSignature='';locationSignature='';clearInput();hud(true);}
   function showDialogue(e){
     const sp=SPECIES[e.species],bond=game.state.friendship[e.species]||0;
     showModal(sp.name+'와의 만남','FIRST CONTACT / '+sp.kind,'<div class="dialogue"><p class="speaker">'+sp.name+' <span class="bond">'+('♥'.repeat(bond)+'♡'.repeat(3-bond))+'</span></p><blockquote>'+sp.line.replace(/\n/g,'<br>')+'</blockquote>'+(e.first?'<div class="reward">첫 만남 선물 · '+Object.entries(sp.gift).map(([r,n])=>RESOURCE_NAMES[r]+' +'+n).join(' · ')+'</div>':'<p class="modal-intro">친밀도 '+bond+' / 3 · 친밀도 2부터 동행과 길 안내가 열려요.</p>')+'<div class="interaction-grid"><button data-care="pet">♡ 쓰다듬기<small>친밀도 +1 · 10초 간격</small></button><button data-care="feed">❋ 먹이 나누기<small>바이오매스 2 · 친밀도 +1</small></button><button data-care="follow" '+(bond<2?'disabled':'')+'>'+(game.state.companion===e.id?'동행 마치기':'함께 탐험하기')+'<small>내 뒤를 따라오는 친구</small></button><button data-care="guide" '+(bond<2?'disabled':'')+'>유적 길 물어보기<small>미탐사 유적의 위치 표시</small></button></div><button class="primary-button" id="dialogue-close">탐험으로 돌아가기</button></div>');
@@ -1564,32 +1318,24 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
   }
   function discovery(title,detail){clearTimeout(bannerTimer);$('discovery-title').textContent=title;$('discovery-detail').textContent=detail;$('discovery-banner').hidden=false;bannerTimer=setTimeout(()=>$('discovery-banner').hidden=true,4300);sound('discovery');}
   function processEvents(){
-    while(game.events.length){const e=game.events.shift();tutorial.event(e);
-      if(e.type==='player-action'){deferredMenu=null;renderer.action(e);}
-      else if(e.type==='message')toast(e.text,e.error);
+    while(game.events.length){const e=game.events.shift();
+      if(e.type==='message')toast(e.text,e.error);
       else if(e.type==='effect'){renderer.effect(e);sound(e.kind,e);}
       else if(e.type==='save'){save();if(buildOpen)renderBuildOptions();}
-      else if(['dialogue','building-menu','relic-story'].includes(e.type)){deferredMenu={event:e,at:game.state.time+(renderer.playerRig.action?.duration||.6),planet:game.state.planet,x:game.state.player.x,y:game.state.player.y};}
+      else if(e.type==='dialogue')showDialogue(e);
+      else if(e.type==='building-menu')showBuilding(e.id);
+      else if(e.type==='relic-story'){showModal(e.name,'ANCIENT SIGNAL / 별빛 기록','<p class="relic-story">'+e.text+'</p><div class="reward">수정 +5 · 철광석 +4</div><button id="relic-close" class="primary-button">다음 기록을 찾아서</button>');$('relic-close').onclick=closeModal;}
       else if(e.type==='discovery'){discovery(SPECIES[e.species].name,SPECIES[e.species].kind+' · 도감에 기록했어요');}
       else if(e.type==='planet-discovery'){const p=PLANETS.find(p=>p.id===e.planet);discovery(p.name,p.kind+' · 새로운 세계에 온 걸 환영해요');}
       else if(e.type==='launch'||e.type==='land'){if(buildOpen){buildOpen=false;$('build-panel').hidden=true;game.selectedBuild=null;$('build-button').classList.remove('selected');$('interact-button').classList.add('selected');}locationSignature='';renderer.effect({kind:e.type});sound(e.type);}
     }
-  }
-  function openDeferredMenu(){
-    const item=deferredMenu;if(!item||game.paused)return;
-    if(game.state.mode!=='surface'||item.planet!==game.state.planet||dist(game.state.player,item)>95){deferredMenu=null;return;}
-    if(game.state.time<item.at)return;
-    deferredMenu=null;const e=item.event;
-    if(e.type==='dialogue')showDialogue(e);
-    else if(e.type==='building-menu')showBuilding(e.id);
-    else{showModal(e.name,'ANCIENT SIGNAL / 별빛 기록','<p class="relic-story">'+e.text+'</p><div class="reward">수정 +5 · 철광석 +4</div><button id="relic-close" class="primary-button">다음 기록을 찾아서</button>');$('relic-close').onclick=closeModal;}
   }
   function hud(force=false){
     const s=game.state,p=game.planet(),space=s.mode==='space',nearest=game.nearest();
     for(const r of ['iron','crystal','biomass'])setText(r+'-count',s.inventory[r]);
     setText('oxygen-text',Math.ceil(s.oxygen)+'%');$('oxygen-bar').style.width=s.oxygen+'%';$('oxygen-bar').style.background=s.oxygen<25?'#ffb196':'';setText('fuel-text',Math.floor(s.fuel)+'%');$('fuel-bar').style.width=s.fuel+'%';setText('journal-count',s.discovered.length);
     const loc=space?'space':p.id;if(locationSignature!==loc||force){locationSignature=loc;setText('location-code',space?'SIGMA SYSTEM / OPEN SPACE':'시그마 성계 / '+String(PLANETS.indexOf(p)+1).padStart(2,'0'));$('location-name').innerHTML=(space?'시그마 성계':p.name)+'<span class="planet-tag">'+(space?'비행 중':'탐험 중')+'</span>';$('location-description').innerHTML=space?'새로운 행성으로 향하는 중':p.kind+' <span>·</span> '+p.temp;setText('ship-label',space?'착륙':'우주선');$('scan-button').title=space?'주변 행성 스캔':'주변 자원과 생명체 스캔';}
-    updateTutorial();$('space-action').hidden=!space;$('mission-card').hidden=space||tutorial.active;$('vertical-controls').hidden=!space;
+    $('space-action').hidden=!space;$('mission-card').hidden=space;$('vertical-controls').hidden=!space;
     if(space){const target=nearest?.kind==='planet'?nearest.entity:null;setText('space-target-name',target?target.name+' 궤도':'다음 목적지를 찾아보세요');setText('space-target-help',target?'착륙해 새로운 자원과 생명체를 만나보세요.':'방향키로 비행하거나 성계 지도에서 항로를 설정하세요.');$('land-button').disabled=!target||!!game.travel;setText('land-button',target?target.name+'에 착륙':'행성 가까이에서 착륙');setText('refuel-button',game.solarCharge>0?'태양광 비상 충전 · '+Math.ceil(game.solarCharge)+'초':s.inventory.biomass>=3?'연료 합성 · 바이오매스 3개':'비상 태양광 충전 · 6초');}
     let hint='자원 가까이에서 E를 누르세요',key='E';
     if(game.selectedBuild){hint='빈 땅 클릭 또는 E · 건설 배치';key='B';}
@@ -1673,7 +1419,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     const elapsed=Math.max(0,Math.min(.1,(now-lastFrame)/1000));lastFrame=now;
     if(document.hidden){accumulator=0;requestAnimationFrame(frame);return;}
     if(game.paused)accumulator=0;else accumulator+=elapsed;
-    let steps=0;while(accumulator>=1/60&&steps++<6){game.tick(1/60,renderer.input(keys));tutorial.tick(game);processEvents();openDeferredMenu();accumulator-=1/60;if(game.paused){accumulator=0;break;}}
+    let steps=0;while(accumulator>=1/60&&steps++<6){game.tick(1/60,renderer.input(keys));processEvents();accumulator-=1/60;if(game.paused){accumulator=0;break;}}
     if(!game.paused||now-previousDraw>66){renderer.draw(elapsed);previousDraw=now;}
     updateEngineAudio();if(now-lastHud>110){hud();lastHud=now;}
     if(now-lastSave>8000){if(!game.paused)save();lastSave=now;}requestAnimationFrame(frame);

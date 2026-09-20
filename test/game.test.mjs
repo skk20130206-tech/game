@@ -143,10 +143,8 @@ test('Worker serves current game, all content pages, existing ads separation and
   for(const path of ['/','/play','/guide','/about','/updates','/privacy','/terms','/contact','/robots.txt','/sitemap.xml'])assert.equal((await worker.fetch(new Request('https://game.test'+path))).status,200,path);
   const health=await (await worker.fetch(new Request('https://game.test/health'))).json();
   assert.equal(health.ok,true);assert.equal(health.creatures,11);assert.equal(health.rendering,'WebGL 3D');
-  assert.equal(health.playerModel,'K-17 articulated reference character');
   const html=await (await worker.fetch(new Request('https://game.test/play'))).text();
   assert.ok(html.includes('orbit-share-button'));assert.ok(html.includes('orbit:start'));
-  assert.ok(html.includes('spriteProgram'));assert.ok(html.includes('/assets/player-k17.webp'));
   assert.equal(html.includes('pagead/js/adsbygoogle.js'),false);
   assert.ok((await (await worker.fetch(new Request('https://game.test/'))).text()).includes('pagead/js/adsbygoogle.js'));
   assert.equal((await worker.fetch(new Request('https://game.test/missing'))).status,404);

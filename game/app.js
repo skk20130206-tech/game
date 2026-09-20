@@ -2,14 +2,7 @@
   'use strict';
   const {Game,PLANETS,SPECIES,BUILDINGS,RESOURCE_NAMES,WORLD_LIMIT,dist,clamp}=window.OrbitCore;
   const {Renderer,drawPlanet,creature}=window.OrbitRenderer;
-  const $=id=>document.getElementById(id),SAVE_KEY='orbit-frontier-save-v1',SOUND_KEY='orbit-frontier-sound',TUTORIAL_KEY='orbit-frontier-tutorial-v1';
-  const TUTORIAL_STEPS=[
-    {title:'첫걸음: 우주복 조작',text:'WASD/방향키 또는 터치 패드로 우주복을 60m 이상 움직여 보세요.',note:'화면을 드래그하면 시점을 돌릴 수 있어요.'},
-    {title:'첫 자원 채굴',text:'자원 가까이 다가가 E를 눌러 채굴하세요. 여러 번 누르면 블록이 부서져요.',note:'철광석과 바이오매스를 모아야 집을 지을 수 있어요.'},
-    {title:'주변 스캔',text:'Q 키나 스캔 버튼으로 주변 자원과 생명체를 탐지하세요.',note:'스캔 링이 주변으로 퍼지면 완료예요.'},
-    {title:'첫 기지 건설',text:'철광석 12개와 바이오매스 8개를 모은 뒤 B로 건설 메뉴를 열어 집을 지으세요.',note:'빈 땅을 선택하거나 이동 후 “여기에 건설”을 누르세요.'},
-    {title:'생명체 만나기',text:'생명체에게 다가가 E를 눌러 인사하세요. 첫 만남 선물을 받을 수 있어요.',note:'Q로 발견하고 E로 교류하면 도감에도 기록됩니다.'}
-  ];
+  const $=id=>document.getElementById(id),SAVE_KEY='orbit-frontier-save-v1',SOUND_KEY='orbit-frontier-sound';
   let saved=null,storageAvailable=true;
   try{const raw=localStorage.getItem(SAVE_KEY);if(raw)saved=JSON.parse(raw);}catch(e){storageAvailable=false;}
   let game=new Game(saved);
@@ -23,20 +16,6 @@
   }
   const keys={};let startOpen=true;game.paused=true;
   const modal=$('modal');let buildOpen=false,missionOpen=true,lastHud=0,lastSave=0,lastFrame=performance.now(),missionSignature='',locationSignature='',bannerTimer=null,lowOxygenWarned=false;
-  let tutorialData=null;try{tutorialData=JSON.parse(localStorage.getItem(TUTORIAL_KEY)||'null');}catch(e){}
-  let tutorial=new window.OrbitTutorial.Tutorial(tutorialData),tutorialSignature='',deferredMenu=null;
-  function saveTutorial(){try{localStorage.setItem(TUTORIAL_KEY,JSON.stringify(tutorial.snapshot()));}catch(e){}}
-  function updateTutorial(){
-    const visible=tutorial.active&&!startOpen&&!modal.open&&!buildOpen&&game.state.mode==='surface';$('tutorial-card').hidden=!visible;
-    const signature=JSON.stringify(tutorial.snapshot())+(tutorial.step===3?JSON.stringify(game.state.inventory):'');if(signature!==tutorialSignature){
-      const previous=tutorialSignature;tutorialSignature=signature;
-      if(!tutorial.active){if(previous&&!tutorial.skipped)toast('튜토리얼 완료! 이제 자유롭게 탐험하세요.');saveTutorial();return;}
-      const step=tutorial.step,info=TUTORIAL_STEPS[step];setText('tutorial-step',(step+1)+' / 5');setText('tutorial-title',info.title);setText('tutorial-description',info.text);
-      setText('tutorial-note',step===0?Math.floor(tutorial.walked)+' / 60m · '+info.note:step===3?'현재 철광석 '+game.state.inventory.iron+' / 12 · 바이오매스 '+game.state.inventory.biomass+' / 8':info.note);
-      $('tutorial-progress-bar').style.width=(tutorial.done.filter(Boolean).length/5*100)+'%';
-    }
-  }
-  $('tutorial-skip').onclick=()=>{tutorial.skipped=true;saveTutorial();hud(true);};
   let audioContext=null,soundEnabled=true,audioBus=null,engineSound=null,lastFootstep=0;
   try{soundEnabled=localStorage.getItem(SOUND_KEY)!=='off';}catch(e){}
   function setText(id,text){const e=$(id);if(e.textContent!==String(text))e.textContent=text;}
@@ -88,11 +67,9 @@
     $('fx-resume').onclick=closeModal;
   }
   function save(silent=true){
-    saveTutorial();
     try{localStorage.setItem(SAVE_KEY,JSON.stringify(game.snapshot()));storageAvailable=true;setText('save-indicator','자동 저장됨');if(!silent)toast('이 브라우저에 탐험 기록을 저장했어요.');return true;}catch(e){storageAvailable=false;setText('save-indicator','저장 불가 · 파일로 백업');if(!silent)toast('브라우저 저장 공간을 사용할 수 없어요. 저장 파일을 내보내 주세요.',true);return false;}
   }
   function showModal(title,eyebrow,html){
-    deferredMenu=null;
     clearInput();game.paused=true;renderer.stopHaptics();updateEngineAudio();game.moveTarget=null;$('modal-title').textContent=title;$('modal-eyebrow').textContent=eyebrow;$('modal-content').innerHTML=html;if(!modal.open)modal.showModal();
   }
   function closeModal(){if(modal.open)modal.close();game.paused=startOpen||document.hidden;clearInput();$('map-tab').classList.remove('active');$('journal-tab').classList.remove('active');$('explore-tab').classList.add('active');if(!startOpen)$('world').focus({preventScroll:true});}
@@ -118,7 +95,7 @@
     for(const[id,sp]of Object.entries(SPECIES)){const c=$('species-'+id).getContext('2d');c.translate(70,123);c.scale(1.7,1.7);if(s.discovered.includes(id))creature(c,id,0,1,s.met.includes(id));else{c.fillStyle='#9eb2aa';c.font='28px system-ui';c.textAlign='center';c.fillText('?',0,-12);}}
   }
   function showHelp(){
-    showModal('탐험가를 위한 작은 안내서','FLIGHT MANUAL / 조작 방법','<p class="modal-intro">서두르지 않아도 괜찮아요. 자원을 모으고 작은 집을 지으며 나만의 속도로 우주를 탐험하세요.</p><div class="help-grid"><div class="help-item"><strong>걷기 · 달리기</strong><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 또는 방향키<br><kbd>Shift</kbd>를 누르면 더 빠르게 이동해요.<br>빈 땅 클릭으로 이동, 드래그로 시점 회전<br>휠로 거리 조절, V로 1인칭 전환, Space로 점프</div><div class="help-item"><strong>채굴 · 생명체와 교류</strong>가까이 다가가 <kbd>E</kbd>를 누르세요.<br>계속 누르면 자원을 연속 채굴해요.<br>터치 화면에서는 ‘채굴 / 교류’를 누르세요.</div><div class="help-item"><strong>나만의 집 짓기</strong><kbd>B</kbd> → 건물 선택 → 빈 땅 클릭<br>또는 이동 후 ‘여기에 건설’을 누르세요.<br>집: 철광석 12개 + 바이오매스 8개</div><div class="help-item"><strong>새로운 행성으로 떠나기</strong>우주선 근처에서 <kbd>F</kbd>로 이륙<br><kbd>M</kbd> → 행성 선택 → <kbd>E</kbd> 착륙<br>Space / C로 상승·하강, Shift로 가속<br>드래그로 시점을 돌리며 직접 비행할 수 있어요.</div><div class="help-item"><strong>스캔 · 도감</strong><kbd>Q</kbd>로 주변 자원과 생명체 탐지<br>발견한 생명체는 도감에 기록됩니다.<br>교류하면 첫 만남 선물을 받아요.</div><div class="help-item"><strong>산소 · 연료</strong>우주선과 집 근처에서는 산소 충전<br><kbd>R</kbd>로 바이오 연료 합성<br>재료가 없으면 6초 비상 충전이 가능해요.</div></div><p class="help-tips">진행 상황은 이 기기의 브라우저에 자동 저장돼요. 다른 기기로 옮기려면 ‘저장 관리’에서 저장 파일을 내보내세요. 산소가 떨어지면 자원을 보존한 채 우주선으로 돌아옵니다. 채굴한 자원은 150초 후 다시 자랍니다.</p><button class="primary-button" id="help-resume" style="margin-top:22px">탐험으로 돌아가기</button>');$('help-resume').onclick=closeModal;const replay=document.createElement('button');replay.className='subtle-button';replay.textContent='튜토리얼 다시 시작';replay.onclick=()=>{tutorial=new window.OrbitTutorial.Tutorial();tutorialSignature='';saveTutorial();closeModal();hud(true);};$('modal-content').append(replay);
+    showModal('탐험가를 위한 작은 안내서','FLIGHT MANUAL / 조작 방법','<p class="modal-intro">서두르지 않아도 괜찮아요. 자원을 모으고 작은 집을 지으며 나만의 속도로 우주를 탐험하세요.</p><div class="help-grid"><div class="help-item"><strong>걷기 · 달리기</strong><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 또는 방향키<br><kbd>Shift</kbd>를 누르면 더 빠르게 이동해요.<br>빈 땅 클릭으로 이동, 드래그로 시점 회전<br>휠로 거리 조절, V로 1인칭 전환, Space로 점프</div><div class="help-item"><strong>채굴 · 생명체와 교류</strong>가까이 다가가 <kbd>E</kbd>를 누르세요.<br>계속 누르면 자원을 연속 채굴해요.<br>터치 화면에서는 ‘채굴 / 교류’를 누르세요.</div><div class="help-item"><strong>나만의 집 짓기</strong><kbd>B</kbd> → 건물 선택 → 빈 땅 클릭<br>또는 이동 후 ‘여기에 건설’을 누르세요.<br>집: 철광석 12개 + 바이오매스 8개</div><div class="help-item"><strong>새로운 행성으로 떠나기</strong>우주선 근처에서 <kbd>F</kbd>로 이륙<br><kbd>M</kbd> → 행성 선택 → <kbd>E</kbd> 착륙<br>Space / C로 상승·하강, Shift로 가속<br>드래그로 시점을 돌리며 직접 비행할 수 있어요.</div><div class="help-item"><strong>스캔 · 도감</strong><kbd>Q</kbd>로 주변 자원과 생명체 탐지<br>발견한 생명체는 도감에 기록됩니다.<br>교류하면 첫 만남 선물을 받아요.</div><div class="help-item"><strong>산소 · 연료</strong>우주선과 집 근처에서는 산소 충전<br><kbd>R</kbd>로 바이오 연료 합성<br>재료가 없으면 6초 비상 충전이 가능해요.</div></div><p class="help-tips">진행 상황은 이 기기의 브라우저에 자동 저장돼요. 다른 기기로 옮기려면 ‘저장 관리’에서 저장 파일을 내보내세요. 산소가 떨어지면 자원을 보존한 채 우주선으로 돌아옵니다. 채굴한 자원은 150초 후 다시 자랍니다.</p><button class="primary-button" id="help-resume" style="margin-top:22px">탐험으로 돌아가기</button>');$('help-resume').onclick=closeModal;
   }
   function toggleBuild(force){
     if(game.state.mode!=='surface'){toast('행성에 착륙한 뒤 건설할 수 있어요.');return;}
@@ -150,7 +127,7 @@
       $('confirm-import').onclick=()=>{replaceGame(new Game(valid));closeModal();save();toast('저장 기록을 가져왔어요. 탐험을 이어가세요!');};$('cancel-import').onclick=showSettings;
     }catch(e){toast('올바른 오르빗 저장 파일이 아니에요. JSON 파일을 확인해 주세요.',true);}
   }
-  function replaceGame(next){deferredMenu=null;tutorial=new window.OrbitTutorial.Tutorial();tutorialSignature='';saveTutorial();game=next;renderer.game=next;renderer.reset();buildOpen=false;$('build-panel').hidden=true;$('build-button').classList.remove('selected');$('interact-button').classList.add('selected');missionSignature='';locationSignature='';clearInput();hud(true);}
+  function replaceGame(next){game=next;renderer.game=next;renderer.reset();buildOpen=false;$('build-panel').hidden=true;$('build-button').classList.remove('selected');$('interact-button').classList.add('selected');missionSignature='';locationSignature='';clearInput();hud(true);}
   function showDialogue(e){
     const sp=SPECIES[e.species],bond=game.state.friendship[e.species]||0;
     showModal(sp.name+'와의 만남','FIRST CONTACT / '+sp.kind,'<div class="dialogue"><p class="speaker">'+sp.name+' <span class="bond">'+('♥'.repeat(bond)+'♡'.repeat(3-bond))+'</span></p><blockquote>'+sp.line.replace(/\n/g,'<br>')+'</blockquote>'+(e.first?'<div class="reward">첫 만남 선물 · '+Object.entries(sp.gift).map(([r,n])=>RESOURCE_NAMES[r]+' +'+n).join(' · ')+'</div>':'<p class="modal-intro">친밀도 '+bond+' / 3 · 친밀도 2부터 동행과 길 안내가 열려요.</p>')+'<div class="interaction-grid"><button data-care="pet">♡ 쓰다듬기<small>친밀도 +1 · 10초 간격</small></button><button data-care="feed">❋ 먹이 나누기<small>바이오매스 2 · 친밀도 +1</small></button><button data-care="follow" '+(bond<2?'disabled':'')+'>'+(game.state.companion===e.id?'동행 마치기':'함께 탐험하기')+'<small>내 뒤를 따라오는 친구</small></button><button data-care="guide" '+(bond<2?'disabled':'')+'>유적 길 물어보기<small>미탐사 유적의 위치 표시</small></button></div><button class="primary-button" id="dialogue-close">탐험으로 돌아가기</button></div>');
@@ -166,32 +143,24 @@
   }
   function discovery(title,detail){clearTimeout(bannerTimer);$('discovery-title').textContent=title;$('discovery-detail').textContent=detail;$('discovery-banner').hidden=false;bannerTimer=setTimeout(()=>$('discovery-banner').hidden=true,4300);sound('discovery');}
   function processEvents(){
-    while(game.events.length){const e=game.events.shift();tutorial.event(e);
-      if(e.type==='player-action'){deferredMenu=null;renderer.action(e);}
-      else if(e.type==='message')toast(e.text,e.error);
+    while(game.events.length){const e=game.events.shift();
+      if(e.type==='message')toast(e.text,e.error);
       else if(e.type==='effect'){renderer.effect(e);sound(e.kind,e);}
       else if(e.type==='save'){save();if(buildOpen)renderBuildOptions();}
-      else if(['dialogue','building-menu','relic-story'].includes(e.type)){deferredMenu={event:e,at:game.state.time+(renderer.playerRig.action?.duration||.6),planet:game.state.planet,x:game.state.player.x,y:game.state.player.y};}
+      else if(e.type==='dialogue')showDialogue(e);
+      else if(e.type==='building-menu')showBuilding(e.id);
+      else if(e.type==='relic-story'){showModal(e.name,'ANCIENT SIGNAL / 별빛 기록','<p class="relic-story">'+e.text+'</p><div class="reward">수정 +5 · 철광석 +4</div><button id="relic-close" class="primary-button">다음 기록을 찾아서</button>');$('relic-close').onclick=closeModal;}
       else if(e.type==='discovery'){discovery(SPECIES[e.species].name,SPECIES[e.species].kind+' · 도감에 기록했어요');}
       else if(e.type==='planet-discovery'){const p=PLANETS.find(p=>p.id===e.planet);discovery(p.name,p.kind+' · 새로운 세계에 온 걸 환영해요');}
       else if(e.type==='launch'||e.type==='land'){if(buildOpen){buildOpen=false;$('build-panel').hidden=true;game.selectedBuild=null;$('build-button').classList.remove('selected');$('interact-button').classList.add('selected');}locationSignature='';renderer.effect({kind:e.type});sound(e.type);}
     }
-  }
-  function openDeferredMenu(){
-    const item=deferredMenu;if(!item||game.paused)return;
-    if(game.state.mode!=='surface'||item.planet!==game.state.planet||dist(game.state.player,item)>95){deferredMenu=null;return;}
-    if(game.state.time<item.at)return;
-    deferredMenu=null;const e=item.event;
-    if(e.type==='dialogue')showDialogue(e);
-    else if(e.type==='building-menu')showBuilding(e.id);
-    else{showModal(e.name,'ANCIENT SIGNAL / 별빛 기록','<p class="relic-story">'+e.text+'</p><div class="reward">수정 +5 · 철광석 +4</div><button id="relic-close" class="primary-button">다음 기록을 찾아서</button>');$('relic-close').onclick=closeModal;}
   }
   function hud(force=false){
     const s=game.state,p=game.planet(),space=s.mode==='space',nearest=game.nearest();
     for(const r of ['iron','crystal','biomass'])setText(r+'-count',s.inventory[r]);
     setText('oxygen-text',Math.ceil(s.oxygen)+'%');$('oxygen-bar').style.width=s.oxygen+'%';$('oxygen-bar').style.background=s.oxygen<25?'#ffb196':'';setText('fuel-text',Math.floor(s.fuel)+'%');$('fuel-bar').style.width=s.fuel+'%';setText('journal-count',s.discovered.length);
     const loc=space?'space':p.id;if(locationSignature!==loc||force){locationSignature=loc;setText('location-code',space?'SIGMA SYSTEM / OPEN SPACE':'시그마 성계 / '+String(PLANETS.indexOf(p)+1).padStart(2,'0'));$('location-name').innerHTML=(space?'시그마 성계':p.name)+'<span class="planet-tag">'+(space?'비행 중':'탐험 중')+'</span>';$('location-description').innerHTML=space?'새로운 행성으로 향하는 중':p.kind+' <span>·</span> '+p.temp;setText('ship-label',space?'착륙':'우주선');$('scan-button').title=space?'주변 행성 스캔':'주변 자원과 생명체 스캔';}
-    updateTutorial();$('space-action').hidden=!space;$('mission-card').hidden=space||tutorial.active;$('vertical-controls').hidden=!space;
+    $('space-action').hidden=!space;$('mission-card').hidden=space;$('vertical-controls').hidden=!space;
     if(space){const target=nearest?.kind==='planet'?nearest.entity:null;setText('space-target-name',target?target.name+' 궤도':'다음 목적지를 찾아보세요');setText('space-target-help',target?'착륙해 새로운 자원과 생명체를 만나보세요.':'방향키로 비행하거나 성계 지도에서 항로를 설정하세요.');$('land-button').disabled=!target||!!game.travel;setText('land-button',target?target.name+'에 착륙':'행성 가까이에서 착륙');setText('refuel-button',game.solarCharge>0?'태양광 비상 충전 · '+Math.ceil(game.solarCharge)+'초':s.inventory.biomass>=3?'연료 합성 · 바이오매스 3개':'비상 태양광 충전 · 6초');}
     let hint='자원 가까이에서 E를 누르세요',key='E';
     if(game.selectedBuild){hint='빈 땅 클릭 또는 E · 건설 배치';key='B';}
@@ -275,7 +244,7 @@
     const elapsed=Math.max(0,Math.min(.1,(now-lastFrame)/1000));lastFrame=now;
     if(document.hidden){accumulator=0;requestAnimationFrame(frame);return;}
     if(game.paused)accumulator=0;else accumulator+=elapsed;
-    let steps=0;while(accumulator>=1/60&&steps++<6){game.tick(1/60,renderer.input(keys));tutorial.tick(game);processEvents();openDeferredMenu();accumulator-=1/60;if(game.paused){accumulator=0;break;}}
+    let steps=0;while(accumulator>=1/60&&steps++<6){game.tick(1/60,renderer.input(keys));processEvents();accumulator-=1/60;if(game.paused){accumulator=0;break;}}
     if(!game.paused||now-previousDraw>66){renderer.draw(elapsed);previousDraw=now;}
     updateEngineAudio();if(now-lastHud>110){hud();lastHud=now;}
     if(now-lastSave>8000){if(!game.paused)save();lastSave=now;}requestAnimationFrame(frame);
