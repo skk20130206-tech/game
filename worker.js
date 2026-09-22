@@ -6,7 +6,7 @@ import modelPackV2 from "./patch/model-pack-v2.txt";
 import shipGlbBase64 from "./assets/pioneer-ex7.glb.txt";
 import {homePage,guidePage,aboutPage,updatesPage,privacyPage,termsPage,contactPage,notFoundPage,robots,sitemap} from "./site.js";
 
-const BUILD="justgame-pioneer-ex7-20260916-v14";
+const BUILD="justgame-tutorial-20260922-v17";
 const ADSENSE_CLIENT="ca-pub-6073295964667681";
 const ADSENSE_SNIPPET=`<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}" crossorigin="anonymous"></script>`;
 let gameHtmlPromise;
@@ -81,7 +81,7 @@ export default {
       try{
         if(!gameHtmlPromise) gameHtmlPromise=loadGameHtml();
         const html=await gameHtmlPromise;
-        return new Response(JSON.stringify({ok:true,build:BUILD,rendering:"WebGL 3D",modelSystem:"PioneerEX7-Mesh-v4",spaceshipModel:"Terralink Pioneer EX-7",spaceshipStyle:"heavy industrial survey lander",modelDownload:"/models/pioneer-ex7.glb",external3DDependency:false,immersive:true,creatureCare:true,companions:true,relics:15,htmlLength:html.length,creatures:11,mystic:true,startScreen:true,share:true,adsenseReviewReady:true,adsenseClient:ADSENSE_CLIENT,adsenseSnippetOnContentPages:true,gameRoute:"/play",contentPages:["/","/guide","/about","/updates","/privacy","/terms","/contact"],playAds:false,preApprovalAdPlaceholders:false}),{headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store",...securityHeaders}});
+        return new Response(JSON.stringify({ok:true,build:BUILD,rendering:"WebGL 3D",modelSystem:"PioneerEX7-Mesh-v4",spaceshipModel:"Terralink Pioneer EX-7",spaceshipStyle:"heavy industrial survey lander",modelDownload:"/models/pioneer-ex7.glb",external3DDependency:false,immersive:true,tutorialSteps:7,creatureCare:true,companions:true,relics:15,htmlLength:html.length,creatures:11,mystic:true,startScreen:true,share:true,adsenseReviewReady:true,adsenseClient:ADSENSE_CLIENT,adsenseSnippetOnContentPages:true,gameRoute:"/play",contentPages:["/","/guide","/about","/updates","/privacy","/terms","/contact"],playAds:false,preApprovalAdPlaceholders:false}),{headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store",...securityHeaders}});
       }catch(error){
         gameHtmlPromise=undefined;
         return new Response(JSON.stringify({ok:false,build:BUILD,error:error instanceof Error?error.message:String(error)}),{status:500,headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store",...securityHeaders}});

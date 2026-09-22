@@ -11,7 +11,7 @@ export async function build() {
   let html = await read('game/shell.html');
   const css = await read('game/style.css');
   html = html.replace(/<link[^>]*href="style.css"[^>]*>/, () => `<style>${css}</style>`);
-  for (const name of ['core', 'portraits', 'renderer-3d', 'app']) {
+  for (const name of ['core', 'portraits', 'renderer-3d', 'tutorial', 'app']) {
     const js = await read(`game/${name}.js`);
     if (/<\/script/i.test(js)) throw new Error(`Unsafe closing script tag in ${name}`);
     html = html.replace(`<script src="${name}.js"></script>`, () => `<script>\n${js}\n</script>`);
