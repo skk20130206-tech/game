@@ -6,7 +6,7 @@ import modelPackV2 from "./patch/model-pack-v2.txt";
 import shipGlbBase64 from "./assets/pioneer-ex7.glb.txt";
 import {homePage,guidePage,aboutPage,updatesPage,privacyPage,termsPage,contactPage,notFoundPage,robots,sitemap} from "./site.js";
 
-const BUILD="justgame-tutorial-20260922-v17";
+const BUILD="justgame-start-expedition-20260923-v18";
 const ADSENSE_CLIENT="ca-pub-6073295964667681";
 const ADSENSE_SNIPPET=`<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}" crossorigin="anonymous"></script>`;
 let gameHtmlPromise;
