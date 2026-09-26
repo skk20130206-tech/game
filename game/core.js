@@ -35,7 +35,7 @@
       this.events=[];this.keys={};this.paused=false;this.moveTarget=null;this.selectedBuild=null;this.interactHeld=false;this.cooldown=0;this.scanCooldown=0;this.scanRing=null;this.beam=null;this.solarCharge=0;this.travel=null;this.pulse=0;
       this.state=this.fresh();
       if(saved){try{this.state=this.validate(saved);}catch(e){this.emit('message',{text:'저장 파일을 읽지 못했어요. 새 탐험을 시작합니다.',error:true});}}
-      this.state.ship.altitude=clamp(Number.isFinite(this.state.ship.altitude)?this.state.ship.altitude:40,0,650);this.ensureWorld(this.state.planet);this.lastSave=0;this.boosting=false;
+      this.state.ship.altitude=clamp(Number.isFinite(this.state.ship.altitude)?this.state.ship.altitude:0,0,650);this.ensureWorld(this.state.planet);this.lastSave=0;this.boosting=false;
       this.velocity={x:0,y:0,z:0};this.motionMode=this.state.mode;this.pendingInteraction=null;this.waypoint=null;
     }
     fresh(){return{version:VERSION,mode:'surface',planet:'verdant',player:{x:90,y:100,angle:0},ship:{x:-480,y:245,angle:-Math.PI/2},oxygen:100,fuel:100,inventory:{iron:0,crystal:0,biomass:0},worlds:{},visited:['verdant'],discovered:[],met:[],friendship:{},creatureCare:{},companion:null,relics:[],time:0,stats:{mined:0,buildings:0,travel:0,collected:{iron:0,crystal:0,biomass:0}},rewarded:false};}
@@ -47,7 +47,7 @@
         const limit=key==='player'?WORLD_LIMIT:2600;
         s[key]={x:clamp(input[key].x,-limit,limit),y:clamp(input[key].y,-limit,limit),angle:Number.isFinite(input[key].angle)?input[key].angle:0};
       }
-      s.ship.altitude=clamp(Number.isFinite(input.ship?.altitude)?input.ship.altitude:40,0,650);s.mode=input.mode;s.planet=input.planet;s.oxygen=clamp(Number(input.oxygen)||100,1,100);s.fuel=clamp(Number(input.fuel)||0,0,100);s.time=clamp(Number(input.time)||0,0,1e9);
+      s.ship.altitude=0;s.mode=input.mode;s.planet=input.planet;s.oxygen=clamp(Number(input.oxygen)||100,1,100);s.fuel=clamp(Number(input.fuel)||0,0,100);s.time=clamp(Number(input.time)||0,0,1e9);
       for(const r of Object.keys(s.inventory))s.inventory[r]=clamp(Math.floor(Number(input.inventory?.[r])||0),0,99999);
       for(const key of ['discovered','met'])s[key]=[...new Set((Array.isArray(input[key])?input[key]:[]).filter(id=>SPECIES[id]))];
       s.visited=[...new Set((Array.isArray(input.visited)?input.visited:[]).filter(id=>PLANETS.some(p=>p.id===id)))];if(!s.visited.includes(s.planet))s.visited.push(s.planet);
@@ -96,7 +96,7 @@
     snapshot(){return JSON.parse(JSON.stringify(this.state));}
     nearest(range=140){
       if(this.state.mode==='space'){
-        const p=PLANETS.map(p=>({kind:'planet',entity:p,d:Math.hypot(this.state.ship.x-p.x,this.state.ship.y-p.y,this.state.ship.altitude||0)-p.r})).sort((a,b)=>a.d-b.d)[0];return p.d<105?p:null;
+        const p=PLANETS.map(p=>({kind:'planet',entity:p,d:Math.hypot(this.state.ship.x-p.x,this.state.ship.y-p.y)-p.r})).sort((a,b)=>a.d-b.d)[0];return p.d<105?p:null;
       }
       const p=this.state.player,w=this.world(),items=[];
       for(const n of w.nodes)if(n.hp>0)items.push({kind:'node',entity:n,d:dist(p,n)});
@@ -130,9 +130,7 @@
       const limit=s.mode==='surface'?WORLD_LIMIT:2300;actor.x=clamp(actor.x,-limit,limit);actor.y=clamp(actor.y,-limit,limit);
       this.moving=Math.hypot(this.velocity.x,this.velocity.y)>2;this.boosting=this.moving&&!!input.run;
       if(s.mode==='space'){
-        const vertical=(input.ascend?1:0)-(input.descend?1:0);this.velocity.z+=(vertical*160-this.velocity.z)*response;
-        s.ship.altitude=clamp((s.ship.altitude||0)+this.velocity.z*dt,0,650);
-        if(vertical){this.moving=true;this.moveTarget=null;}
+        s.ship.altitude=0;this.velocity.z=0;
         if(this.moving)s.fuel=clamp(s.fuel-dt*(input.run?.8:.28),0,100);
       }
       if(s.mode==='surface'){
@@ -206,7 +204,7 @@
         const target=targets.sort((a,b)=>dist(a,s.player)-dist(b,s.player))[0];
         if(!target)return{ok:false,reason:'이 행성의 유적을 모두 발견했어요!'};
         this.waypoint={x:target.x,y:target.y,label:target.name};
-        this.emit('message',{text:sp.name+'이 '+target.name+'의 방향을 알려줬어요. 빛 기둥을 따라가세요.'});
+        this.emit('message',{text:sp.name+'이 '+target.name+'의 방향을 알려줬어요. 목표 표시를 따라가세요.'});
         this.emit('effect',{kind:'scan',x:c.x,y:c.y});
       }else if(action==='pet'||action==='feed'){
         if(action==='pet'&&s.creatureCare[c.species]!==undefined&&s.time-s.creatureCare[c.species]<10)return{ok:false,reason:'조금 뒤 다시 쓰다듬어 주세요 · '+Math.ceil(10-(s.time-s.creatureCare[c.species]))+'초'};
@@ -292,13 +290,13 @@
       if(this.paused||this.travel)return{ok:false,reason:'잠시 기다려주세요.'};
       if(this.state.mode==='space')return this.land();
       if(dist(this.state.player,{x:0,y:0})>190){this.moveTarget={x:80,y:60};this.emit('message',{text:'우주선으로 이동합니다. 도착하면 F를 눌러 이륙하세요.'});return{ok:false,reason:'우주선으로 이동 중'};}
-      const p=this.planet();this.state.mode='space';this.state.ship={x:p.x,y:p.y+p.r+155,angle:-Math.PI/2,altitude:45};this.state.oxygen=100;this.moveTarget=null;this.selectedBuild=null;this.emit('launch');this.emit('message',{text:'이륙 완료! 방향키로 비행하거나 M 키로 성계 지도를 열어보세요.'});this.emit('save');return{ok:true,mode:'space'};
+      const p=this.planet();this.state.mode='space';this.state.ship={x:p.x,y:p.y+p.r+155,angle:-Math.PI/2,altitude:0};this.state.oxygen=100;this.moveTarget=null;this.selectedBuild=null;this.emit('launch');this.emit('message',{text:'이륙 완료! 방향키로 비행하거나 M 키로 성계 지도를 열어보세요.'});this.emit('save');return{ok:true,mode:'space'};
     }
     land(id){
       if(this.paused||this.travel)return{ok:false,reason:'잠시 기다려주세요.'};
       if(this.state.mode!=='space')return{ok:false,reason:'이미 행성에 착륙해 있어요.'};
       const target=id?PLANETS.find(p=>p.id===id):this.nearest()?.entity;
-      if(!target||Math.hypot(target.x-this.state.ship.x,target.y-this.state.ship.y,this.state.ship.altitude||0)>target.r+105){this.emit('message',{text:'행성에 더 가까이 다가가거나 M으로 항로를 설정하세요.'});return{ok:false,reason:'착륙 범위 밖입니다.'};}
+      if(!target||Math.hypot(target.x-this.state.ship.x,target.y-this.state.ship.y)>target.r+105){this.emit('message',{text:'행성에 더 가까이 다가가거나 M으로 항로를 설정하세요.'});return{ok:false,reason:'착륙 범위 밖입니다.'};}
       this.state.planet=target.id;this.state.mode='surface';this.state.player={x:90,y:100,angle:0};this.state.oxygen=100;this.ensureWorld(target.id);this.moveTarget=null;
       if(!this.state.visited.includes(target.id)){this.state.visited.push(target.id);this.emit('planet-discovery',{planet:target.id});}
       this.emit('land');this.emit('message',{text:target.name+'에 착륙했어요. 새로운 탐험을 시작하세요!'});this.emit('save');return{ok:true,planet:target.id};
@@ -310,7 +308,7 @@
       if(this.state.fuel<18){this.emit('message',{text:'연료가 18 필요해요. 연료 합성 또는 비상 충전을 이용하세요.',error:true});return{ok:false,reason:'연료 부족'};}
       this.state.fuel-=18;this.state.stats.travel++;this.travel={planet:id,age:0};this.moveTarget=null;this.emit('effect',{kind:'warp'});this.emit('message',{text:target.name+' 궤도로 이동 중…'});return{ok:true,planet:id,cost:18};
     }
-    finishTravel(){const target=PLANETS.find(p=>p.id===this.travel.planet);this.state.ship={x:target.x,y:target.y+target.r+65,angle:-Math.PI/2,altitude:35};this.travel=null;this.emit('message',{text:target.name+' 궤도 도착. E 또는 착륙 버튼을 눌러주세요.'});this.emit('save');}
+    finishTravel(){const target=PLANETS.find(p=>p.id===this.travel.planet);this.state.ship={x:target.x,y:target.y+target.r+65,angle:-Math.PI/2,altitude:0};this.travel=null;this.emit('message',{text:target.name+' 궤도 도착. E 또는 착륙 버튼을 눌러주세요.'});this.emit('save');}
     refuel(){
       if(this.paused||this.travel)return{ok:false,reason:'잠시 기다려주세요.'};
       if(this.state.fuel>=99){this.emit('message',{text:'연료가 충분해요!'});return{ok:false,reason:'연료 가득'};}

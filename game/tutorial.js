@@ -1,7 +1,7 @@
 (function(root){
   'use strict';
   const STEPS=[
-    {title:'첫걸음을 내디뎌요',text:'WASD·방향키 또는 화면의 이동 패드로 60m를 걸어 보세요. 빈 땅을 눌러도 이동해요.',note:'화면 드래그: 둘러보기 · V: 시점 전환',controls:['touch-pad']},
+    {title:'첫걸음을 내디뎌요',text:'WASD·방향키 또는 화면의 이동 패드로 60m를 걸어 보세요. 빈 땅을 눌러도 이동해요.',note:'화면 드래그: 지도 둘러보기 · V: 확대 보기',controls:['touch-pad']},
     {title:'자원 하나를 채굴해요',text:'표시한 자원 가까이에서 E 또는 ‘채굴 / 교류’를 꾹 누르세요. 블록이 부서지면 자원을 얻어요.',note:'자원을 직접 누르면 다가가서 한 번 채굴해요.',controls:['interact-button']},
     {title:'주변을 스캔해요',text:'Q 또는 ‘스캔’을 눌러 주변의 자원과 생명체를 찾아보세요.',note:'스캐너는 사용한 뒤 5초 동안 충전해요.',controls:['scan-button']},
     {title:'첫 번째 집을 지어요',text:'철광석 12개와 바이오매스 8개를 모은 뒤 B 또는 ‘건설’ → 집을 선택하세요. 빈 땅 클릭 또는 ‘여기에 건설’로 완성해요.',note:'우주선과 자원에서 조금 떨어진 빈 땅에 지으세요.',controls:['build-button']},

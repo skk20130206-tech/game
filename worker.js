@@ -2,11 +2,9 @@ import immersiveGame from "./game/play.txt";
 import startScreen from "./patch/start-screen-side-ad.txt";
 import shareFeature from "./patch/share-feature.txt";
 import siteReady from "./patch/adsense-ready.txt";
-import modelPackV2 from "./patch/model-pack-v2.txt";
-import shipGlbBase64 from "./assets/pioneer-ex7.glb.txt";
 import {homePage,guidePage,aboutPage,updatesPage,privacyPage,termsPage,contactPage,notFoundPage,robots,sitemap} from "./site.js";
 
-const BUILD="justgame-start-expedition-20260923-v18";
+const BUILD="justgame-2d-20260926-v19";
 const ADSENSE_CLIENT="ca-pub-6073295964667681";
 const ADSENSE_SNIPPET=`<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}" crossorigin="anonymous"></script>`;
 let gameHtmlPromise;
@@ -34,24 +32,14 @@ function cleanHomeHtml(){
   return homePage().replace(/<div class="adbox"[\s\S]*?<\/div><\/div>/,"");
 }
 
-function injectModelPack(html){
-  const shipStart=html.indexOf("  function spaceshipModel(b,time,space,moving){");
-  const shipEnd=html.indexOf("  function lifeModel(b,id,time,met){",shipStart);
-  if(shipStart<0||shipEnd<0||shipEnd<=shipStart) throw new Error("3D spaceship model markers not found");
-  html=html.slice(0,shipStart)+modelPackV2.trimEnd()+"\n"+html.slice(shipEnd);
-
-  if(!html.includes("PioneerEX7-Mesh-v4")||!html.includes("spaceshipModel.info.thrusters")) throw new Error("3D model pack injection failed");
-  return html;
-}
-
 async function loadGameHtml(){
-  let html=injectModelPack(immersiveGame);
+  let html=immersiveGame;
 
   const headEnd=html.indexOf("</head>");
   if(headEnd<0) throw new Error("HTML head closing tag not found");
   const reviewMeta=`<meta name="description" content="justgame은 낯선 행성을 탐험하고 자원을 수집해 거점을 건설하며 신비로운 생명체를 발견하는 브라우저 우주 탐험 게임입니다."><meta name="robots" content="index,follow"><meta name="theme-color" content="#07131b"><link rel="canonical" href="/play"><meta property="og:type" content="website"><meta property="og:title" content="justgame | 우주 탐험 게임"><meta property="og:description" content="행성을 탐험하고 자원을 모아 개척지를 세우는 브라우저 우주 탐험 게임.">`;
   html=html.slice(0,headEnd)+reviewMeta+html.slice(headEnd);
-  html=html.replace(/<title>[^<]*<\/title>/i,"<title>justgame | 입체 우주 탐험 게임</title>");
+  html=html.replace(/<title>[^<]*<\/title>/i,"<title>justgame | 2D 우주 탐험 게임</title>");
 
   const bodyEnd=html.lastIndexOf("</body>");
   if(bodyEnd<0) throw new Error("HTML body closing tag not found");
@@ -72,16 +60,11 @@ export default {
     const path=url.pathname!=="/"?url.pathname.replace(/\/+$/,""):"/";
     const origin=url.origin;
 
-    if(path==="/models/pioneer-ex7.glb"){
-      const bytes=Uint8Array.from(atob(shipGlbBase64.trim()),c=>c.charCodeAt(0));
-      return new Response(bytes,{headers:{"content-type":"model/gltf-binary","content-disposition":"attachment; filename=pioneer-ex7.glb","cache-control":"public, max-age=300",...securityHeaders}});
-    }
-
     if(path==="/health"){
       try{
         if(!gameHtmlPromise) gameHtmlPromise=loadGameHtml();
         const html=await gameHtmlPromise;
-        return new Response(JSON.stringify({ok:true,build:BUILD,rendering:"WebGL 3D",modelSystem:"PioneerEX7-Mesh-v4",spaceshipModel:"Terralink Pioneer EX-7",spaceshipStyle:"heavy industrial survey lander",modelDownload:"/models/pioneer-ex7.glb",external3DDependency:false,immersive:true,tutorialSteps:7,creatureCare:true,companions:true,relics:15,htmlLength:html.length,creatures:11,mystic:true,startScreen:true,share:true,adsenseReviewReady:true,adsenseClient:ADSENSE_CLIENT,adsenseSnippetOnContentPages:true,gameRoute:"/play",contentPages:["/","/guide","/about","/updates","/privacy","/terms","/contact"],playAds:false,preApprovalAdPlaceholders:false}),{headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store",...securityHeaders}});
+        return new Response(JSON.stringify({ok:true,build:BUILD,rendering:"Canvas 2D",perspective:"top-down",webglRequired:false,immersive:true,tutorialSteps:7,creatureCare:true,companions:true,relics:15,htmlLength:html.length,creatures:11,mystic:true,startScreen:true,share:true,adsenseReviewReady:true,adsenseClient:ADSENSE_CLIENT,adsenseSnippetOnContentPages:true,gameRoute:"/play",contentPages:["/","/guide","/about","/updates","/privacy","/terms","/contact"],playAds:false,preApprovalAdPlaceholders:false}),{headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store",...securityHeaders}});
       }catch(error){
         gameHtmlPromise=undefined;
         return new Response(JSON.stringify({ok:false,build:BUILD,error:error instanceof Error?error.message:String(error)}),{status:500,headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store",...securityHeaders}});

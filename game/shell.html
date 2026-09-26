@@ -4,15 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#101b23">
-  <meta name="description" content="우주선을 타고 새로운 행성을 발견하세요. 자원을 채굴하고 나만의 기지를 지으며 낯선 생명체와 친구가 되는 3D 우주 탐험 게임, 오르빗. 입체 행성과 채굴·비행 체험 효과를 만나보세요.">
-  <title>justgame — 몰입형 우주 탐험</title>
+  <meta name="description" content="우주선을 타고 새로운 행성을 발견하세요. 자원을 채굴하고 나만의 기지를 지으며 낯선 생명체와 친구가 되는 2D 우주 탐험 게임, 오르빗. 다채로운 행성과 채굴·비행 효과를 만나보세요.">
+  <title>justgame — 2D 우주 탐험</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23101b23'/%3E%3Ccircle cx='32' cy='32' r='13' fill='%23bef264'/%3E%3Cellipse cx='32' cy='32' rx='25' ry='8' transform='rotate(-35 32 32)' fill='none' stroke='%23f1f7ed' stroke-width='4'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="app-shell">
     <header class="topbar">
-      <a class="brand" href="#game-area" aria-label="오르빗 홈"><svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="10" fill="currentColor"/><ellipse cx="22" cy="22" rx="21" ry="7" transform="rotate(-35 22 22)" fill="none" stroke="currentColor" stroke-width="2"/></svg><span>justgame<span class="brand-sub">3D 우주 개척 일지</span></span></a>
+      <a class="brand" href="#game-area" aria-label="오르빗 홈"><svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="10" fill="currentColor"/><ellipse cx="22" cy="22" rx="21" ry="7" transform="rotate(-35 22 22)" fill="none" stroke="currentColor" stroke-width="2"/></svg><span>justgame<span class="brand-sub">2D 우주 개척 일지</span></span></a>
       <nav class="main-nav" aria-label="게임 메뉴">
         <button id="explore-tab" class="nav-item active" aria-current="page"><span class="nav-symbol">⌖</span> 탐험</button>
         <button id="map-tab" class="nav-item"><span class="nav-symbol">◎</span> 성계 지도 <kbd>M</kbd></button>
@@ -21,8 +21,8 @@
       <div class="header-actions"><span id="save-indicator" class="save-indicator">이 기기에 자동 저장</span><button id="sound-button" class="icon-button" aria-label="소리 켜기" aria-pressed="false" title="소리 켜기">♪</button><button id="help-button" class="icon-button" aria-label="조작 방법" title="조작 방법">?</button><button id="pause-button" class="icon-button pause-icon" aria-label="일시 정지" title="일시 정지">Ⅱ</button></div>
     </header>
     <main id="game-area" class="game-area">
-      <canvas id="world" tabindex="0" aria-label="입체 행성 탐험 게임. 화면을 드래그해 시점을 회전하세요. WASD 또는 방향키로 이동하고 E로 채굴·교류하세요. M은 지도, B는 건설입니다."></canvas>
-      <div class="field-status glass" id="field-status"></div><div class="camera-controls"><button id="view-button" title="V: 1인칭 / 3인칭 전환">3인칭 <kbd>V</kbd></button><button id="immersion-button" aria-label="몰입 효과 설정">몰입 효과</button><button id="fullscreen-button" aria-label="전체 화면">⛶</button></div>
+      <canvas id="world" tabindex="0" aria-label="2D 행성 탐험 게임. 빈 땅 클릭으로 이동하고 드래그로 지도를 둘러보세요. WASD 또는 방향키로 이동하고 E로 채굴·교류하세요. M은 지도, B는 건설입니다."></canvas>
+      <div class="field-status glass" id="field-status"></div><div class="camera-controls"><button id="view-button" title="V: 확대 / 전체 보기">확대 보기 <kbd>V</kbd></button><button id="immersion-button" aria-label="화면 효과 설정">화면 효과</button><button id="fullscreen-button" aria-label="전체 화면">⛶</button></div>
       <div class="vignette" aria-hidden="true"></div>
       <div class="top-hud">
         <section class="location glass">
@@ -53,14 +53,13 @@
       <div class="discovery-banner" id="discovery-banner" hidden><span>새로운 발견</span><strong id="discovery-title"></strong><p id="discovery-detail"></p></div>
       <div class="bottom-hud">
         <div class="expedition-state"><span class="compass">N ↑</span><span id="coordinate-label">X 0000 / Y 0000</span><span id="day-label">탐험 1일째</span></div>
-        <div class="center-controls"><div class="interaction-hint glass" id="interaction-hint"><kbd>E</kbd><span>가까운 자원을 채굴하세요</span></div><div class="toolbar glass" role="group" aria-label="탐험 도구"><button id="interact-button" class="tool-button selected"><span class="tool-icon">⛏</span><span id="interact-label">채굴 / 교류</span><kbd>E</kbd></button><button id="scan-button" class="tool-button"><span class="tool-icon">⌾</span><span>스캔</span><kbd>Q</kbd></button><button id="build-button" class="tool-button"><span class="tool-icon">⌂</span><span>건설</span><kbd>B</kbd></button><button id="ship-button" class="tool-button"><span class="tool-icon">↑</span><span id="ship-label">우주선</span><kbd>F</kbd></button></div><p class="keyboard-hint"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 이동 <span>·</span> <kbd>Shift</kbd> 가속 <span>·</span> 드래그 시점 <span>·</span> <kbd>V</kbd> 1인칭</p></div>
+        <div class="center-controls"><div class="interaction-hint glass" id="interaction-hint"><kbd>E</kbd><span>가까운 자원을 채굴하세요</span></div><div class="toolbar glass" role="group" aria-label="탐험 도구"><button id="interact-button" class="tool-button selected"><span class="tool-icon">⛏</span><span id="interact-label">채굴 / 교류</span><kbd>E</kbd></button><button id="scan-button" class="tool-button"><span class="tool-icon">⌾</span><span>스캔</span><kbd>Q</kbd></button><button id="build-button" class="tool-button"><span class="tool-icon">⌂</span><span>건설</span><kbd>B</kbd></button><button id="ship-button" class="tool-button"><span class="tool-icon">↑</span><span id="ship-label">우주선</span><kbd>F</kbd></button></div><p class="keyboard-hint"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 이동 <span>·</span> <kbd>Shift</kbd> 가속 <span>·</span> 드래그 지도 <span>·</span> <kbd>V</kbd> 확대</p></div>
         <button class="radar-panel glass" id="radar-button" aria-label="성계 지도 열기"><span class="radar-title">주변 탐색 <span>↗</span></span><canvas id="radar" width="160" height="126" aria-hidden="true"></canvas><span class="radar-caption">시그마 성계 · 개척 가능</span></button>
       </div>
       <div class="touch-pad" id="touch-pad" aria-label="터치 이동"><button data-move="up" aria-label="위로 이동">↑</button><button data-move="left" aria-label="왼쪽으로 이동">←</button><span></span><button data-move="right" aria-label="오른쪽으로 이동">→</button><button data-move="down" aria-label="아래로 이동">↓</button></div>
-      <div class="vertical-controls" id="vertical-controls" hidden><button id="ascend-button" aria-label="우주선 상승">↑ 상승</button><button id="descend-button" aria-label="우주선 하강">↓ 하강</button></div>
       <div class="space-action glass" id="space-action" hidden><strong id="space-target-name">다음 목적지를 찾아보세요</strong><p id="space-target-help">방향키로 비행하거나 성계 지도에서 항로를 설정하세요.</p><button id="land-button" class="primary-button" disabled>행성 가까이에서 착륙</button><button id="refuel-button" class="subtle-button">연료 합성 · 바이오매스 3개</button></div>
     </main>
-    <footer class="statusbar"><span><span class="status-light"></span> <span id="status-label">탐사 장비 정상</span></span><span>ORBIT <span class="version">01</span><span class="footer-divider">/</span> 3D IMMERSIVE EXPLORATION</span><button id="settings-button">저장 관리</button></footer>
+    <footer class="statusbar"><span><span class="status-light"></span> <span id="status-label">탐사 장비 정상</span></span><span>ORBIT <span class="version">01</span><span class="footer-divider">/</span> 2D TOP-DOWN EXPLORATION</span><button id="settings-button">저장 관리</button></footer>
   </div>
   <dialog id="modal" aria-labelledby="modal-title"><div class="modal-heading"><div><span class="eyebrow" id="modal-eyebrow">ORBIT</span><h2 id="modal-title"></h2></div><button id="modal-close" class="icon-button" aria-label="창 닫기">×</button></div><div id="modal-content"></div></dialog>
   <noscript><p class="noscript">게임을 실행하려면 브라우저에서 JavaScript를 켜주세요.</p></noscript>
@@ -69,7 +68,7 @@
 
 <script src="core.js"></script>
 <script src="portraits.js"></script>
-<script src="renderer-3d.js"></script>
+<script src="renderer-2d.js"></script>
 <script src="tutorial.js"></script>
 <script src="app.js"></script>
 </body>

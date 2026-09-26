@@ -52,16 +52,13 @@ test('mining still awards once, requires range, and depleted nodes regrow', () =
   g.state.player.x=-1000;assert.equal(g.interact(n.id).ok,false);
 });
 
-test('mining emits staged block-break metadata and finite fracture meshes', async () => {
+test('mining emits staged block-break metadata', async () => {
   const g=new Game(),n=g.world().nodes[0];g.state.player={x:n.x-65,y:n.y,angle:0};g.events=[];
   for(let i=0;i<n.maxHp;i++){g.cooldown=0;assert.ok(g.interact(n.id).ok);}
   const effects=g.events.filter(e=>e.type==='effect'),hits=effects.filter(e=>e.kind==='mine'),broken=effects.find(e=>e.kind==='break');
   assert.equal(hits.length,n.maxHp);assert.equal(hits.at(-1).broken,true);assert.equal(hits.at(-1).remaining,0);
   assert.equal(broken.nodeType,n.type);assert.equal(broken.maxHp,n.maxHp);assert.equal(broken.x,n.x);assert.equal(broken.y,n.y);
-  const context=vm.createContext({OrbitCore:require('../game/core.js'),Float32Array,Math});
-  vm.runInContext(await readFile(new URL('../game/renderer-3d.js',import.meta.url),'utf8'),context);
-  const {Batch,blockBreakModel}=context.Orbit3D;
-  for(const destroyed of [false,true]){const b=new Batch();blockBreakModel(b,{x:n.x,z:n.y,nodeType:n.type,color:'#cad9df',rotation:.2,seed:7,age:.12,duration:destroyed?.82:.38,destroyed},PLANETS[0],.5);assert.ok(b.array().length>0);assert.ok(b.array().every(Number.isFinite));}
+
 });
 
 test('friendship has costs, cooldowns, unlocks and persistent companion state', () => {
@@ -99,52 +96,20 @@ test('building placement, upgrade costs, light and charging survive saving', () 
   loaded.state.fuel=20;tick(loaded,1);assert.ok(loaded.state.fuel>=26.9);
 });
 
-test('launch, boost, altitude, warp, landing and emergency refuel remain playable', () => {
+test('launch, boost, 2D flight, warp, landing and emergency refuel remain playable', () => {
   const g=new Game();assert.ok(g.launch().ok);tick(g,.5,{right:true,run:true,ascend:true});
-  assert.ok(g.state.ship.altitude>45);assert.ok(g.state.fuel<100);
+  assert.equal(g.state.ship.altitude,0);assert.ok(g.state.fuel<100);
   for(const p of PLANETS){g.state.fuel=100;assert.ok(g.warp(p.id).ok);tick(g,2.5);assert.equal(g.travel,null);assert.ok(g.land(p.id).ok);assert.equal(g.state.planet,p.id);assert.ok(g.launch().ok);}
   g.state.fuel=0;g.state.inventory.biomass=0;assert.ok(g.refuel().ok);tick(g,6.1);assert.ok(g.state.fuel>=22);
-});
-
-test('every species and biome produces finite 3D mesh data', async () => {
-  const context=vm.createContext({OrbitCore:{Game,PLANETS,SPECIES,...require('../game/core.js')},Float32Array,Math});
-  vm.runInContext(await readFile(new URL('../game/renderer-3d.js',import.meta.url),'utf8'),context);
-  const {Batch,lifeModel,terrainBatch}=context.Orbit3D;
-  for(const id of Object.keys(SPECIES)){const b=new Batch();lifeModel(b,id,1,true);const data=b.array();assert.ok(data.length>100);assert.ok(data.every(Number.isFinite),id);}
-  for(const p of PLANETS){const data=terrainBatch(p);assert.ok(data.every(Number.isFinite),p.id);assert.ok(data.shadows.every(Number.isFinite));}
-});
-
-test('curved surfaces have outward, continuous unit normals and shadows fade to zero', async () => {
-  const context=vm.createContext({OrbitCore:require('../game/core.js'),Float32Array,Math});
-  vm.runInContext(await readFile(new URL('../game/renderer-3d.js',import.meta.url),'utf8'),context);
-  const {Batch,resourceModel,terrainNormal,terrainColor}=context.Orbit3D,b=new Batch();
-  b.sphere(0,0,0,30,20,12,'#aabbcc',16,9);
-  const data=b.array(),normals=new Map();
-  for(let i=0;i<data.length;i+=10){
-    const position=Array.from(data.slice(i,i+3)),normal=Array.from(data.slice(i+3,i+6));
-    assert.ok(Math.abs(Math.hypot(...normal)-1)<1e-5);
-    assert.ok(position.reduce((sum,v,k)=>sum+v*normal[k],0)>0,'sphere lighting must face outward');
-    const key=position.map(v=>v.toFixed(4)).join(',');
-    if(normals.has(key))normal.forEach((v,k)=>assert.ok(Math.abs(v-normals.get(key)[k])<1e-5));
-    normals.set(key,normal);
-  }
-  for(const p of PLANETS){
-    const n=terrainNormal(480,300,p);assert.ok(n[1]>0&&Math.abs(Math.hypot(...n)-1)<1e-6);
-    const left=terrainColor(499.999,300,p),right=terrainColor(500.001,300,p);left.forEach((v,i)=>assert.ok(Math.abs(v-right[i])<.0001,'tile boundaries must not change color'));
-  }
-  const rock=new Batch();resourceModel(rock,{x:0,y:0,type:'iron',hp:4,maxHp:4},PLANETS[0]);
-  const shadows=rock.array().shadows;assert.ok(shadows?.length>0);let transparent=false,visible=false;
-  for(let i=9;i<shadows.length;i+=10){const alpha=-shadows[i]-1;assert.ok(alpha>=0&&alpha<=.31);transparent||=alpha===0;visible||=alpha>.2;}
-  assert.ok(transparent&&visible,'contact shadows need both a visible center and a transparent edge');
 });
 
 test('Worker serves current game, all content pages, existing ads separation and health', async () => {
   const worker=await loadWorker();
   for(const path of ['/','/play','/guide','/about','/updates','/privacy','/terms','/contact','/robots.txt','/sitemap.xml'])assert.equal((await worker.fetch(new Request('https://game.test'+path))).status,200,path);
   const health=await (await worker.fetch(new Request('https://game.test/health'))).json();
-  assert.equal(health.ok,true);assert.equal(health.creatures,11);assert.equal(health.rendering,'WebGL 3D');
+  assert.equal(health.ok,true);assert.equal(health.creatures,11);assert.equal(health.rendering,'Canvas 2D');
   const html=await (await worker.fetch(new Request('https://game.test/play'))).text();
-  assert.ok(html.includes('orbit-share-button'));assert.ok(html.includes('orbit:start'));
+  assert.ok(html.includes('orbit-share-button'));assert.ok(html.includes('orbit:start'));assert.ok(html.includes('Canvas 2D'));assert.equal(html.includes('Orbit3D'),false);assert.equal(html.includes("getContext('webgl')"),false);
   assert.equal(html.includes('pagead/js/adsbygoogle.js'),false);
   assert.ok((await (await worker.fetch(new Request('https://game.test/'))).text()).includes('pagead/js/adsbygoogle.js'));
   assert.equal((await worker.fetch(new Request('https://game.test/missing'))).status,404);

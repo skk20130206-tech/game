@@ -59,9 +59,9 @@ test('guide finds needed resources, offers building only with funds, and recover
   g.warp(PLANETS[1].id);assert.equal(t.guide(g).action,null);
 });
 
-test('deployed Worker includes tutorial controller and keeps original player renderer',async()=>{
+test('deployed Worker includes tutorial controller and uses only the 2D player renderer',async()=>{
   const worker=await loadWorker();const html=await (await worker.fetch(new Request('https://test.local/play'))).text();
   assert.match(html,/id="tutorial-card"/);assert.match(html,/root\.OrbitTutorial=\{Tutorial,STEPS\}/);assert.match(html,/튜토리얼 다시 시작/);
-  assert.doesNotMatch(html,/<script src="tutorial\.js"/);assert.doesNotMatch(html,/OrbitPlayerRig|player-k17\.webp/);
+  assert.doesNotMatch(html,/<script src="tutorial\.js"/);assert.doesNotMatch(html,/OrbitPlayerRig|Orbit3D|player-k17\.webp/);
   const health=await (await worker.fetch(new Request('https://test.local/health'))).json();assert.equal(health.ok,true);assert.equal(health.tutorialSteps,7);
 });
