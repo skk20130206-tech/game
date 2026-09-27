@@ -4,10 +4,34 @@ import { createRequire } from 'node:module';
 import { loadWorker } from '../scripts/load-worker.mjs';
 const require=createRequire(import.meta.url);
 const {Game,PLANETS}=require('../game/core.js');
-const {Tutorial}=require('../game/tutorial.js');
+const {Tutorial,TrainingSession}=require('../game/tutorial.js');
 const drain=(g,t)=>{while(g.events.length)t.event(g.events.shift(),g);};
 const walk=(g,t,seconds)=>{for(let i=0;i<seconds*60;i++){g.tick(1/60,{right:true});t.tick(g);drain(g,t);}};
 const mine=(g,t,n)=>{g.state.player={x:n.x-65,y:n.y,angle:0};while(n.hp>0){g.cooldown=0;assert.ok(g.interact(n.id).ok);drain(g,t);}};
+
+test('first-time training resumes its own world and cannot enter main before completion',()=>{
+  const session=new TrainingSession(null,null),g=new Game(session.state);
+  assert.equal(session.active,true);assert.equal(session.destination(g),null);
+  walk(g,session.tutorial,2);mine(g,session.tutorial,g.world().nodes.find(n=>n.type==='iron'));
+  const resumed=new TrainingSession(null,JSON.parse(JSON.stringify(session.snapshot(g))));
+  assert.equal(resumed.tutorial.step,2);assert.equal(resumed.state.inventory.iron,6);
+  resumed.tutorial.done.fill(true);const main=resumed.destination(new Game(resumed.state));
+  assert.equal(main.inventory.iron,6);resumed.finish();
+  const nextVisit=new TrainingSession(main,{version:1,active:false});
+  assert.equal(nextVisit.active,false);assert.equal(nextVisit.tutorial.dismissed,true);
+});
+
+test('replaying training preserves the existing main expedition across reload and completion',()=>{
+  const original=new Game();original.state.inventory.iron=57;original.state.met=['mossling'];
+  const main=original.snapshot(),before=JSON.stringify(main);
+  assert.equal(new TrainingSession(main,null).active,false);
+  const practice=new Game(),session=new TrainingSession(main,{version:1,active:true,game:practice.snapshot()});
+  practice.state.inventory.iron=2;session.tutorial.done.fill(true);
+  const resumed=new TrainingSession(main,session.snapshot(practice));
+  assert.equal(resumed.active,true);assert.equal(resumed.tutorial.complete,true);
+  assert.equal(resumed.destination(practice).inventory.iron,57);
+  assert.equal(JSON.stringify(main),before);
+});
 
 test('new explorer completes all seven steps through actual game actions',()=>{
   const g=new Game(),t=new Tutorial();
@@ -61,7 +85,7 @@ test('guide finds needed resources, offers building only with funds, and recover
 
 test('deployed Worker includes tutorial controller and uses only the 2D player renderer',async()=>{
   const worker=await loadWorker();const html=await (await worker.fetch(new Request('https://test.local/play'))).text();
-  assert.match(html,/id="tutorial-card"/);assert.match(html,/root\.OrbitTutorial=\{Tutorial,STEPS\}/);assert.match(html,/튜토리얼 다시 시작/);
+  assert.match(html,/id="tutorial-card"/);assert.match(html,/root\.OrbitTutorial=\{Tutorial,STEPS,TrainingSession\}/);assert.match(html,/튜토리얼 다시 시작/);
   assert.doesNotMatch(html,/<script src="tutorial\.js"/);assert.doesNotMatch(html,/OrbitPlayerRig|Orbit3D|player-k17\.webp/);
   const health=await (await worker.fetch(new Request('https://test.local/health'))).json();assert.equal(health.ok,true);assert.equal(health.tutorialSteps,7);
 });

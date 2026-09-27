@@ -11,8 +11,8 @@
 <div class="orbit-start-hero"><section>
 <h1 class="orbit-start-logo">just<span>game</span></h1><h2 class="orbit-start-headline">낯선 행성에서,<br><em>나만의 집이 있는 우주로.</em></h2>
 <p class="orbit-start-copy">우주선을 타고 착륙한 곳이 새로운 시작.<br>자원을 캐고, 기지를 짓고, 작은 생명체와 친구가 되어 다섯 행성을 탐험하세요.</p>
-<div class="orbit-start-actions"><button id="orbit-start-button" class="orbit-start-primary" type="button">첫 행성에 착륙하기 ↗</button><button id="orbit-start-guide" class="orbit-start-secondary" type="button" aria-expanded="false" aria-controls="orbit-start-manual">조작법 보기</button></div>
-<p class="orbit-start-small">설치 없이 바로 시작 · 처음이라면 7단계 튜토리얼과 함께</p>
+<div class="orbit-start-actions"><button id="orbit-start-button" class="orbit-start-primary" type="button">튜토리얼부터 시작하기 ↗</button><button id="orbit-start-guide" class="orbit-start-secondary" type="button" aria-expanded="false" aria-controls="orbit-start-manual">조작법 보기</button></div>
+<p class="orbit-start-small">튜토리얼 플레이 → 7단계 완료 → 본게임 시작</p>
 </section><figure class="orbit-start-visual" style="margin:0"><canvas id="orbit-start-preview" width="720" height="430" aria-label="2D 행성 위 우주선, 탐험가, 작은 친구와 건설한 기지"></canvas><div class="orbit-scene-top"><span>01 / VERDANT</span><span>2D 탐험 미리보기</span></div><figcaption class="orbit-scene-caption"><small>YOUR FIRST OUTPOST</small><strong>여기서, 당신의 탐험이 시작됩니다.</strong><p>우주선 한 대. 작은 친구. 그리고 내가 세운 첫 기지.</p></figcaption></figure></div>
 <section class="orbit-start-features" aria-label="게임에서 할 수 있는 일">
 <article class="orbit-feature"><span class="orbit-feature-icon" aria-hidden="true">◎</span><small>EXPLORE</small><h3>다섯 행성, 다섯 풍경</h3><p>우주선을 직접 조종하며<br>숲·화산·얼음 행성으로 떠나요.</p></article>
@@ -21,13 +21,14 @@
 <article class="orbit-feature"><span class="orbit-feature-icon" aria-hidden="true">♡</span><small>BEFRIEND</small><h3>11종의 신비로운 친구</h3><p>먹이를 나누고 친해지면<br>새 친구와 함께 탐험할 수 있어요.</p></article>
 </section>
 <div class="orbit-start-save"><span class="orbit-save-dot" aria-hidden="true">◈</span><span id="orbit-start-save-text">진행 상황은 이 브라우저에 자동 저장됩니다.</span></div>
-<section id="orbit-start-manual" class="orbit-start-manual" hidden><h2>첫 탐험을 위한 조작법</h2><p><kbd>WASD</kbd> / 방향키 이동 · 빈 땅 클릭으로 이동 · 드래그로 지도 둘러보기<br><kbd>E</kbd> 채굴·교류 · <kbd>Q</kbd> 스캔 · <kbd>B</kbd> 건설<br><kbd>F</kbd> 우주선 이륙 · <kbd>M</kbd> 성계 지도 · <kbd>V</kbd> 확대 보기<br>휴대폰에서는 이동 패드와 화면 아래 도구 버튼을 누르세요.<br>게임을 시작하면 7단계 튜토리얼이 안내합니다. 건너뛴 안내는 ‘?’에서 다시 시작할 수 있어요.</p></section>
+<section id="orbit-start-manual" class="orbit-start-manual" hidden><h2>첫 탐험을 위한 조작법</h2><p><kbd>WASD</kbd> / 방향키 이동 · 빈 땅 클릭으로 이동 · 드래그로 지도 둘러보기<br><kbd>E</kbd> 채굴·교류 · <kbd>Q</kbd> 스캔 · <kbd>B</kbd> 건설<br><kbd>F</kbd> 우주선 이륙 · <kbd>M</kbd> 성계 지도 · <kbd>V</kbd> 확대 보기<br>휴대폰에서는 이동 패드와 화면 아래 도구 버튼을 누르세요.<br>처음에는 별도로 저장되는 튜토리얼을 플레이합니다. 7단계를 완료하면 본게임을 시작할 수 있어요. ‘?’에서 다시 연습할 수도 있어요.</p></section>
 </main></div></div>
 <script>
 (()=>{
  const screen=document.getElementById('orbit-start-screen'),start=document.getElementById('orbit-start-button'),guide=document.getElementById('orbit-start-guide'),manual=document.getElementById('orbit-start-manual'),saveText=document.getElementById('orbit-start-save-text');
  let saved=null;try{const value=JSON.parse(localStorage.getItem('orbit-frontier-save-v1')||'null');if(value&&typeof value==='object'&&value.player&&value.worlds)saved=value;}catch(e){}
  if(saved){start.textContent='내 우주로 돌아가기 ↗';const planet=window.OrbitCore?.PLANETS.find(p=>p.id===saved.planet);saveText.textContent=(saved.mode==='space'?'우주 비행 중':planet?.name||'지난 탐험')+' · 저장된 탐험에서 이어집니다';}
+ if(window.OrbitEntry?.training){start.textContent=window.OrbitEntry.resuming?'튜토리얼 이어하기 ↗':'튜토리얼부터 시작하기 ↗';saveText.textContent='7단계를 직접 플레이하면 본게임이 열립니다 · 훈련 중간에도 자동 저장';}
  window.OrbitRenderer?.drawPreview(document.getElementById('orbit-start-preview'));
  window.dispatchEvent(new Event('blur'));
  guide.addEventListener('click',()=>{manual.hidden=!manual.hidden;guide.setAttribute('aria-expanded',String(!manual.hidden));guide.textContent=manual.hidden?'조작법 보기':'조작법 접기';if(!manual.hidden)manual.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'nearest'});});

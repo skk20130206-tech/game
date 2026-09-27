@@ -73,6 +73,20 @@
       return info;
     }
   }
-  root.OrbitTutorial={Tutorial,STEPS};
+  // Training progress is separate from the player's main expedition.
+  class TrainingSession{
+    constructor(main,record){
+      this.main=main||null;
+      const resume=record?.version===1&&record.active===true&&record.game?.player&&record.game?.worlds;
+      this.active=!!resume||!this.main;
+      this.state=resume?record.game:this.main;
+      this.tutorial=this.active?new Tutorial(resume?record.tutorial:null):new Tutorial({done:STEPS.map(()=>true),dismissed:true});
+      if(this.active){this.tutorial.skipped=false;this.tutorial.dismissed=false;}
+    }
+    snapshot(game){return{version:1,active:this.active,game:game.snapshot(),tutorial:this.tutorial.snapshot()};}
+    destination(game){if(!this.active||!this.tutorial.complete)return null;return this.main||game.snapshot();}
+    finish(){this.active=false;this.tutorial.dismissed=true;}
+  }
+  root.OrbitTutorial={Tutorial,STEPS,TrainingSession};
   if(typeof module!=='undefined')module.exports=root.OrbitTutorial;
 })(typeof globalThis!=='undefined'?globalThis:this);
