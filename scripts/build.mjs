@@ -15,6 +15,8 @@ export async function build() {
   const patches = await Promise.all(['start-screen-side-ad', 'share-feature', 'adsense-ready'].map(name => read(`patch/${name}.txt`)));
   let preview = html.replace('</body>', () => patches.join('\n') + '\n</body>');
   preview = preview.replace(/<aside class="orbit-ad-rail"[\s\S]*?<\/aside>/, '').replace(/^[\t ]+$/gm, '');
+  const ironOre = (await read('assets/iron-ore-base64.txt')).trim();
+  preview = preview.replace('<head>', () => '<head><script>window.OrbitIronOreSource="data:image/png;base64,' + ironOre + '";</script>');
   await writeFile(new URL('index.html', root), preview);
   return { htmlBytes: Buffer.byteLength(html), previewBytes: Buffer.byteLength(preview),rendering: 'Canvas 2D' };
 }

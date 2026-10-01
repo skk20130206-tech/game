@@ -1,10 +1,11 @@
 import immersiveGame from "./game/play.txt";
+import ironOreBase64 from "./assets/iron-ore-base64.txt";
 import startScreen from "./patch/start-screen-side-ad.txt";
 import shareFeature from "./patch/share-feature.txt";
 import siteReady from "./patch/adsense-ready.txt";
 import {homePage,guidePage,aboutPage,updatesPage,privacyPage,termsPage,contactPage,notFoundPage,robots,sitemap} from "./site.js";
 
-const BUILD="justgame-tutorial-first-20260927-v20";
+const BUILD="justgame-iron-artwork-20261001-v21";
 const ADSENSE_CLIENT="ca-pub-6073295964667681";
 const ADSENSE_SNIPPET=`<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}" crossorigin="anonymous"></script>`;
 let gameHtmlPromise;
@@ -59,6 +60,11 @@ export default {
     const url=new URL(request.url);
     const path=url.pathname!=="/"?url.pathname.replace(/\/+$/,""):"/";
     const origin=url.origin;
+
+    if(path==="/assets/iron-ore-20261001.png"){
+      const bytes=Uint8Array.from(atob(ironOreBase64.trim()),char=>char.charCodeAt(0));
+      return new Response(bytes,{headers:{"content-type":"image/png","cache-control":"public, max-age=31536000, immutable",...securityHeaders}});
+    }
 
     if(path==="/health"){
       try{
