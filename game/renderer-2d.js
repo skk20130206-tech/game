@@ -4,7 +4,7 @@
   const {creature,drawPlanet}=root.OrbitPortraits,TAU=Math.PI*2;
   // Reuse the supplied transparent artwork for every iron deposit.
   const ironOreImage=typeof root.Image==='function'?new root.Image():null;
-  if(ironOreImage){ironOreImage.decoding='async';ironOreImage.src=root.OrbitIronOreSource||'/assets/iron-ore-20261001.png';}
+  if(ironOreImage){ironOreImage.decoding='async';ironOreImage.src=root.OrbitIronOreSource||'/assets/iron-ore-20261001-v22.png';}
   const oval=(c,x,y,rx,ry,color)=>{c.beginPath();c.ellipse(x,y,Math.max(.1,rx),Math.max(.1,ry),0,0,TAU);c.fillStyle=color;c.fill();};
   const path=(c,points,fill,stroke)=>{c.beginPath();points.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.closePath();if(fill){c.fillStyle=fill;c.fill();}if(stroke){c.strokeStyle=stroke;c.stroke();}};
   const box=(c,x,y,w,h,r,color,stroke)=>{c.beginPath();c.roundRect(x,y,w,h,r);if(color){c.fillStyle=color;c.fill();}if(stroke){c.strokeStyle=stroke;c.stroke();}};
@@ -54,7 +54,8 @@
     const damaged=n.hp<n.maxHp;c.save();c.scale(n.size||1,n.size||1);oval(c,0,6,27,10,'#10292836');
     if(n.type==='iron'&&ironOreImage?.complete&&ironOreImage.naturalWidth){
       c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';
-      c.drawImage(ironOreImage,-46,-76,92,92);
+      const height=92*ironOreImage.naturalHeight/ironOreImage.naturalWidth;
+      c.drawImage(ironOreImage,-46,16-height,92,height);
     }else if(n.type==='iron'){
       // Flat illustrated facets, mineral seams and chips keep small deposits readable.
       c.lineWidth=1.2;
