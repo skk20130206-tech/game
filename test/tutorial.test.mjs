@@ -9,6 +9,19 @@ const drain=(g,t)=>{while(g.events.length)t.event(g.events.shift(),g);};
 const walk=(g,t,seconds)=>{for(let i=0;i<seconds*60;i++){g.tick(1/60,{right:true});t.tick(g);drain(g,t);}};
 const mine=(g,t,n)=>{g.state.player={x:n.x-65,y:n.y,angle:0};while(n.hp>0){g.cooldown=0;assert.ok(g.interact(n.id).ok);drain(g,t);}};
 
+test('station survives reload, supports NPC dialogue, and exits to the normal world',()=>{
+  const session=new TrainingSession(null,null),g=new Game(session.state);
+  assert.equal(g.state.training,true);assert.equal(g.world().nodes.length,22);assert.equal(g.world().relics.length,0);
+  const npc=g.trainingNpc();assert.equal(npc.name,'교관 루미');assert.equal(g.interact(npc.id).ok,false);
+  g.state.player={x:npc.x+25,y:npc.y,angle:0};assert.equal(g.nearest().kind,'npc');
+  assert.equal(g.interact().type,'instructor');assert.ok(g.events.some(e=>e.type==='instructor'));
+  drain(g,session.tutorial);assert.equal(session.tutorial.done[4],false);
+  const resumed=new TrainingSession(null,session.snapshot(g)),restored=new Game(resumed.state);
+  assert.equal(restored.state.training,true);assert.ok(restored.trainingNpc());
+  resumed.tutorial.done.fill(true);const main=new Game(resumed.destination(restored));
+  assert.equal(main.state.training,false);assert.equal(main.trainingNpc(),null);assert.equal(main.world().nodes.length,146);
+});
+
 test('first-time training resumes its own world and cannot enter main before completion',()=>{
   const session=new TrainingSession(null,null),g=new Game(session.state);
   assert.equal(session.active,true);assert.equal(session.destination(g),null);

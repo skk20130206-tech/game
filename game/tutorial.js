@@ -80,11 +80,19 @@
       const resume=record?.version===1&&record.active===true&&record.game?.player&&record.game?.worlds;
       this.active=!!resume||!this.main;
       this.state=resume?record.game:this.main;
+      if(this.active){
+        this.state=JSON.parse(JSON.stringify(this.state||new root.OrbitCore.Game().snapshot()));
+        if(!this.state.training){this.state.training=true;this.state.mode='surface';this.state.planet='verdant';this.state.player={x:90,y:100,angle:0};}
+      }
       this.tutorial=this.active?new Tutorial(resume?record.tutorial:null):new Tutorial({done:STEPS.map(()=>true),dismissed:true});
       if(this.active){this.tutorial.skipped=false;this.tutorial.dismissed=false;}
     }
     snapshot(game){return{version:1,active:this.active,game:game.snapshot(),tutorial:this.tutorial.snapshot()};}
-    destination(game){if(!this.active||!this.tutorial.complete)return null;return this.main||game.snapshot();}
+    destination(game){
+      if(!this.active||!this.tutorial.complete)return null;
+      if(this.main)return this.main;
+      const next=game.snapshot();next.training=false;next.mode='surface';next.planet='verdant';next.player={x:90,y:100,angle:0};return next;
+    }
     finish(){this.active=false;this.tutorial.dismissed=true;}
   }
   root.OrbitTutorial={Tutorial,STEPS,TrainingSession};

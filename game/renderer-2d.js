@@ -155,7 +155,17 @@
       const ground=c.createRadialGradient(this.width*.45,this.height*.35,20,this.width*.5,this.height*.48,Math.max(this.width,this.height)*.86);
       ground.addColorStop(0,p.ground[3]);ground.addColorStop(.5,p.ground[1]);ground.addColorStop(1,p.ground[0]);c.fillStyle=ground;c.fillRect(0,0,this.width,this.height);
       c.save();this.worldTransform(c);
-      for(const d of this.getDecor(p)){
+      if(s.training){
+        c.fillStyle='#102c40';c.fillRect(-2700,-2700,5400,5400);
+        box(c,-650,-380,1450,1080,36,'#21485a','#65dbe088');
+        for(let x=-600;x<800;x+=80)line(c,x,-350,x,680,'#77c7dd18',1);
+        for(let y=-350;y<700;y+=80)line(c,-630,y,780,y,'#77c7dd18',1);
+        for(const [x,y,w,h,label] of[[-220,85,240,190,'01 · 교관 루미'],[140,-30,220,310,'02 · 채굴 연습'],[220,320,350,250,'03 · 건설 연습']]){
+          box(c,x,y,w,h,16,'#15394d','#65dbe077');c.fillStyle='#a0e8ec';c.font='bold 14px sans-serif';c.textAlign='left';c.fillText(label,x+14,y+25);
+        }
+        c.fillStyle='#d8faff';c.font='bold 22px sans-serif';c.textAlign='center';c.fillText('SIGMA · TRAINING STATION',50,-220);
+      }
+      for(const d of (s.training?[]:this.getDecor(p))){
         if(!this.project(d.x,d.y).visible)continue;
         if(d.type===0){
           c.save();c.translate(d.x,d.y);c.rotate(d.angle);oval(c,0,5,d.r*2.1,d.r*.72,p.dark+'35');
@@ -179,6 +189,7 @@
       if(g.moveTarget){ring(c,g.moveTarget.x,g.moveTarget.y,10+Math.sin(this.time*5)*2,'#edf7c7',1.5);}
       const nearest=g.nearest(),actors=[{kind:'ship',x:0,y:0},...w.nodes.filter(n=>n.hp>0).map(n=>({...n,kind:'node'})),...w.buildings.map(b=>({...b,kind:'building'})),...w.relics.map(r=>({...r,kind:'relic'})),...w.creatures.map(v=>({...v,kind:'creature'})),{...s.player,kind:'player'}];
       actors.sort((a,b)=>a.y-b.y);
+      const instructor=g.trainingNpc();if(instructor){actors.push({...instructor,kind:'npc'});actors.sort((a,b)=>a.y-b.y);}
       for(const a of actors){if(!this.project(a.x,a.y).visible)continue;c.save();c.translate(a.x,a.y);
         if(a.kind==='node'&&(a.type==='crystal'||a.type==='iron'))glow(c,0,-18,a.type==='crystal'?78:45,a.type==='crystal'?p.accent+'16':p.light+'0c');
         if(a.kind==='creature')glow(c,0,-20,48,p.light+'0a');
@@ -188,6 +199,14 @@
         if(a.kind==='building')building(c,a,this.time);
         if(a.kind==='creature')creature(c,a.species,this.time+a.phase,1,s.met.includes(a.species));
         if(a.kind==='player')astronaut(c,this.time,g.moving,s.player.angle,g.beam?'mine':null);
+        if(a.kind==='npc'){
+          oval(c,0,8,23,8,'#071b3388');c.translate(0,Math.sin(this.time*2)*3);
+          glow(c,0,-26,44,'#68e4f533');box(c,-17,-30,34,34,9,'#74cdd2','#d6f9f8');
+          box(c,-24,-62,48,33,10,'#d3eeed','#75b7c9');box(c,-19,-56,38,20,6,'#12364b');
+          oval(c,-9,-47,4,4,'#92fff1');oval(c,9,-47,4,4,'#92fff1');line(c,0,-63,0,-72,'#a6e5e3',2);oval(c,0,-75,4,4,'#ffdb83');
+          line(c,-18,-22,-29,-9,'#9ce6e5',6);line(c,18,-22,31,-36+Math.sin(this.time*3)*6,'#9ce6e5',6);box(c,-8,-20,16,10,3,'#f0d48c');
+          c.fillStyle='#dfffff';c.font='bold 12px sans-serif';c.textAlign='center';c.fillText('교관 루미 · E 대화',0,-92);
+        }
         if(a.kind==='relic'){oval(c,0,8,31,12,'#102b3740');path(c,[[-25,4],[-20,-45],[0,-64],[22,-46],[25,4]],p.dark,p.light+'55');line(c,-8,-32,0,-45,p.accent,3);line(c,0,-45,10,-31,p.accent,3);line(c,10,-31,0,-20,p.accent,3);if(!s.relics.includes(a.id))ring(c,0,-32,22+Math.sin(this.time*2)*2,p.accent+'50');}
         c.restore();}
       if(g.beam){line(c,s.player.x+23,s.player.y-30,g.beam.x,g.beam.y-20,'#d6ffc488',7);line(c,s.player.x+23,s.player.y-30,g.beam.x,g.beam.y-20,'#f8ffe0',2);}

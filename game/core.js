@@ -41,7 +41,7 @@
     fresh(){return{version:VERSION,mode:'surface',planet:'verdant',player:{x:90,y:100,angle:0},ship:{x:-480,y:245,angle:-Math.PI/2},oxygen:100,fuel:100,inventory:{iron:0,crystal:0,biomass:0},worlds:{},visited:['verdant'],discovered:[],met:[],friendship:{},creatureCare:{},companion:null,relics:[],time:0,stats:{mined:0,buildings:0,travel:0,collected:{iron:0,crystal:0,biomass:0}},rewarded:false};}
     validate(input){
       if(!input||input.version!==VERSION||!['surface','space'].includes(input.mode)||!PLANETS.some(p=>p.id===input.planet))throw Error('Invalid save');
-      const s=this.fresh();
+      const s=this.fresh();s.training=input.training===true;
       for(const key of ['player','ship']){
         if(!input[key]||!Number.isFinite(input[key].x)||!Number.isFinite(input[key].y))throw Error('Invalid position');
         const limit=key==='player'?WORLD_LIMIT:2600;
@@ -62,7 +62,7 @@
       s.companion=typeof input.companion==='string'&&input.companion.length<80?input.companion:null;
       if(input.worlds&&typeof input.worlds==='object')for(const p of PLANETS){
         const old=input.worlds[p.id];if(!old)continue;
-        const w=this.makeWorld(p);
+        const w=this.makeWorld(p,s.training);
         if(Array.isArray(old.nodes))for(const n of w.nodes){const prior=old.nodes.find(v=>v.id===n.id);if(prior){n.hp=clamp(Number(prior.hp)||0,0,n.maxHp);n.respawnAt=clamp(Number(prior.respawnAt)||0,0,s.time+180);}}
         if(Array.isArray(old.buildings))w.buildings=old.buildings.slice(0,80).filter(b=>BUILDINGS[b.type]&&Number.isFinite(b.x)&&Number.isFinite(b.y)&&Math.abs(b.x)<WORLD_LIMIT&&Math.abs(b.y)<WORLD_LIMIT).map((b,i)=>({id:'building-'+i,type:b.type,x:b.x,y:b.y,level:b.level===2?2:1,lit:b.lit!==false}));
         s.worlds[p.id]=w;s.stats.buildings+=w.buildings.length;
@@ -71,11 +71,12 @@
     }
     emit(type,data={}){this.events.push({type,...data});}
     planet(){return PLANETS.find(p=>p.id===this.state.planet);}
-    makeWorld(p){
+    trainingNpc(){return this.state.training&&this.state.mode==='surface'?{id:'training-instructor',x:-90,y:145,name:'교관 루미'}:null;}
+    makeWorld(p,training=this.state.training){
       const random=rand(p.seed),nodes=[],creatures=[];
       const resourceRadius=970*SURFACE_MAP_SCALE, creatureSpread=1900*SURFACE_MAP_SCALE;
       const fixed=[{x:190,y:115,type:'iron'},{x:285,y:65,type:'iron'},{x:185,y:230,type:'biomass'},{x:65,y:265,type:'biomass'},{x:-155,y:90,type:'crystal'},{x:-260,y:-70,type:'crystal'}];
-      for(let i=0;i<140;i++){
+      for(let i=0;i<(training?16:140);i++){
         const a=random()*TAU,d=330+Math.sqrt(random())*resourceRadius;
         const special=p.id==='solara'?'iron':(p.id==='nix'||p.id==='prisma')?'crystal':p.id==='verdant'?'biomass':'iron';
         fixed.push({x:Math.cos(a)*d,y:Math.sin(a)*d,type:random()<.36?special:['iron','crystal','biomass'][Math.floor(random()*3)]});
@@ -89,7 +90,7 @@
         }
       });
       const relics=[[-245,405],[720,-490],[-810,-710]].map(([x,y],i)=>({id:p.id+'-relic-'+i,x:x*SURFACE_MAP_SCALE,y:y*SURFACE_MAP_SCALE,name:['별빛 기록석','잊힌 항로 표식','공명 수정 유적'][i]}));
-      return{nodes,creatures,buildings:[],relics};
+      return{nodes,creatures:training?creatures.slice(0,1):creatures,buildings:[],relics:training?[]:relics};
     }
     ensureWorld(id){if(!this.state.worlds[id])this.state.worlds[id]=this.makeWorld(PLANETS.find(p=>p.id===id));return this.state.worlds[id];}
     world(){return this.ensureWorld(this.state.planet);}
@@ -99,6 +100,7 @@
         const p=PLANETS.map(p=>({kind:'planet',entity:p,d:Math.hypot(this.state.ship.x-p.x,this.state.ship.y-p.y)-p.r})).sort((a,b)=>a.d-b.d)[0];return p.d<105?p:null;
       }
       const p=this.state.player,w=this.world(),items=[];
+      const npc=this.trainingNpc();if(npc)items.push({kind:'npc',entity:npc,d:dist(p,npc)});
       for(const n of w.nodes)if(n.hp>0)items.push({kind:'node',entity:n,d:dist(p,n)});
       for(const c of w.creatures)items.push({kind:'creature',entity:c,d:dist(p,c)});
       for(const b of w.buildings)items.push({kind:'building',entity:b,d:dist(p,b)-20});
@@ -145,7 +147,7 @@
         const obstacles=[{x:0,y:0,r:65},...w.buildings.map(b=>({...b,r:b.type==='habitat'?56:30})),...w.nodes.filter(n=>n.hp>0&&n.type==='iron').map(n=>({...n,r:27}))];
         for(const o of obstacles){const d=dist(p,o),r=o.r+12;if(d>0&&d<r){p.x=o.x+(p.x-o.x)/d*r;p.y=o.y+(p.y-o.y)/d*r;}}
         if(this.pendingInteraction){
-          const target=[...w.nodes,...w.creatures,...w.buildings,...w.relics].find(n=>n.id===this.pendingInteraction);
+          const target=[...w.nodes,...w.creatures,...w.buildings,...w.relics,...(this.trainingNpc()?[this.trainingNpc()]:[])].find(n=>n.id===this.pendingInteraction);
           if(!target||(target.hp!==undefined&&target.hp<=0)){this.pendingInteraction=null;this.moveTarget=null;}
           else if(dist(p,target)<110&&this.cooldown<=0){this.pendingInteraction=null;this.moveTarget=null;this.velocity.x=this.velocity.y=0;this.interact(target.id);}
           else this.moveTarget={x:target.x,y:target.y};
@@ -163,11 +165,16 @@
       if(this.paused||this.travel||this.cooldown>0)return{ok:false,reason:'잠시 기다려주세요.'};
       if(this.selectedBuild)return this.build(this.selectedBuild,this.state.player.x+Math.cos(this.state.player.angle)*105,this.state.player.y+Math.sin(this.state.player.angle)*105);
       let n=this.nearest();
-      if(targetId&&this.state.mode==='surface'){
+      if(targetId==='training-instructor'){
+        const npc=this.trainingNpc();if(!npc||dist(npc,this.state.player)>=160)return{ok:false,reason:'교관 가까이로 이동하세요.'};
+        n={kind:'npc',entity:npc};
+      }
+      if(targetId&&targetId!=='training-instructor'&&this.state.mode==='surface'){
         const w=this.world(),target=[...w.nodes.filter(n=>n.hp>0).map(entity=>({kind:'node',entity})),...w.creatures.map(entity=>({kind:'creature',entity})),...w.buildings.map(entity=>({kind:'building',entity})),...w.relics.map(entity=>({kind:'relic',entity}))].find(v=>v.entity.id===targetId);
         if(target&&dist(target.entity,this.state.player)<160)n=target;else return{ok:false,reason:'더 가까이 이동하세요.'};
       }
       if(!n){this.emit('message',{text:this.state.mode==='surface'?'자원이나 생명체 가까이에서 E를 눌러주세요.':'행성 가까이로 비행하거나 M으로 항로를 설정하세요.'});return{ok:false,reason:'주변에 상호작용할 대상이 없습니다.'};}
+      if(n.kind==='npc'){this.emit('instructor');return{ok:true,type:'instructor'};}
       if(n.kind==='planet')return this.land(n.entity.id);
       if(n.kind==='node'){
         const node=n.entity;this.cooldown=.38;node.hp--;this.beam={x:node.x,y:node.y,life:.28};
