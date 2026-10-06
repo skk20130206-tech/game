@@ -270,7 +270,7 @@
     setText('oxygen-text',Math.ceil(s.oxygen)+'%');$('oxygen-bar').style.width=s.oxygen+'%';$('oxygen-bar').style.background=s.oxygen<25?'#ffb196':'';setText('fuel-text',Math.floor(s.fuel)+'%');$('fuel-bar').style.width=s.fuel+'%';setText('journal-count',s.discovered.length);
     const loc=space?'space':p.id;if(locationSignature!==loc||force){locationSignature=loc;setText('location-code',space?'SIGMA SYSTEM / OPEN SPACE':'시그마 성계 / '+String(PLANETS.indexOf(p)+1).padStart(2,'0'));$('location-name').innerHTML=(space?'시그마 성계':p.name)+'<span class="planet-tag">'+(space?'비행 중':'탐험 중')+'</span>';$('location-description').innerHTML=space?'새로운 행성으로 향하는 중':p.kind+' <span>·</span> '+p.temp;setText('ship-label',space?'착륙':'우주선');$('scan-button').title=space?'주변 행성 스캔':'주변 자원과 생명체 스캔';}
     if(s.training){setText('location-code','TRAINING SIMULATION / 전용 공간');$('location-name').innerHTML=(space?'비행 시뮬레이터':s.planet==='verdant'?'시그마 훈련 기지':'모의 착륙 구역')+'<span class="planet-tag">훈련 중</span>';$('location-description').textContent=space?'모의 항로 · 다른 행성에 착륙해 보세요':'루미와 함께하는 첫 우주 탐험';}
-    updateTutorial();$('space-action').hidden=!space||!$('tutorial-card').hidden;$('mission-card').hidden=space||!$('tutorial-card').hidden;
+    updateTutorial();$('space-action').hidden=!space||!$('tutorial-card').hidden;$('mission-card').hidden=space||session.active||!$('tutorial-card').hidden;
     if(space){const target=nearest?.kind==='planet'?nearest.entity:null;setText('space-target-name',target?target.name+' 궤도':'다음 목적지를 찾아보세요');setText('space-target-help',target?'착륙해 새로운 자원과 생명체를 만나보세요.':'방향키로 비행하거나 성계 지도에서 항로를 설정하세요.');$('land-button').disabled=!target||!!game.travel;setText('land-button',target?target.name+'에 착륙':'행성 가까이에서 착륙');setText('refuel-button',game.solarCharge>0?'태양광 비상 충전 · '+Math.ceil(game.solarCharge)+'초':s.inventory.biomass>=3?'연료 합성 · 바이오매스 3개':'비상 태양광 충전 · 6초');}
     let hint='자원 가까이에서 E를 누르세요',key='E';
     if(game.selectedBuild){hint='빈 땅 클릭 또는 E · 건설 배치';key='B';}
@@ -283,7 +283,7 @@
     setText('status-label',game.paused?'탐험 일시 정지':s.training?'훈련 기지 · 산소 안전 공급':nearHome?'안전 구역 · 산소 충전 중':s.oxygen<25?'산소 부족 · 집이나 우주선으로 돌아가세요':space?'항법 장치 정상':'2D 탐사 장비 정상');
     if(s.oxygen<25&&!lowOxygenWarned){toast('산소가 얼마 남지 않았어요. 집이나 우주선 근처에서 충전하세요.',true);lowOxygenWarned=true;}if(s.oxygen>50)lowOxygenWarned=false;
     const goals=game.goals(),signature=goals.map(v=>v.done?'1':'0').join('');if(signature!==missionSignature||force){missionSignature=signature;$('mission-list').innerHTML=goals.map(v=>'<li class="'+(v.done?'done':'')+'">'+v.text+'</li>').join('');const completed=goals.filter(v=>v.done).length;$('mission-progress-bar').style.width=(completed/goals.length*100)+'%';if(completed===goals.length){setText('mission-title','이제 당신도 우주 개척자');setText('mission-description','남은 행성을 탐험하고 더 큰 기지를 만들어보세요.');setText('mission-note','모든 첫 탐험 목표를 달성했어요!');}else{setText('mission-title','작은 발걸음, 새로운 세계');setText('mission-description','우주에 첫 번째 나만의 집을 지어보세요.');setText('mission-note','천천히 둘러보세요. 모험은 이제 시작이에요.');}}
-    if(nearest&&!space&&!game.selectedBuild&&nearest.kind!=='ship'){
+    if(nearest&&!space&&!game.selectedBuild&&!['ship','npc'].includes(nearest.kind)){
       const e=nearest.entity,pt=renderer.project(e.x,e.y-65);$('world-label').hidden=pt.x<40||pt.x>renderer.width-40||pt.y<100||pt.y>renderer.height-100;$('world-label').style.left=pt.x+'px';$('world-label').style.top=(pt.y-12)+'px';setText('world-label',nearest.kind==='node'?RESOURCE_NAMES[e.type]:nearest.kind==='creature'?SPECIES[e.species].name:(nearest.kind==='relic'||nearest.kind==='npc')?e.name:BUILDINGS[e.type].name);
     }else $('world-label').hidden=true;
   }
@@ -358,7 +358,7 @@
     if(now-lastSave>8000){if(!game.paused)save();lastSave=now;}requestAnimationFrame(frame);
   }
   updateSoundButton();updateImmersionButton();hud(true);processEvents();
-  if(saved)toast('다시 오신 걸 환영해요. 지난 탐험에서 이어서 시작합니다.');else toast('베르단트에 착륙했어요! WASD 또는 빈 땅 클릭으로 이동하세요. E는 채굴이에요.');
+  if(session.active)toast('시그마 훈련 기지에 도착했어요. 루미와 함께 첫 탐험을 준비하세요.');else if(saved)toast('다시 오신 걸 환영해요. 지난 탐험에서 이어서 시작합니다.');else toast('베르단트에 착륙했어요! WASD 또는 빈 땅 클릭으로 이동하세요. E는 채굴이에요.');
   if(!storageAvailable)toast('자동 저장을 사용할 수 없어요. 저장 관리에서 파일을 내보내 주세요.',true);
   requestAnimationFrame(frame);
   // Optional browser-native agent tools share exactly the same game actions as the interface.

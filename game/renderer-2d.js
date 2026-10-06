@@ -240,7 +240,7 @@
         c.restore();}
       if(g.beam){line(c,s.player.x+23,s.player.y-30,g.beam.x,g.beam.y-20,'#d6ffc488',7);line(c,s.player.x+23,s.player.y-30,g.beam.x,g.beam.y-20,'#f8ffe0',2);}
       if(g.scanRing){const t=g.scanRing.age;c.globalAlpha=Math.max(0,1-t/2);ring(c,g.scanRing.x,g.scanRing.y,t*330,p.accent,3);c.globalAlpha=1;}
-      if(g.waypoint){const t=g.waypoint;ring(c,t.x,t.y,36+Math.sin(this.time*3)*4,p.accent,3);line(c,t.x,t.y-11,t.x,t.y-78,p.accent,2);path(c,[[t.x-8,t.y-76],[t.x+8,t.y-76],[t.x,t.y-66]],p.accent);c.fillStyle='#f2ffd7';c.font='bold 11px sans-serif';c.textAlign='center';c.fillText(t.label||'목표',t.x,t.y-87);}
+      if(g.waypoint){const t=g.waypoint;ring(c,t.x,t.y,36+Math.sin(this.time*3)*4,p.accent,3);if(!(s.training&&g.trainingStep===0)){line(c,t.x,t.y-11,t.x,t.y-78,p.accent,2);path(c,[[t.x-8,t.y-76],[t.x+8,t.y-76],[t.x,t.y-66]],p.accent);c.fillStyle='#f2ffd7';c.font='bold 11px sans-serif';c.textAlign='center';c.fillText(t.label||'목표',t.x,t.y-87);}}
       if(g.selectedBuild){const target=this.mouse||{x:s.player.x+Math.cos(s.player.angle)*105,y:s.player.y+Math.sin(s.player.angle)*105},valid=g.canPlace(g.selectedBuild,target.x,target.y).ok;c.globalAlpha=.65;c.save();c.translate(target.x,target.y);building(c,{type:g.selectedBuild},this.time);ring(c,0,5,BUILDINGS[g.selectedBuild].radius+8,valid?'#d2ff99':'#ff9b8e',3);c.restore();c.globalAlpha=1;}
       this.drawEffects(c,dt);c.restore();this.waypointArrow(c);
     }
