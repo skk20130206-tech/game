@@ -49,6 +49,20 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
 @media(max-height:560px) and (min-width:601px){.tutorial-card{top:125px;max-height:calc(100% - 235px);width:235px;padding:10px}.tutorial-card h2{font-size:14px}.tutorial-card p{font-size:11px}.tutorial-card .tutorial-note{font-size:10px}}
 :root .instructor-portrait{width:100px;margin:0 auto 20px;padding:24px 8px;border:3px solid #91ecea;border-radius:22px;background:#173b51;color:#9ef7ee;text-align:center;font-size:23px;box-shadow:0 0 30px #6cdad833}
 #instructor-radio{width:100%;margin-top:14px;border:1px solid #78dce2;color:#a7f1ed}
+
+/* Academy: one visible goal and a distinct voice from Lumi. */
+.training-active .location h1{font-size:25px}.training-active .tutorial-card{background:linear-gradient(150deg,#173442f7,#101f30f7);border-color:#79d9df66;box-shadow:0 16px 40px #03091466}
+.tutorial-route{display:flex;gap:7px;margin:15px 0 12px}.tutorial-route span{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;font-size:11px;color:#839fac;border:1px solid #496476;background:#142c3c}.tutorial-route .current{background:#96eee2;color:#153542;border-color:#c4fff4;box-shadow:0 0 15px #74dfcf35;font-weight:800}.tutorial-route .done{color:#baf3b1;background:#2b4e44;border-color:#8bc99477}
+.lumi-guidance{display:flex;gap:9px;margin-bottom:13px;padding:11px;border:1px solid #80cfd42b;border-radius:10px;background:#81c5dd0c}.lumi-guidance>span{flex-shrink:0;width:32px;height:27px;border-radius:8px;background:#b0eae3;color:#163d4c;display:grid;place-items:center;font-size:10px;letter-spacing:2px}.tutorial-card .lumi-guidance p{font-size:11px;line-height:1.65;color:#aad4db}.training-active #instructor-radio{font-size:11px;margin-top:10px;padding:10px;border-radius:8px}
+.academy-welcome{display:flex;align-items:center;gap:32px;padding:24px 0 30px}.academy-welcome h3{font-size:32px;line-height:1.25;letter-spacing:-1px;margin:14px 0}.academy-welcome p{font-size:14px;color:#aac8d0;line-height:1.7;margin:0}.academy-tag{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#97dcd7}.academy-course{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap}.academy-course span{padding:9px 13px;border-radius:20px;border:1px solid #88cbd63b;color:#d0e2e6;font-size:12px;background:#20425144}
+.lumi-face{position:relative;display:flex;justify-content:center;align-items:center;gap:24px;flex-shrink:0;width:130px;height:110px;border:9px solid #c5e9e8;border-radius:34px;background:#0c3348;box-shadow:0 0 0 2px #68acbd,0 0 50px #86eee120;animation:lumi-hover 3s ease-in-out infinite}.lumi-face:before{content:'';position:absolute;width:3px;height:22px;background:#a2d9dc;left:50%;top:-31px}.lumi-face:after{content:'';position:absolute;width:11px;height:11px;border-radius:50%;background:#ffcb79;left:calc(50% - 4px);top:-38px;box-shadow:0 0 18px #ffcf8180}.lumi-face i{width:14px;height:20px;background:#a5fff0;border-radius:12px;box-shadow:0 0 15px #95ffed80;animation:lumi-blink 5s infinite}
+.instructor-chat{display:flex;gap:32px;align-items:center;margin:38px 0 30px}.instructor-chat blockquote{margin:0;font-size:20px;line-height:1.8;color:#e0eeed}.instructor-task{padding:22px;background:#91d6eb0b;border:1px solid #84d4e02b;border-radius:14px;margin-bottom:22px}.instructor-task h3{font-size:21px;margin:10px 0}.instructor-task p{font-size:14px;line-height:1.8;color:#bcd2d9;margin:0}#instructor-continue.subtle-button{display:block;margin:13px auto 0}
+.academy-graduate{text-align:center;padding:15px 0 25px}.academy-graduate>span{display:block;color:#d3ff97;font-size:70px;text-shadow:0 0 50px #b6fd9977}.academy-graduate h3{font-size:24px}.academy-graduate p{font-size:15px;line-height:1.9;color:#bfd7d6}
+.training-transfer{position:absolute;z-index:40;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#071727f5;animation:academy-arrival 1.35s both}.training-transfer>span{font-size:58px;color:#a2f4e7}.training-transfer strong{font-size:30px;letter-spacing:-1px;color:#e8fff9}.training-transfer small{font-size:13px;color:#96c6d1}
+@keyframes lumi-hover{50%{transform:translateY(-4px)}}@keyframes lumi-blink{0%,43%,47%,100%{transform:scaleY(1)}45%{transform:scaleY(.13)}}@keyframes academy-arrival{0%,55%{opacity:1}100%{opacity:0}}
+@media(max-width:600px){.training-active .location h1{font-size:18px}.training-active .tutorial-card{width:188px;max-height:calc(100% - 365px)}.tutorial-route{gap:4px;margin:10px 0}.tutorial-route span{width:19px;height:19px;font-size:9px}.lumi-guidance{display:none}.academy-welcome{gap:20px;align-items:flex-start;padding-top:30px}.academy-welcome h3{font-size:23px}.academy-welcome p{font-size:12px}.lumi-face{width:78px;height:70px;border-width:6px;border-radius:22px;gap:15px}.lumi-face i{width:10px;height:14px}.instructor-chat{gap:22px}.instructor-chat blockquote{font-size:15px}.academy-course span{font-size:10px;padding:7px 9px}.training-transfer strong{font-size:24px}.instructor-task{padding:16px}}
+@media(max-height:650px){.lumi-guidance{display:none}.tutorial-route{margin:8px 0}.training-active .tutorial-card{max-height:calc(100% - 300px)}}
+@media(prefers-reduced-motion:reduce){.lumi-face,.lumi-face i{animation:none}.training-transfer{animation:none}}
 </style>
 </head>
 <body>
@@ -85,8 +99,8 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
       <aside class="mission-card glass" id="mission-card"><div class="mission-heading"><span class="eyebrow">EXPLORER'S LOG</span><button id="mission-toggle" aria-label="탐험 목표 접기">−</button></div><div id="mission-body"><h2 id="mission-title">작은 발걸음, 새로운 세계</h2><p id="mission-description">우주에 첫 번째 나만의 집을 지어보세요.</p><ol id="mission-list"></ol><div class="mission-progress"><i id="mission-progress-bar"></i></div><span class="mission-note" id="mission-note">천천히 둘러보세요. 모험은 이제 시작이에요.</span></div></aside>
       <section class="tutorial-card glass" id="tutorial-card" hidden aria-label="탐험 튜토리얼">
         <div class="tutorial-heading"><span class="eyebrow" id="play-phase">TUTORIAL / 탐험가 훈련</span><div><button id="tutorial-toggle" aria-expanded="true" aria-controls="tutorial-body" aria-label="튜토리얼 접기">−</button><button id="tutorial-skip" hidden>본게임 시작</button></div></div>
-        <div id="tutorial-step" class="tutorial-step"></div><h2 id="tutorial-title" aria-live="polite"></h2>
-        <div id="tutorial-body"><p id="tutorial-description"></p><p id="tutorial-note" class="tutorial-note"></p><button id="tutorial-action" class="tutorial-action" hidden>목표 위치 표시</button><button id="tutorial-refuel" class="subtle-button" hidden>연료 충전</button></div>
+        <div id="tutorial-route" class="tutorial-route" aria-label="7개 훈련 과정"></div><div id="tutorial-step" class="tutorial-step"></div><h2 id="tutorial-title" aria-live="polite"></h2>
+        <div id="tutorial-body"><div class="lumi-guidance"><span aria-hidden="true">◉ ◉</span><p id="lumi-guidance"></p></div><p id="tutorial-description"></p><p id="tutorial-note" class="tutorial-note"></p><button id="tutorial-action" class="tutorial-action" hidden>목표 위치 표시</button><button id="tutorial-refuel" class="subtle-button" hidden>연료 충전</button></div>
         <div id="tutorial-progress" class="tutorial-progress" role="progressbar" aria-label="튜토리얼 진행" aria-valuemin="0" aria-valuemax="7" aria-valuenow="0"><i id="tutorial-progress-bar"></i></div>
       </section>
       <div class="world-label" id="world-label" hidden></div>
@@ -152,7 +166,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     fresh(){return{version:VERSION,mode:'surface',planet:'verdant',player:{x:90,y:100,angle:0},ship:{x:-480,y:245,angle:-Math.PI/2},oxygen:100,fuel:100,inventory:{iron:0,crystal:0,biomass:0},worlds:{},visited:['verdant'],discovered:[],met:[],friendship:{},creatureCare:{},companion:null,relics:[],time:0,stats:{mined:0,buildings:0,travel:0,collected:{iron:0,crystal:0,biomass:0}},rewarded:false};}
     validate(input){
       if(!input||input.version!==VERSION||!['surface','space'].includes(input.mode)||!PLANETS.some(p=>p.id===input.planet))throw Error('Invalid save');
-      const s=this.fresh();s.training=input.training===true;
+      const s=this.fresh();s.training=input.training===true;if(s.training)s.trainingLayout=2;
       for(const key of ['player','ship']){
         if(!input[key]||!Number.isFinite(input[key].x)||!Number.isFinite(input[key].y))throw Error('Invalid position');
         const limit=key==='player'?WORLD_LIMIT:2600;
@@ -182,9 +196,17 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     }
     emit(type,data={}){this.events.push({type,...data});}
     planet(){return PLANETS.find(p=>p.id===this.state.planet);}
-    trainingNpc(){return this.state.training&&this.state.mode==='surface'?{id:'training-instructor',x:-90,y:145,name:'교관 루미'}:null;}
+    trainingNpc(){return this.state.training&&this.state.mode==='surface'?{id:'training-instructor',x:-350,y:140,name:'교관 루미'}:null;}
+    trainingGate(step,reason){
+      if(!this.state.training||!(this.trainingStep<step))return null;
+      this.emit('message',{text:reason});return{ok:false,reason};
+    }
     makeWorld(p,training=this.state.training){
       const random=rand(p.seed),nodes=[],creatures=[];
+      if(training){
+        const samples=[['iron',330,15],['iron',535,45],['crystal',645,135],['biomass',335,195],['biomass',505,215]];
+        return{nodes:samples.map(([type,x,y],i)=>({id:'training-v2-'+p.id+'-node-'+i,type,x,y,hp:type==='iron'?4:type==='crystal'?3:2,maxHp:type==='iron'?4:type==='crystal'?3:2,respawnAt:0,size:1,rotation:random()*TAU,seed:Math.floor(random()*10000)})),creatures:[{id:'training-v2-'+p.id+'-friend',species:p.species[0],x:-465,y:515,homeX:-465,homeY:515,phase:0,angle:0}],buildings:[],relics:[]};
+      }
       const resourceRadius=970*SURFACE_MAP_SCALE, creatureSpread=1900*SURFACE_MAP_SCALE;
       const fixed=[{x:190,y:115,type:'iron'},{x:285,y:65,type:'iron'},{x:185,y:230,type:'biomass'},{x:65,y:265,type:'biomass'},{x:-155,y:90,type:'crystal'},{x:-260,y:-70,type:'crystal'}];
       for(let i=0;i<(training?16:140);i++){
@@ -241,6 +263,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
       actor.x+=this.velocity.x*dt;actor.y+=this.velocity.y*dt;
       if(moving){const difference=Math.atan2(Math.sin(Math.atan2(dy,dx)-actor.angle),Math.cos(Math.atan2(dy,dx)-actor.angle));actor.angle+=difference*(1-Math.exp(-dt*13));}
       const limit=s.mode==='surface'?WORLD_LIMIT:2300;actor.x=clamp(actor.x,-limit,limit);actor.y=clamp(actor.y,-limit,limit);
+      if(s.training&&s.mode==='surface'){actor.x=clamp(actor.x,-720,740);actor.y=clamp(actor.y,-270,660);}
       this.moving=Math.hypot(this.velocity.x,this.velocity.y)>2;this.boosting=this.moving&&!!input.run;
       if(s.mode==='space'){
         s.ship.altitude=0;this.velocity.z=0;
@@ -265,7 +288,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
         }
         for(const n of w.nodes)if(n.hp<=0&&s.time>=n.respawnAt)n.hp=n.maxHp;
         const safe=dist(p,{x:0,y:0})<180||w.buildings.some(b=>b.type==='habitat'&&dist(p,b)<150);
-        s.oxygen=clamp(s.oxygen+dt*(safe?15:-this.planet().oxygen*(input.run?1.6:1)),0,100);
+        s.oxygen=s.training?100:clamp(s.oxygen+dt*(safe?15:-this.planet().oxygen*(input.run?1.6:1)),0,100);
         const solar=w.buildings.find(b=>b.type==='solar'&&dist(p,b)<200);if(solar)s.fuel=clamp(s.fuel+dt*(solar.level===2?7:3),0,100);
         if(s.oxygen<=0){s.player.x=90;s.player.y=90;s.oxygen=100;this.moveTarget=null;this.emit('message',{text:'산소가 부족해 우주선으로 긴급 귀환했어요. 자원은 안전합니다.',error:true});this.emit('save');}
       }else{s.oxygen=100;}
@@ -288,6 +311,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
       if(n.kind==='npc'){this.emit('instructor');return{ok:true,type:'instructor'};}
       if(n.kind==='planet')return this.land(n.entity.id);
       if(n.kind==='node'){
+        const locked=this.trainingGate(1,'루미에게 먼저 인사해 주세요. 목표 표시를 따라 접수대로 가세요.');if(locked)return locked;
         const node=n.entity;this.cooldown=.38;node.hp--;this.beam={x:node.x,y:node.y,life:.28};
         const nodeColor=node.type==='crystal'?'#bccfff':node.type==='biomass'?'#c3f379':'#cad9df',broken=node.hp<=0;
         this.emit('effect',{kind:'mine',x:node.x,y:node.y,color:nodeColor,nodeType:node.type,remaining:node.hp,maxHp:node.maxHp,broken});
@@ -377,6 +401,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     }
     scan(){
       if(this.paused||this.travel)return{ok:false,reason:'탐험 중에 스캔할 수 있어요.'};
+      const locked=this.trainingGate(2,'먼저 루미를 만나고 철광석 하나를 끝까지 채굴하세요.');if(locked)return locked;
       if(this.scanCooldown>0){this.emit('message',{text:'스캐너 충전 중 · '+Math.ceil(this.scanCooldown)+'초'});return{ok:false,reason:'스캐너 충전 중'};}
       this.scanCooldown=5;const pos=this.state.mode==='surface'?this.state.player:this.state.ship;this.scanRing={x:pos.x,y:pos.y,age:0};this.emit('effect',{kind:'scan',scanAction:true});
       if(this.state.mode==='space'){this.emit('message',{text:'행성 5개 감지. M 키로 성계 지도를 열어보세요.'});return{ok:true,planets:PLANETS.length};}
@@ -387,6 +412,11 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     canAfford(type){return!!BUILDINGS[type]&&Object.entries(BUILDINGS[type].cost).every(([r,n])=>this.state.inventory[r]>=n);}
     canPlace(type,x,y){
       if(this.state.mode!=='surface')return{ok:false,reason:'행성에 착륙한 뒤 건설하세요.'};
+      if(this.state.training){
+        if(this.trainingStep<3)return{ok:false,reason:'채굴과 스캔을 마치면 건설 연습이 열려요.'};
+        if(type!=='habitat')return{ok:false,reason:'훈련에서는 탐험가의 집을 먼저 지어보세요.'};
+        if(x<270||x>640||y<410||y>585)return{ok:false,reason:'금색 테두리 안의 건설 연습장에 지어주세요.'};
+      }
       const def=BUILDINGS[type];if(!def||!Number.isFinite(x)||!Number.isFinite(y))return{ok:false,reason:'건물을 선택하세요.'};
       if(!this.canAfford(type))return{ok:false,reason:'자원이 부족해요. 비용을 확인하고 더 모아주세요.'};
       if(this.world().buildings.length>=80)return{ok:false,reason:'이 행성에는 건물을 80개까지 지을 수 있어요.'};
@@ -407,6 +437,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     launch(){
       if(this.paused||this.travel)return{ok:false,reason:'잠시 기다려주세요.'};
       if(this.state.mode==='space')return this.land();
+      const locked=this.trainingGate(5,'집을 짓고 생명체에게 인사하면 비행 훈련이 열려요.');if(locked)return locked;
       if(dist(this.state.player,{x:0,y:0})>190){this.moveTarget={x:80,y:60};this.emit('message',{text:'우주선으로 이동합니다. 도착하면 F를 눌러 이륙하세요.'});return{ok:false,reason:'우주선으로 이동 중'};}
       const p=this.planet();this.state.mode='space';this.state.ship={x:p.x,y:p.y+p.r+155,angle:-Math.PI/2,altitude:0};this.state.oxygen=100;this.moveTarget=null;this.selectedBuild=null;this.emit('launch');this.emit('message',{text:'이륙 완료! 방향키로 비행하거나 M 키로 성계 지도를 열어보세요.'});this.emit('save');return{ok:true,mode:'space'};
     }
@@ -728,21 +759,49 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
       for(let i=0;i<700;i++)items.push({x:(random()-.5)*WORLD_LIMIT*2.1,y:(random()-.5)*WORLD_LIMIT*2.1,r:8+random()*75,type:i%7,angle:random()*TAU});this.decoration.set(p.id,items);return items;
     }
     worldTransform(c){c.translate(this.width*.5,this.height*.53);c.scale(this.scale,this.scale);c.translate(-this.camera.x,-this.camera.y);}
+    trainingStation(c){
+      const stage=this.game.trainingStep??0,t=this.time;
+      c.fillStyle='#081321';c.fillRect(-2900,-2900,5800,5800);
+      const random=rand(527);for(let i=0;i<190;i++){const x=(random()-.5)*4400,y=(random()-.5)*3500;oval(c,x,y,i%8===0?2:1,i%8===0?2:1,i%3?'#baddea66':'#f3f4ca99');}
+      glow(c,1130,-540,510,'#24759233');drawPlanet(c,PLANETS[0],1120,-500,270,t);
+      // A bounded deck, outer hull, and room colors make this a separate place.
+      box(c,-787,-358,1594,1080,52,'#020b16','#426074');
+      box(c,-770,-340,1560,1040,44,'#162b3a','#87c6d0');
+      box(c,-747,-313,1514,990,32,'#203847','#3c5c6c');
+      for(let x=-720;x<750;x+=60)line(c,x,-280,x,650,'#62869514',1);
+      for(let y=-280;y<650;y+=60)line(c,-720,y,740,y,'#62869514',1);
+      for(let x=-695;x<=700;x+=85){box(c,x,-329,35,5,2,'#a4ece5');box(c,x,684,35,5,2,'#4d92a6');}
+      const rooms=[
+        {x:-705,y:-35,w:465,h:345,n:'01',name:'루미의 접수대',sub:'WELCOME / 이동 · 대화',color:'#87eee2',active:stage===0},
+        {x:215,y:-170,w:500,h:475,n:'02',name:'자원 실습실',sub:'MINING / 채굴 · 스캔',color:'#83d7f2',active:stage===1||stage===2},
+        {x:215,y:350,w:500,h:290,n:'03',name:'건설 실습실',sub:'BUILD / 첫 번째 보금자리',color:'#f5c87a',active:stage===3},
+        {x:-700,y:370,w:410,h:280,n:'04',name:'생태 실습실',sub:'LIFE / 새로운 친구',color:'#bae589',active:stage===4},
+        {x:-200,y:-225,w:365,h:430,n:'05',name:'비행 격납고',sub:'FLIGHT / 우주로 출발',color:'#a1bdfc',active:stage>=5}
+      ];
+      for(const r of rooms){
+        box(c,r.x,r.y,r.w,r.h,22,r.active?'#243f50':'#182e3e',r.color+(r.active?'dd':'50'));
+        box(c,r.x+15,r.y+15,31,28,7,r.color);c.textAlign='center';c.font='bold 13px sans-serif';c.fillStyle='#18313b';c.fillText(r.n,r.x+30,r.y+34);
+        c.textAlign='left';c.fillStyle=r.color;c.font='bold 17px sans-serif';c.fillText(r.name,r.x+56,r.y+34);
+        c.font='10px sans-serif';c.fillStyle='#99b6c6';c.fillText(r.sub,r.x+20,r.y+61);
+        if(r.active){c.font='bold 10px sans-serif';c.textAlign='right';c.fillStyle=r.color;c.fillText('● 현재 실습',r.x+r.w-18,r.y+32);}
+      }
+      c.textAlign='left';c.fillStyle='#d7edf2';c.font='bold 23px sans-serif';c.fillText('SIGMA / EXPLORER ACADEMY',-690,-252);
+      c.font='12px sans-serif';c.fillStyle='#87b7c8';c.fillText('시그마 탐험가 훈련 기지   ·   지상 실습 → 모의 비행 → 정식 탐험',-690,-225);
+      // Glowing approach route and arrival airlock.
+      box(c,-687,100,102,105,15,'#1b4553','#92e5df');c.textAlign='center';c.fillStyle='#b8efe8';c.font='10px sans-serif';c.fillText('ARRIVAL',-636,221);
+      for(let x=-563;x<-390;x+=32){path(c,[[x,139],[x-7,132],[x-7,146]],'#87eee2'+(stage===0?'bd':'40'));}
+      box(c,-496,35,108,32,8,'#345664','#94bcc1');box(c,-485,40,31,18,3,'#81e5e2');box(c,-447,40,42,18,3,'#1b3c4a');
+      // The gold build pad is always empty of resources.
+      c.setLineDash([10,7]);c.strokeStyle='#f5c87a99';c.lineWidth=2;c.strokeRect(270,410,370,175);c.setLineDash([]);
+      if(!this.game.world().buildings.length){c.textAlign='center';c.fillStyle='#f5cf8a90';c.font='bold 32px sans-serif';c.fillText('⌂',450,505);c.font='11px sans-serif';c.fillText('이 안에 집을 지어보세요',450,540);}
+      for(const [x,y]of[[-655,575],[-620,615],[-352,590]]){oval(c,x,y,25,14,'#74b8852a');line(c,x,y,x,y-22,'#98c39d',3);oval(c,x-7,y-17,10,5,'#92bc86');oval(c,x+6,y-26,9,5,'#bad796');}
+    }
     surface(c,dt){
       const g=this.game,s=g.state,p=g.planet(),w=g.world();
       const ground=c.createRadialGradient(this.width*.45,this.height*.35,20,this.width*.5,this.height*.48,Math.max(this.width,this.height)*.86);
       ground.addColorStop(0,p.ground[3]);ground.addColorStop(.5,p.ground[1]);ground.addColorStop(1,p.ground[0]);c.fillStyle=ground;c.fillRect(0,0,this.width,this.height);
       c.save();this.worldTransform(c);
-      if(s.training){
-        c.fillStyle='#102c40';c.fillRect(-2700,-2700,5400,5400);
-        box(c,-650,-380,1450,1080,36,'#21485a','#65dbe088');
-        for(let x=-600;x<800;x+=80)line(c,x,-350,x,680,'#77c7dd18',1);
-        for(let y=-350;y<700;y+=80)line(c,-630,y,780,y,'#77c7dd18',1);
-        for(const [x,y,w,h,label] of[[-220,85,240,190,'01 · 교관 루미'],[140,-30,220,310,'02 · 채굴 연습'],[220,320,350,250,'03 · 건설 연습']]){
-          box(c,x,y,w,h,16,'#15394d','#65dbe077');c.fillStyle='#a0e8ec';c.font='bold 14px sans-serif';c.textAlign='left';c.fillText(label,x+14,y+25);
-        }
-        c.fillStyle='#d8faff';c.font='bold 22px sans-serif';c.textAlign='center';c.fillText('SIGMA · TRAINING STATION',50,-220);
-      }
+      if(s.training)this.trainingStation(c);
       for(const d of (s.training?[]:this.getDecor(p))){
         if(!this.project(d.x,d.y).visible)continue;
         if(d.type===0){
@@ -762,8 +821,8 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
         }
       }
       // World boundary and safe landing circle are drawn below all sprites.
-      c.setLineDash([12,10]);c.strokeStyle=p.light+'66';c.lineWidth=2;c.strokeRect(-WORLD_LIMIT,-WORLD_LIMIT,WORLD_LIMIT*2,WORLD_LIMIT*2);c.setLineDash([]);
-      oval(c,0,15,111,72,p.ground[0]);ring(c,0,0,155,p.accent+'24',1.5);c.fillStyle=p.light+'99';c.font='10px sans-serif';c.textAlign='center';c.fillText('LANDING ZONE',0,91);
+      if(!s.training){c.setLineDash([12,10]);c.strokeStyle=p.light+'66';c.lineWidth=2;c.strokeRect(-WORLD_LIMIT,-WORLD_LIMIT,WORLD_LIMIT*2,WORLD_LIMIT*2);c.setLineDash([]);}
+      oval(c,0,15,111,72,s.training?'#203748':p.ground[0]);ring(c,0,0,155,s.training?'#80d4ff50':p.accent+'24',1.5);c.fillStyle=p.light+'99';c.font='10px sans-serif';c.textAlign='center';c.fillText('LANDING ZONE',0,91);
       if(g.moveTarget){ring(c,g.moveTarget.x,g.moveTarget.y,10+Math.sin(this.time*5)*2,'#edf7c7',1.5);}
       const nearest=g.nearest(),actors=[{kind:'ship',x:0,y:0},...w.nodes.filter(n=>n.hp>0).map(n=>({...n,kind:'node'})),...w.buildings.map(b=>({...b,kind:'building'})),...w.relics.map(r=>({...r,kind:'relic'})),...w.creatures.map(v=>({...v,kind:'creature'})),{...s.player,kind:'player'}];
       actors.sort((a,b)=>a.y-b.y);
@@ -779,11 +838,12 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
         if(a.kind==='player')astronaut(c,this.time,g.moving,s.player.angle,g.beam?'mine':null);
         if(a.kind==='npc'){
           oval(c,0,8,23,8,'#071b3388');c.translate(0,Math.sin(this.time*2)*3);
-          glow(c,0,-26,44,'#68e4f533');box(c,-17,-30,34,34,9,'#74cdd2','#d6f9f8');
+          glow(c,0,-26,44,'#68e4f533');box(c,-19,-32,38,39,10,'#d6e9e6','#80c9ce');box(c,-14,-5,28,8,3,'#f4bc6a');
           box(c,-24,-62,48,33,10,'#d3eeed','#75b7c9');box(c,-19,-56,38,20,6,'#12364b');
           oval(c,-9,-47,4,4,'#92fff1');oval(c,9,-47,4,4,'#92fff1');line(c,0,-63,0,-72,'#a6e5e3',2);oval(c,0,-75,4,4,'#ffdb83');
           line(c,-18,-22,-29,-9,'#9ce6e5',6);line(c,18,-22,31,-36+Math.sin(this.time*3)*6,'#9ce6e5',6);box(c,-8,-20,16,10,3,'#f0d48c');
           c.fillStyle='#dfffff';c.font='bold 12px sans-serif';c.textAlign='center';c.fillText('교관 루미 · E 대화',0,-92);
+          if(g.trainingStep===0){box(c,-93,-148,186,32,12,'#b9f3ed');c.fillStyle='#123946';c.font='bold 12px sans-serif';c.fillText('여기로 와서 인사해 주세요!',0,-127);}
         }
         if(a.kind==='relic'){oval(c,0,8,31,12,'#102b3740');path(c,[[-25,4],[-20,-45],[0,-64],[22,-46],[25,4]],p.dark,p.light+'55');line(c,-8,-32,0,-45,p.accent,3);line(c,0,-45,10,-31,p.accent,3);line(c,10,-31,0,-20,p.accent,3);if(!s.relics.includes(a.id))ring(c,0,-32,22+Math.sin(this.time*2)*2,p.accent+'50');}
         c.restore();}
@@ -836,47 +896,47 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
 (function(root){
   'use strict';
   const STEPS=[
-    {title:'첫걸음을 내디뎌요',text:'WASD·방향키 또는 화면의 이동 패드로 60m를 걸어 보세요. 빈 땅을 눌러도 이동해요.',note:'화면 드래그: 지도 둘러보기 · V: 확대 보기',controls:['touch-pad']},
-    {title:'자원 하나를 채굴해요',text:'표시한 자원 가까이에서 E 또는 ‘채굴 / 교류’를 꾹 누르세요. 블록이 부서지면 자원을 얻어요.',note:'자원을 직접 누르면 다가가서 한 번 채굴해요.',controls:['interact-button']},
-    {title:'주변을 스캔해요',text:'Q 또는 ‘스캔’을 눌러 주변의 자원과 생명체를 찾아보세요.',note:'스캐너는 사용한 뒤 5초 동안 충전해요.',controls:['scan-button']},
-    {title:'첫 번째 집을 지어요',text:'철광석 12개와 바이오매스 8개를 모은 뒤 B 또는 ‘건설’ → 집을 선택하세요. 빈 땅 클릭 또는 ‘여기에 건설’로 완성해요.',note:'우주선과 자원에서 조금 떨어진 빈 땅에 지으세요.',controls:['build-button']},
-    {title:'생명체에게 인사해요',text:'생명체 가까이에서 E 또는 ‘채굴 / 교류’를 눌러 인사하세요. 첫 만남에는 선물도 받아요.',note:'만난 뒤에는 쓰다듬기와 먹이 나누기도 가능해요.',controls:['interact-button']},
-    {title:'우주로 이륙해요',text:'우주선 근처로 돌아가 F 또는 ‘우주선’을 누르세요. 멀리 있으면 먼저 우주선으로 이동해요.',note:'집이나 우주선 근처에 머무르면 산소가 충전돼요.',controls:['ship-button']},
-    {title:'다른 행성에 착륙해요',text:'M 또는 ‘성계 지도’에서 다른 행성의 항로를 선택하세요. 도착하면 E 또는 ‘착륙’을 누르세요.',note:'항로 이동에는 연료 18이 필요해요. R로 충전할 수 있어요.',controls:['map-tab','ship-button']}
+    {short:'루미',zone:'01 · 도착 / 접수대',title:'루미에게 첫인사를 건네요',text:'빛나는 안내 로봇을 클릭해 다가가세요. 가까이에서는 E로 대화할 수 있어요.',note:'WASD·방향키로 이동 · 빈 땅 클릭으로 이동',line:'어서 와요! 저는 교관 루미예요. 제 쪽으로 걸어와 인사해 주세요. 함께 첫 탐험을 준비해요.',controls:['touch-pad','interact-button']},
+    {short:'채굴',zone:'02 · 자원 실습실',title:'철광석 하나를 채굴해요',text:'채굴장에 표시된 철광석 가까이에서 E 또는 ‘채굴 / 교류’를 꾹 누르세요.',note:'4번 채굴하면 철광석이 부서져요. 클릭으로도 채굴할 수 있어요.',line:'잘 왔어요! 오른쪽 실습실의 철광석을 캐 볼까요? 도구를 계속 사용해서 바위를 끝까지 부숴 보세요.',controls:['interact-button']},
+    {short:'스캔',zone:'02 · 자원 실습실',title:'스캐너를 작동시켜요',text:'Q 또는 아래 ‘스캔’을 누르세요. 주변 자원과 생명체를 감지해요.',note:'스캔을 마치면 집 짓기에 필요한 재료를 지급해요.',line:'첫 자원을 얻었네요! 이번에는 스캐너로 주변을 살펴봐요. 다음 실습에 쓸 건설 재료도 준비해 둘게요.',controls:['scan-button']},
+    {short:'건설',zone:'03 · 건설 실습실',title:'나만의 첫 집을 지어요',text:'금색 건설장으로 이동해 B → ‘탐험가의 집’을 선택하고, 테두리 안의 빈 땅을 클릭하세요.',note:'철광석 12개 + 바이오매스 8개 · 건설 재료 지급 완료',line:'건설 재료를 받았죠? 금색 실습장에 집을 지어 보세요. 실제 탐험에서는 집 근처에서 산소를 채울 수 있어요.',controls:['build-button']},
+    {short:'교류',zone:'04 · 생태 실습실',title:'모스링과 친구가 돼요',text:'초록빛 생태실의 생명체를 클릭하거나 가까이에서 E를 눌러 인사하세요.',note:'스캔은 발견, 대화는 교류예요. 직접 인사를 건네 보세요.',line:'멋진 집이에요! 이제 왼쪽 생태실로 가 볼까요? 모스링에게 인사하면 작은 선물을 받을 수 있어요.',controls:['interact-button']},
+    {short:'이륙',zone:'05 · 비행 격납고',title:'우주선을 타고 출발해요',text:'중앙 격납고의 우주선으로 돌아가 F 또는 ‘우주선’을 누르세요.',note:'우주선에 다가간 뒤 한 번 더 눌러 이륙해요.',line:'지상 훈련을 모두 마쳤어요! 중앙 격납고에서 비행 연습을 시작해요. 제가 무전으로 계속 안내할게요.',controls:['ship-button']},
+    {short:'착륙',zone:'06 · 비행 시뮬레이터',title:'다른 행성에 착륙해요',text:'M → 다른 행성의 항로를 선택하세요. 도착한 뒤 E 또는 ‘착륙’을 누르면 훈련 완료!',note:'현재 행성이 아닌 다른 행성을 선택하세요.',line:'마지막 실습이에요! 성계 지도에서 새로운 목적지를 고르고 착륙해 보세요. 여기까지 마치면 정식 탐험가가 됩니다.',controls:['map-tab','ship-button']}
   ];
   class Tutorial{
     constructor(saved){
       this.done=STEPS.map((_,i)=>saved?.done?.[i]===true);
       this.walked=Number.isFinite(saved?.walked)?Math.max(0,Math.min(60,saved.walked)):0;
       this.skipped=saved?.skipped===true;this.dismissed=saved?.dismissed===true;
-      this.launchPlanet=typeof saved?.launchPlanet==='string'?saved.launchPlanet:null;
-      this.previous=null;
+      this.launchPlanet=typeof saved?.launchPlanet==='string'?saved.launchPlanet:null;this.previous=null;
     }
     get step(){const n=this.done.indexOf(false);return n<0?STEPS.length:n;}
     get active(){return !this.skipped&&this.step<STEPS.length;}
     get complete(){return this.step===STEPS.length;}
+    sync(game){game.trainingStep=this.step;}
     tick(game){
-      const s=game.state,p=s.player;
+      this.sync(game);const s=game.state,p=s.player;
       if(!this.active||game.paused||s.mode!=='surface'){this.previous=null;return;}
-      if(this.previous&&this.previous.planet===s.planet){
-        const d=Math.hypot(p.x-this.previous.x,p.y-this.previous.y);
-        // Ignore teleports, landings and emergency returns.
-        if(game.moving&&d<12)this.walked=Math.min(60,this.walked+d);
-      }
+      if(this.previous&&this.previous.planet===s.planet){const d=Math.hypot(p.x-this.previous.x,p.y-this.previous.y);if(game.moving&&d<12)this.walked=Math.min(60,this.walked+d);}
       this.previous={x:p.x,y:p.y,planet:s.planet};
-      if(this.walked>=60)this.done[0]=true;
+      // The new station starts with a real NPC encounter; legacy free-world guides still support walking.
+      if(!s.training&&this.walked>=60)this.done[0]=true;
     }
     event(e,game){
       if(!this.active)return;
-      if(e.type==='effect'&&e.kind==='break')this.done[1]=true;
-      if(e.type==='effect'&&e.kind==='scan'&&e.scanAction&&game.state.mode==='surface')this.done[2]=true;
-      if(e.type==='effect'&&e.kind==='build'&&e.buildingType==='habitat')this.done[3]=true;
-      if(e.type==='dialogue')this.done[4]=true;
-      if(e.type==='launch'){this.done[5]=true;this.launchPlanet=game.state.planet;this.previous=null;}
-      if(e.type==='land'){
-        if(this.launchPlanet&&game.state.planet!==this.launchPlanet)this.done[6]=true;
-        this.previous=null;
+      const stage=this.step,training=game.state.training,allowed=n=>!training||stage===n;
+      if(training&&e.type==='instructor'&&stage===0)this.done[0]=true;
+      if(allowed(1)&&e.type==='effect'&&e.kind==='break')this.done[1]=true;
+      if(allowed(2)&&e.type==='effect'&&e.kind==='scan'&&e.scanAction&&game.state.mode==='surface'){
+        this.done[2]=true;
+        if(training){for(const [r,n]of Object.entries({iron:12,biomass:8}))if(game.state.inventory[r]<n)game.addResource(r,n-game.state.inventory[r]);game.emit('message',{text:'루미: 건설 재료 도착! 철광석 12개와 바이오매스 8개가 준비됐어요.'});game.emit('save');}
       }
+      if(allowed(3)&&e.type==='effect'&&e.kind==='build'&&e.buildingType==='habitat')this.done[3]=true;
+      if(allowed(4)&&e.type==='dialogue')this.done[4]=true;
+      if(e.type==='launch'){if(allowed(5))this.done[5]=true;this.launchPlanet=game.state.planet;this.previous=null;}
+      if(e.type==='land'){if(allowed(6)&&this.launchPlanet&&game.state.planet!==this.launchPlanet)this.done[6]=true;this.previous=null;}
+      this.sync(game);
     }
     snapshot(){return{done:[...this.done],walked:this.walked,skipped:this.skipped,dismissed:this.dismissed,launchPlanet:this.launchPlanet};}
     guide(game){
@@ -884,49 +944,50 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
       if(!this.active)return info;
       if(s.mode==='space'){
         const canLand=game.nearest()?.kind==='planet'&&!game.travel;
-        if(this.step<5)Object.assign(info,{title:'행성에 착륙해 이어가요',text:'이 단계는 행성 위에서 진행해요. 가까운 행성에 착륙하거나 성계 지도에서 항로를 선택하세요.'});
-        if(game.travel){info.action=null;info.note='항로 이동 중이에요. 도착하면 착륙 버튼이 나타나요.';info.controls=[];}
+        if(this.step<5)Object.assign(info,{title:'훈련장에 착륙해 이어가요',text:'이 단계는 지상에서 진행해요. 가까운 행성에 착륙하거나 성계 지도에서 항로를 선택하세요.'});
+        if(game.travel){info.action=null;info.note='이동 중이에요. 도착하면 착륙 버튼이 나타나요.';info.controls=[];}
         else if(canLand){info.action='land';info.label='이 행성에 착륙';info.controls=['ship-button'];}
-        else {info.action='map';info.label='성계 지도 열기';info.controls=['map-tab'];}
+        else{info.action='map';info.label='성계 지도 열기';info.controls=['map-tab'];}
         return info;
       }
-      if(this.step===6){info.text='우주선으로 돌아가 F 또는 ‘우주선’으로 이륙한 뒤, 성계 지도에서 다른 행성으로 떠나세요.';info.controls=['ship-button'];}
+      if(this.step===6){info.text='우주선으로 돌아가 이륙한 뒤, 성계 지도에서 다른 행성으로 떠나세요.';info.controls=['ship-button'];}
       const nearest=list=>list.reduce((a,b)=>!a||Math.hypot(b.x-s.player.x,b.y-s.player.y)<Math.hypot(a.x-s.player.x,a.y-s.player.y)?b:a,null);
       const w=game.world();let target=null;
-      if(this.step===0)info.note=Math.floor(this.walked)+' / 60m · '+info.note;
-      if(this.step===1)target=nearest(w.nodes.filter(n=>n.hp>0));
+      if(this.step===0){target=game.trainingNpc();if(!target)info.note=Math.floor(this.walked)+' / 60m · '+info.note;}
+      if(this.step===1)target=nearest(w.nodes.filter(n=>n.hp>0&&n.type==='iron'));
       if(this.step===3){
         info.note='철광석 '+s.inventory.iron+' / 12 · 바이오매스 '+s.inventory.biomass+' / 8';
         const type=s.inventory.iron<12?'iron':s.inventory.biomass<8?'biomass':null;
         if(type){target=nearest(w.nodes.filter(n=>n.hp>0&&n.type===type));info.controls=['interact-button'];}
-        else {info.action='build';info.label='건설 메뉴 열기';}
+        else if(s.training&&Math.hypot(s.player.x-450,s.player.y-480)>210){target={x:450,y:370};info.label='건설장으로 이동';}
+        else{info.action='build';info.label='집 건설하기';if(s.training)info.target={x:450,y:480};}
       }
       if(this.step===4)target=nearest(w.creatures);
-      if(this.step>=5)target={x:80,y:60};
-      if(target){info.target={x:target.x,y:target.y};info.action='mark';info.label=this.step>=5?'우주선 위치 표시':'목표 위치 표시';info.distance=Math.round(Math.hypot(target.x-s.player.x,target.y-s.player.y));}
-      else if([1,4].includes(this.step)||this.step===3&&!game.canAfford('habitat'))info.note+=' · 주변을 둘러보세요. 채굴한 자원은 150초 뒤 다시 자라요.';
+      if(this.step>=5)target={x:80,y:80};
+      if(target){info.target={x:target.x,y:target.y};info.targetId=target.id;info.action='mark';info.label=info.label||(this.step===0?'루미에게 이동':this.step>=5?'우주선으로 이동':'목표로 이동');info.distance=Math.round(Math.hypot(target.x-s.player.x,target.y-s.player.y));}
+      else if([1,4].includes(this.step)||this.step===3&&!game.canAfford('habitat'))info.note+=' · 채굴한 자원은 150초 뒤 다시 자라요.';
       return info;
     }
   }
-  // Training progress is separate from the player's main expedition.
   class TrainingSession{
     constructor(main,record){
       this.main=main||null;
-      const resume=record?.version===1&&record.active===true&&record.game?.player&&record.game?.worlds;
-      this.active=!!resume||!this.main;
-      this.state=resume?record.game:this.main;
+      const resume=[1,2].includes(record?.version)&&record.active===true&&record.game?.player&&record.game?.worlds;
+      this.active=!!resume||!this.main;this.state=resume?record.game:this.main;
       if(this.active){
         this.state=JSON.parse(JSON.stringify(this.state||new root.OrbitCore.Game().snapshot()));
-        if(!this.state.training){this.state.training=true;this.state.mode='surface';this.state.planet='verdant';this.state.player={x:90,y:100,angle:0};}
+        if(!this.state.training||this.state.trainingLayout!==2){
+          this.state.training=true;this.state.trainingLayout=2;this.state.mode='surface';this.state.planet='verdant';this.state.player={x:-610,y:140,angle:0};this.state.worlds={};
+        }
       }
       this.tutorial=this.active?new Tutorial(resume?record.tutorial:null):new Tutorial({done:STEPS.map(()=>true),dismissed:true});
       if(this.active){this.tutorial.skipped=false;this.tutorial.dismissed=false;}
     }
-    snapshot(game){return{version:1,active:this.active,game:game.snapshot(),tutorial:this.tutorial.snapshot()};}
+    snapshot(game){return{version:2,active:this.active,game:game.snapshot(),tutorial:this.tutorial.snapshot()};}
     destination(game){
       if(!this.active||!this.tutorial.complete)return null;
       if(this.main)return this.main;
-      const next=game.snapshot();next.training=false;next.mode='surface';next.planet='verdant';next.player={x:90,y:100,angle:0};return next;
+      const next=new root.OrbitCore.Game().snapshot();next.training=false;next.inventory={iron:12,biomass:8,crystal:4};return next;
     }
     finish(){this.active=false;this.tutorial.dismissed=true;}
   }
@@ -958,27 +1019,48 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
   const keys={};let startOpen=true;game.paused=true;
   const modal=$('modal');let buildOpen=false,missionOpen=true,lastHud=0,lastSave=0,lastFrame=performance.now(),missionSignature='',locationSignature='',bannerTimer=null,lowOxygenWarned=false;
   let tutorial=session.tutorial,tutorialStep=tutorial.step,tutorialCollapsed=false,tutorialWaypoint=null,completionShown=false;
+  tutorial.sync(game);
   const tutorialControls=['touch-pad','interact-button','scan-button','build-button','ship-button','map-tab'];
   function saveTutorial(){try{if(session.active)localStorage.setItem(TRAINING_KEY,JSON.stringify(session.snapshot(game)));else localStorage.setItem(TUTORIAL_KEY,JSON.stringify(tutorial.snapshot()));}catch(e){}}
   function clearTutorialWaypoint(){if(game.waypoint===tutorialWaypoint)game.waypoint=null;tutorialWaypoint=null;}
   function restartTutorial(){
-    if(session.active){closeModal();return;}
-    const main=game.snapshot();save();session=new window.OrbitTutorial.TrainingSession(main,{version:1,active:true,game:new Game().snapshot()});tutorial=session.tutorial;completionShown=false;replaceGame(new Game(session.state));save();closeModal();showTrainingIntro();
+    const main=session.active?session.main:game.snapshot();save();
+    session=new window.OrbitTutorial.TrainingSession(main,{version:2,active:true,game:new Game().snapshot()});tutorial=session.tutorial;completionShown=false;
+    replaceGame(new Game(session.state));save();closeModal();showTrainingIntro();
+  }
+  function showTransfer(title,detail){
+    document.querySelector('.training-transfer')?.remove();
+    const layer=document.createElement('div');layer.className='training-transfer';layer.setAttribute('role','status');
+    const icon=document.createElement('span');icon.textContent='✦';
+    const heading=document.createElement('strong');heading.textContent=title;
+    const sub=document.createElement('small');sub.textContent=detail;
+    layer.append(icon,heading,sub);$('game-area').append(layer);setTimeout(()=>layer.remove(),1350);
   }
   function showTrainingIntro(){
-    showModal('먼저, 탐험을 연습해요','TUTORIAL / 탐험가 훈련','<p class="modal-intro">이동 → 채굴 → 스캔 → 집 짓기 → 생명체 만나기 → 이륙 → 다른 행성 착륙을 직접 해보세요.</p><p class="modal-intro">왼쪽 안내와 목표 표시를 따라가면 돼요. 7단계를 모두 마치면 본게임이 열립니다. 중간에 나가도 훈련은 이어집니다.</p><p class="modal-intro">'+(session.main?'연습은 따로 저장돼요. 기존 본게임 기록은 그대로 보관됩니다.':'훈련에서 모은 자원과 지은 집은 본게임으로 이어집니다.')+'</p><button id="training-begin" class="primary-button">'+(tutorial.step?'튜토리얼 이어하기':'튜토리얼 시작')+'</button>');
-    $('modal-title').textContent='전용 훈련 공간으로 이동해요';
-    $('modal-content').querySelector('p').textContent='시그마 훈련 스테이션에서 교관 루미와 함께 이동, 채굴, 건설과 우주 비행을 연습해요. 본게임과 분리된 시뮬레이션 공간입니다.';
-    $('training-begin').textContent=tutorial.step?'훈련 스테이션 이어가기':'훈련 스테이션으로 이동';
-    $('training-begin').onclick=()=>{closeModal();renderer.reset();save();hud(true);showInstructor();};
+    showModal('첫 탐험은, 루미와 함께','SIGMA ACADEMY / 탐험가 훈련',
+      '<div class="academy-welcome"><div class="lumi-face" aria-label="교관 루미"><i></i><i></i></div><div><span class="academy-tag">별도의 훈련 기지 · 7개의 실습</span><h3>작은 연습부터<br>첫 우주 비행까지.</h3><p>접수대에서 루미를 만나고, 안내를 따라 직접 움직여 보세요.</p></div></div>'+
+      '<div class="academy-course"><span>01 만나기</span><span>02 채굴 · 스캔</span><span>03 건설 · 교류</span><span>04 모의 비행</span></div>'+
+      '<p class="modal-intro">'+(session.main?'기존 탐험은 보관됩니다. 훈련을 마치면 원래 위치로 돌아가요.':'훈련을 마치면 출발 재료를 받고 본게임의 첫 행성으로 이동해요.')+' 진행 상황은 자동 저장돼요.</p>'+
+      '<button id="training-begin" class="primary-button">'+(tutorial.step?'훈련 기지 이어가기':'훈련 기지로 이동')+'</button>');
+    $('training-begin').onclick=()=>{closeModal();renderer.reset();save();hud(true);showTransfer('시그마 훈련 기지','도착 후 빛나는 목표를 따라가세요');};
+  }
+  function moveToTutorialGoal(){
+    const info=tutorial.guide(game);if(!info.target)return;
+    tutorialWaypoint={...info.target,label:info.zone||'실습 목표'};game.waypoint=tutorialWaypoint;
+    game.moveTarget={...info.target};game.pendingInteraction=info.targetId||null;renderer.pan={x:0,y:0};
   }
   function showInstructor(){
     if(!session.active)return;
     const info=tutorial.guide(game);
-    showModal('교관 루미','TRAINING STATION / 안내 NPC','<div class="instructor-portrait" aria-label="안내 로봇 루미">◉ ▰ ◉</div><p class="modal-intro">'+(tutorial.complete?'훈련을 모두 마쳤군요! 이제 실제 행성으로 출발할 준비가 됐어요.':'안녕하세요, 탐험가님! 저는 이 훈련 스테이션의 교관 루미예요.')+'</p><h3>'+(tutorial.complete?'본게임으로 출발':info.title)+'</h3><p class="modal-intro">'+(tutorial.complete?'출발 버튼을 누르면 본게임으로 이동해요.':info.text)+'</p><p class="modal-intro">'+(tutorial.complete?'':info.note||'')+'</p><p>광장에 있는 저를 클릭하거나 가까이에서 E를 누르면 다시 대화할 수 있어요. 멀리서는 왼쪽 ‘루미에게 질문’ 버튼을 이용하세요.</p><button id="instructor-continue" class="primary-button">'+(tutorial.complete?'본게임으로 출발':'알겠어요, 연습할게요')+'</button>');
+    showModal('교관 루미','LUMI / 탐험가 훈련 담당',
+      '<div class="instructor-chat"><div class="lumi-face" aria-label="안내 로봇 루미"><i></i><i></i></div><blockquote>'+(info.line||'모든 훈련을 마쳤어요! 이제 새로운 행성들이 탐험가님을 기다리고 있어요.')+'</blockquote></div>'+
+      '<div class="instructor-task"><span class="academy-tag">'+(info.zone||'ALL CLEAR / 훈련 수료')+'</span><h3>'+(info.title||'정식 탐험을 시작할 시간')+'</h3><p>'+(info.text||'본게임으로 이동해 자유롭게 탐험하세요.')+'</p></div>'+
+      (info.target?'<button id="instructor-go" class="primary-button">목표로 안내받기 →</button>':'')+
+      '<button id="instructor-continue" class="'+(info.target?'subtle-button':'primary-button')+'">'+(tutorial.complete?'본게임으로 출발':'직접 해볼게요')+'</button>');
+    if($('instructor-go'))$('instructor-go').onclick=()=>{closeModal();moveToTutorialGoal();hud(true);};
     $('instructor-continue').onclick=()=>{if(tutorial.complete)enterMainGame();else{closeModal();hud(true);}};
   }
-  const instructorButton=document.createElement('button');instructorButton.id='instructor-radio';instructorButton.className='subtle-button';instructorButton.textContent='루미에게 질문';instructorButton.onclick=showInstructor;$('tutorial-card').append(instructorButton);
+  const instructorButton=document.createElement('button');instructorButton.id='instructor-radio';instructorButton.className='subtle-button';instructorButton.textContent='루미와 무전하기';instructorButton.onclick=showInstructor;$('tutorial-card').append(instructorButton);
   function enterMainGame(){
     const next=session.destination(game);if(!next)return;
     // Write the main save first: an interrupted transition never loses training.
@@ -986,29 +1068,35 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     session.finish();tutorial=session.tutorial;
     try{localStorage.setItem(TRAINING_KEY,JSON.stringify({version:1,active:false}));}catch(e){}
     completionShown=true;replaceGame(new Game(next));closeModal();save();
-    toast('본게임 시작! 다섯 행성을 탐험하고 나만의 기지를 넓혀보세요.');
+    showTransfer('정식 탐험 시작',session.main?'원래 탐험으로 돌아왔어요':'베르단트에 도착했어요 · 출발 재료 지급 완료');toast('본게임 시작! 다섯 행성을 탐험하고 나만의 기지를 넓혀보세요.');
   }
   function showTrainingComplete(){
-    completionShown=true;save();showModal('훈련 완료! 본게임을 시작해요','7 / 7 COMPLETE','<p class="modal-intro">이동, 채굴, 스캔, 건설, 교류, 우주 비행을 모두 해냈어요.</p><p class="modal-intro">'+(session.main?'이제 저장해 둔 본게임으로 돌아갑니다.':'지금까지 모은 자원과 지은 집을 가지고 자유 탐험을 시작하세요.')+'</p><button id="training-finish" class="primary-button">본게임 시작</button>');$('training-finish').onclick=enterMainGame;
+    completionShown=true;save();showModal('탐험가 훈련 수료!','ALL CLEAR / 7개 실습 완료',
+      '<div class="academy-graduate"><span>✦</span><h3>이제, 당신만의 탐험을 시작하세요.</h3><p>루미: 첫 만남부터 우주 비행까지 모두 해냈어요.<br>새로운 행성에서도 오늘 배운 걸 기억해 주세요!</p></div>'+
+      '<div class="reward">'+(session.main?'보관한 본게임의 원래 위치로 돌아갑니다.':'수료 선물 · 철광석 12 · 바이오매스 8 · 수정 4')+'</div><button id="training-finish" class="primary-button">본게임으로 출발 →</button>');$('training-finish').onclick=enterMainGame;
   }
   function updateTutorial(){
+    tutorial.sync(game);$('game-area').classList.toggle('training-active',session.active);
     setText('play-phase',session.active?'TUTORIAL / 탐험가 훈련':'MAIN GAME / 자유 탐험');
     setText('phase-status',session.active?'훈련 스테이션 · 교관 루미와 연습 중':'본게임 · 자유 탐험');
     if(session.active&&tutorial.complete&&!completionShown&&!startOpen&&!modal.open){showTrainingComplete();return;}
     if(tutorial.step!==tutorialStep){
       tutorialStep=tutorial.step;clearTutorialWaypoint();saveTutorial();
-      toast(tutorial.complete?'튜토리얼 완료! 이제 자유롭게 우주를 탐험하세요.':'목표 달성! 다음 안내를 확인하세요.');
+      toast(tutorial.complete?'모든 실습을 마쳤어요!':'루미: 잘했어요! 다음은 '+(window.OrbitTutorial.STEPS[tutorial.step]?.short||'출발')+' 실습이에요.');
     }
     const visible=session.active&&!startOpen&&!modal.open&&!buildOpen&&(tutorial.active||tutorial.complete);
     $('tutorial-card').hidden=!visible;$('game-area').classList.toggle('tutorial-visible',visible);
     tutorialControls.forEach(id=>$(id).classList.remove('tutorial-focus'));
     if(!visible)return;
     const info=tutorial.guide(game),count=tutorial.done.filter(Boolean).length;
-    if(info.target&&info.action==='mark'){tutorialWaypoint={...info.target,label:'튜토리얼 목표'};game.waypoint=tutorialWaypoint;}
-    setText('tutorial-step',tutorial.complete?'7 / 7 · 완료':(tutorial.step+1)+' / 7');
+    if(info.target){tutorialWaypoint={...info.target,label:info.zone||'실습 목표'};game.waypoint=tutorialWaypoint;}
+    setText('tutorial-step',tutorial.complete?'7 / 7 · 훈련 완료':(tutorial.step+1)+' / 7 · '+info.zone);
+    const route=window.OrbitTutorial.STEPS.map((step,i)=>'<span class="'+(tutorial.done[i]?'done':i===tutorial.step?'current':'')+'" aria-label="'+step.short+': '+(tutorial.done[i]?'완료':i===tutorial.step?'진행 중':'대기')+'" title="'+step.short+'">'+(tutorial.done[i]?'✓':i+1)+'</span>').join('');if($('tutorial-route').innerHTML!==route)$('tutorial-route').innerHTML=route;
+    setText('lumi-guidance',info.line||'멋진 탐험을 기대할게요!');
+    instructorButton.hidden=tutorial.step===0;
     setText('tutorial-title',tutorial.complete?'첫 탐험을 마쳤어요!':info.title);
     setText('tutorial-description',tutorial.complete?'준비가 끝났어요. 본게임 시작을 누르면 자유 탐험으로 넘어갑니다.':info.text);
-    setText('tutorial-note',tutorial.complete?'훈련에서 배운 조작으로 나만의 우주를 개척하세요.':info.note+(info.distance!==undefined?' · 목표까지 '+info.distance+'m':''));
+    setText('tutorial-note',tutorial.complete?'루미의 훈련을 수료했어요. 본게임으로 출발하세요.':info.note+(info.distance!==undefined?' · 목표까지 '+info.distance+'m':''));
     $('tutorial-body').hidden=tutorialCollapsed;$('tutorial-toggle').setAttribute('aria-expanded',String(!tutorialCollapsed));
     $('tutorial-toggle').setAttribute('aria-label',tutorialCollapsed?'튜토리얼 펼치기':'튜토리얼 접기');setText('tutorial-toggle',tutorialCollapsed?'+':'−');
     $('tutorial-skip').hidden=true;
@@ -1025,7 +1113,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
   $('tutorial-action').onclick=()=>{
     if(tutorial.complete){dismissTutorial();return;}
     const info=tutorial.guide(game);
-    if(info.action==='mark'&&info.target){tutorialWaypoint={...info.target,label:'튜토리얼 목표'};game.waypoint=tutorialWaypoint;toast('목표를 표시했어요. 화면 가장자리의 화살표를 따라가세요.');}
+    if(info.action==='mark'&&info.target){moveToTutorialGoal();toast('목표로 이동합니다. WASD를 누르거나 다른 곳을 클릭하면 멈출 수 있어요.');}
     else if(info.action==='build')toggleBuild(true);
     else if(info.action==='map')showMap();
     else if(info.action==='land'){game.land();processEvents();}
@@ -1116,12 +1204,13 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
   }
   function toggleBuild(force){
     if(game.state.mode!=='surface'){toast('행성에 착륙한 뒤 건설할 수 있어요.');return;}
+    if(session.active&&tutorial.step<3){toast('루미의 채굴·스캔 실습을 마치면 건설장이 열려요.');return;}
     buildOpen=typeof force==='boolean'?force:!buildOpen;$('build-panel').hidden=!buildOpen;$('build-button').classList.toggle('selected',buildOpen);$('interact-button').classList.toggle('selected',!buildOpen);
     if(!buildOpen){game.selectedBuild=null;renderer.mouse=null;}renderBuildOptions();
   }
   function renderBuildOptions(){
     if(!buildOpen)return;
-    $('build-options').innerHTML=Object.entries(BUILDINGS).map(([id,b])=>'<button class="build-option'+(game.selectedBuild===id?' active':'')+'" data-building="'+id+'" aria-pressed="'+(game.selectedBuild===id)+'"><span class="building-icon">'+b.icon+'</span><span><strong>'+b.name+'</strong><small>'+b.description+'</small><small class="cost">'+Object.entries(b.cost).map(([r,n])=>RESOURCE_NAMES[r]+' '+n).join(' · ')+'</small></span></button>').join('');
+    $('build-options').innerHTML=Object.entries(BUILDINGS).filter(([id])=>!session.active||id==='habitat').map(([id,b])=>'<button class="build-option'+(game.selectedBuild===id?' active':'')+'" data-building="'+id+'" aria-pressed="'+(game.selectedBuild===id)+'"><span class="building-icon">'+b.icon+'</span><span><strong>'+b.name+'</strong><small>'+b.description+'</small><small class="cost">'+Object.entries(b.cost).map(([r,n])=>RESOURCE_NAMES[r]+' '+n).join(' · ')+'</small></span></button>').join('');
     $('build-options').querySelectorAll('[data-building]').forEach(b=>b.onclick=()=>{game.selectedBuild=b.dataset.building;renderer.mouse=null;renderBuildOptions();if(!game.canAfford(game.selectedBuild))toast('자원이 부족해요. 비용을 확인하고 조금 더 모아주세요.',true);else toast('빈 땅을 클릭하거나, 이동 후 ‘여기에 건설’을 누르세요.');});
     const chosen=game.selectedBuild;$('place-building').disabled=!chosen||!game.canAfford(chosen);setText('place-building',chosen?'여기에 건설':'건물을 먼저 선택하세요');
   }
@@ -1145,7 +1234,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
       $('confirm-import').onclick=()=>{replaceGame(new Game(valid));closeModal();save();toast('저장 기록을 가져왔어요. 탐험을 이어가세요!');};$('cancel-import').onclick=showSettings;
     }catch(e){toast('올바른 오르빗 저장 파일이 아니에요. JSON 파일을 확인해 주세요.',true);}
   }
-  function replaceGame(next){clearTutorialWaypoint();tutorialStep=tutorial.step;tutorialCollapsed=false;game=next;renderer.game=next;renderer.reset();buildOpen=false;$('build-panel').hidden=true;$('build-button').classList.remove('selected');$('interact-button').classList.add('selected');missionSignature='';locationSignature='';clearInput();hud(true);}
+  function replaceGame(next){clearTutorialWaypoint();tutorialStep=tutorial.step;tutorialCollapsed=false;game=next;tutorial.sync(game);renderer.game=next;renderer.reset();buildOpen=false;$('build-panel').hidden=true;$('build-button').classList.remove('selected');$('interact-button').classList.add('selected');missionSignature='';locationSignature='';clearInput();hud(true);}
   function showDialogue(e){
     const sp=SPECIES[e.species],bond=game.state.friendship[e.species]||0;
     showModal(sp.name+'와의 만남','FIRST CONTACT / '+sp.kind,'<div class="dialogue"><p class="speaker">'+sp.name+' <span class="bond">'+('♥'.repeat(bond)+'♡'.repeat(3-bond))+'</span></p><blockquote>'+sp.line.replace(/\n/g,'<br>')+'</blockquote>'+(e.first?'<div class="reward">첫 만남 선물 · '+Object.entries(sp.gift).map(([r,n])=>RESOURCE_NAMES[r]+' +'+n).join(' · ')+'</div>':'<p class="modal-intro">친밀도 '+bond+' / 3 · 친밀도 2부터 동행과 길 안내가 열려요.</p>')+'<div class="interaction-grid"><button data-care="pet">♡ 쓰다듬기<small>친밀도 +1 · 10초 간격</small></button><button data-care="feed">❋ 먹이 나누기<small>바이오매스 2 · 친밀도 +1</small></button><button data-care="follow" '+(bond<2?'disabled':'')+'>'+(game.state.companion===e.id?'동행 마치기':'함께 탐험하기')+'<small>내 뒤를 따라오는 친구</small></button><button data-care="guide" '+(bond<2?'disabled':'')+'>유적 길 물어보기<small>미탐사 유적의 위치 표시</small></button></div><button class="primary-button" id="dialogue-close">탐험으로 돌아가기</button></div>');
@@ -1179,7 +1268,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     for(const r of ['iron','crystal','biomass'])setText(r+'-count',s.inventory[r]);
     setText('oxygen-text',Math.ceil(s.oxygen)+'%');$('oxygen-bar').style.width=s.oxygen+'%';$('oxygen-bar').style.background=s.oxygen<25?'#ffb196':'';setText('fuel-text',Math.floor(s.fuel)+'%');$('fuel-bar').style.width=s.fuel+'%';setText('journal-count',s.discovered.length);
     const loc=space?'space':p.id;if(locationSignature!==loc||force){locationSignature=loc;setText('location-code',space?'SIGMA SYSTEM / OPEN SPACE':'시그마 성계 / '+String(PLANETS.indexOf(p)+1).padStart(2,'0'));$('location-name').innerHTML=(space?'시그마 성계':p.name)+'<span class="planet-tag">'+(space?'비행 중':'탐험 중')+'</span>';$('location-description').innerHTML=space?'새로운 행성으로 향하는 중':p.kind+' <span>·</span> '+p.temp;setText('ship-label',space?'착륙':'우주선');$('scan-button').title=space?'주변 행성 스캔':'주변 자원과 생명체 스캔';}
-    if(s.training){setText('location-code','TRAINING SIMULATION / 전용 공간');$('location-name').innerHTML=(space?'비행 시뮬레이터':'시그마 훈련 스테이션')+'<span class="planet-tag">훈련 중</span>';$('location-description').textContent=space?'모의 항로 · 다른 행성에 착륙해 보세요':'교관 루미 · 채굴장 · 건설 연습장';}
+    if(s.training){setText('location-code','TRAINING SIMULATION / 전용 공간');$('location-name').innerHTML=(space?'비행 시뮬레이터':s.planet==='verdant'?'시그마 훈련 기지':'모의 착륙 구역')+'<span class="planet-tag">훈련 중</span>';$('location-description').textContent=space?'모의 항로 · 다른 행성에 착륙해 보세요':'루미와 함께하는 첫 우주 탐험';}
     updateTutorial();$('space-action').hidden=!space||!$('tutorial-card').hidden;$('mission-card').hidden=space||!$('tutorial-card').hidden;
     if(space){const target=nearest?.kind==='planet'?nearest.entity:null;setText('space-target-name',target?target.name+' 궤도':'다음 목적지를 찾아보세요');setText('space-target-help',target?'착륙해 새로운 자원과 생명체를 만나보세요.':'방향키로 비행하거나 성계 지도에서 항로를 설정하세요.');$('land-button').disabled=!target||!!game.travel;setText('land-button',target?target.name+'에 착륙':'행성 가까이에서 착륙');setText('refuel-button',game.solarCharge>0?'태양광 비상 충전 · '+Math.ceil(game.solarCharge)+'초':s.inventory.biomass>=3?'연료 합성 · 바이오매스 3개':'비상 태양광 충전 · 6초');}
     let hint='자원 가까이에서 E를 누르세요',key='E';
@@ -1187,10 +1276,10 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     else if(space){hint=game.travel?'워프 항로를 따라 이동하고 있어요':nearest?'E 또는 F · '+nearest.entity.name+'에 착륙':'WASD 비행 · M 성계 지도';key=nearest?'E':'M';}
     else if(nearest){if(nearest.kind==='node')hint=RESOURCE_NAMES[nearest.entity.type]+' 채굴 · 길게 누르기';else if(nearest.kind==='creature')hint=SPECIES[nearest.entity.species].name+'에게 인사하기';else if(nearest.kind==='ship')hint='우주선 탑승 · 이륙';else if(nearest.kind==='npc')hint='교관 루미 · 대화하기';else if(nearest.kind==='relic')hint=nearest.entity.name+' · 별빛 기록 조사';else hint=BUILDINGS[nearest.entity.type].name+' · 사용하기';}
     $('interaction-hint').querySelector('kbd').textContent=key;$('interaction-hint').querySelector('span').textContent=hint;
-    setText('interact-label',space?'착륙':nearest?.kind==='creature'?'인사하기':nearest?.kind==='ship'?'탑승하기':nearest?.kind==='relic'?'조사하기':nearest?.kind==='building'?'사용하기':'채굴 / 교류');
-    setText('field-status','유적 '+s.relics.length+' / 15'+(s.companion?' · 동행 중':'')+' · '+Math.round(1000/renderer.frameMs)+' FPS');const actor=space?s.ship:s.player;setText('coordinate-label','X '+String(Math.round(actor.x)).padStart(4,'0')+' / Y '+String(Math.round(actor.y)).padStart(4,'0'));setText('day-label','탐험 '+(Math.floor(s.time/600)+1)+'일째');
+    setText('interact-label',space?'착륙':nearest?.kind==='npc'?'루미와 대화':nearest?.kind==='creature'?'인사하기':nearest?.kind==='ship'?'탑승하기':nearest?.kind==='relic'?'조사하기':nearest?.kind==='building'?'사용하기':'채굴 / 교류');
+    setText('field-status',s.training?'TRAINING / 안전한 실습 공간':'유적 '+s.relics.length+' / 15'+(s.companion?' · 동행 중':'')+' · '+Math.round(1000/renderer.frameMs)+' FPS');const actor=space?s.ship:s.player;setText('coordinate-label','X '+String(Math.round(actor.x)).padStart(4,'0')+' / Y '+String(Math.round(actor.y)).padStart(4,'0'));setText('day-label','탐험 '+(Math.floor(s.time/600)+1)+'일째');
     const nearHome=!space&&(dist(s.player,{x:0,y:0})<180||game.world().buildings.some(b=>b.type==='habitat'&&dist(s.player,b)<150));
-    setText('status-label',game.paused?'탐험 일시 정지':nearHome?'안전 구역 · 산소 충전 중':s.oxygen<25?'산소 부족 · 집이나 우주선으로 돌아가세요':space?'항법 장치 정상':'2D 탐사 장비 정상');
+    setText('status-label',game.paused?'탐험 일시 정지':s.training?'훈련 기지 · 산소 안전 공급':nearHome?'안전 구역 · 산소 충전 중':s.oxygen<25?'산소 부족 · 집이나 우주선으로 돌아가세요':space?'항법 장치 정상':'2D 탐사 장비 정상');
     if(s.oxygen<25&&!lowOxygenWarned){toast('산소가 얼마 남지 않았어요. 집이나 우주선 근처에서 충전하세요.',true);lowOxygenWarned=true;}if(s.oxygen>50)lowOxygenWarned=false;
     const goals=game.goals(),signature=goals.map(v=>v.done?'1':'0').join('');if(signature!==missionSignature||force){missionSignature=signature;$('mission-list').innerHTML=goals.map(v=>'<li class="'+(v.done?'done':'')+'">'+v.text+'</li>').join('');const completed=goals.filter(v=>v.done).length;$('mission-progress-bar').style.width=(completed/goals.length*100)+'%';if(completed===goals.length){setText('mission-title','이제 당신도 우주 개척자');setText('mission-description','남은 행성을 탐험하고 더 큰 기지를 만들어보세요.');setText('mission-note','모든 첫 탐험 목표를 달성했어요!');}else{setText('mission-title','작은 발걸음, 새로운 세계');setText('mission-description','우주에 첫 번째 나만의 집을 지어보세요.');setText('mission-note','천천히 둘러보세요. 모험은 이제 시작이에요.');}}
     if(nearest&&!space&&!game.selectedBuild&&nearest.kind!=='ship'){

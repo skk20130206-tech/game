@@ -20,27 +20,48 @@
   const keys={};let startOpen=true;game.paused=true;
   const modal=$('modal');let buildOpen=false,missionOpen=true,lastHud=0,lastSave=0,lastFrame=performance.now(),missionSignature='',locationSignature='',bannerTimer=null,lowOxygenWarned=false;
   let tutorial=session.tutorial,tutorialStep=tutorial.step,tutorialCollapsed=false,tutorialWaypoint=null,completionShown=false;
+  tutorial.sync(game);
   const tutorialControls=['touch-pad','interact-button','scan-button','build-button','ship-button','map-tab'];
   function saveTutorial(){try{if(session.active)localStorage.setItem(TRAINING_KEY,JSON.stringify(session.snapshot(game)));else localStorage.setItem(TUTORIAL_KEY,JSON.stringify(tutorial.snapshot()));}catch(e){}}
   function clearTutorialWaypoint(){if(game.waypoint===tutorialWaypoint)game.waypoint=null;tutorialWaypoint=null;}
   function restartTutorial(){
-    if(session.active){closeModal();return;}
-    const main=game.snapshot();save();session=new window.OrbitTutorial.TrainingSession(main,{version:1,active:true,game:new Game().snapshot()});tutorial=session.tutorial;completionShown=false;replaceGame(new Game(session.state));save();closeModal();showTrainingIntro();
+    const main=session.active?session.main:game.snapshot();save();
+    session=new window.OrbitTutorial.TrainingSession(main,{version:2,active:true,game:new Game().snapshot()});tutorial=session.tutorial;completionShown=false;
+    replaceGame(new Game(session.state));save();closeModal();showTrainingIntro();
+  }
+  function showTransfer(title,detail){
+    document.querySelector('.training-transfer')?.remove();
+    const layer=document.createElement('div');layer.className='training-transfer';layer.setAttribute('role','status');
+    const icon=document.createElement('span');icon.textContent='✦';
+    const heading=document.createElement('strong');heading.textContent=title;
+    const sub=document.createElement('small');sub.textContent=detail;
+    layer.append(icon,heading,sub);$('game-area').append(layer);setTimeout(()=>layer.remove(),1350);
   }
   function showTrainingIntro(){
-    showModal('먼저, 탐험을 연습해요','TUTORIAL / 탐험가 훈련','<p class="modal-intro">이동 → 채굴 → 스캔 → 집 짓기 → 생명체 만나기 → 이륙 → 다른 행성 착륙을 직접 해보세요.</p><p class="modal-intro">왼쪽 안내와 목표 표시를 따라가면 돼요. 7단계를 모두 마치면 본게임이 열립니다. 중간에 나가도 훈련은 이어집니다.</p><p class="modal-intro">'+(session.main?'연습은 따로 저장돼요. 기존 본게임 기록은 그대로 보관됩니다.':'훈련에서 모은 자원과 지은 집은 본게임으로 이어집니다.')+'</p><button id="training-begin" class="primary-button">'+(tutorial.step?'튜토리얼 이어하기':'튜토리얼 시작')+'</button>');
-    $('modal-title').textContent='전용 훈련 공간으로 이동해요';
-    $('modal-content').querySelector('p').textContent='시그마 훈련 스테이션에서 교관 루미와 함께 이동, 채굴, 건설과 우주 비행을 연습해요. 본게임과 분리된 시뮬레이션 공간입니다.';
-    $('training-begin').textContent=tutorial.step?'훈련 스테이션 이어가기':'훈련 스테이션으로 이동';
-    $('training-begin').onclick=()=>{closeModal();renderer.reset();save();hud(true);showInstructor();};
+    showModal('첫 탐험은, 루미와 함께','SIGMA ACADEMY / 탐험가 훈련',
+      '<div class="academy-welcome"><div class="lumi-face" aria-label="교관 루미"><i></i><i></i></div><div><span class="academy-tag">별도의 훈련 기지 · 7개의 실습</span><h3>작은 연습부터<br>첫 우주 비행까지.</h3><p>접수대에서 루미를 만나고, 안내를 따라 직접 움직여 보세요.</p></div></div>'+
+      '<div class="academy-course"><span>01 만나기</span><span>02 채굴 · 스캔</span><span>03 건설 · 교류</span><span>04 모의 비행</span></div>'+
+      '<p class="modal-intro">'+(session.main?'기존 탐험은 보관됩니다. 훈련을 마치면 원래 위치로 돌아가요.':'훈련을 마치면 출발 재료를 받고 본게임의 첫 행성으로 이동해요.')+' 진행 상황은 자동 저장돼요.</p>'+
+      '<button id="training-begin" class="primary-button">'+(tutorial.step?'훈련 기지 이어가기':'훈련 기지로 이동')+'</button>');
+    $('training-begin').onclick=()=>{closeModal();renderer.reset();save();hud(true);showTransfer('시그마 훈련 기지','도착 후 빛나는 목표를 따라가세요');};
+  }
+  function moveToTutorialGoal(){
+    const info=tutorial.guide(game);if(!info.target)return;
+    tutorialWaypoint={...info.target,label:info.zone||'실습 목표'};game.waypoint=tutorialWaypoint;
+    game.moveTarget={...info.target};game.pendingInteraction=info.targetId||null;renderer.pan={x:0,y:0};
   }
   function showInstructor(){
     if(!session.active)return;
     const info=tutorial.guide(game);
-    showModal('교관 루미','TRAINING STATION / 안내 NPC','<div class="instructor-portrait" aria-label="안내 로봇 루미">◉ ▰ ◉</div><p class="modal-intro">'+(tutorial.complete?'훈련을 모두 마쳤군요! 이제 실제 행성으로 출발할 준비가 됐어요.':'안녕하세요, 탐험가님! 저는 이 훈련 스테이션의 교관 루미예요.')+'</p><h3>'+(tutorial.complete?'본게임으로 출발':info.title)+'</h3><p class="modal-intro">'+(tutorial.complete?'출발 버튼을 누르면 본게임으로 이동해요.':info.text)+'</p><p class="modal-intro">'+(tutorial.complete?'':info.note||'')+'</p><p>광장에 있는 저를 클릭하거나 가까이에서 E를 누르면 다시 대화할 수 있어요. 멀리서는 왼쪽 ‘루미에게 질문’ 버튼을 이용하세요.</p><button id="instructor-continue" class="primary-button">'+(tutorial.complete?'본게임으로 출발':'알겠어요, 연습할게요')+'</button>');
+    showModal('교관 루미','LUMI / 탐험가 훈련 담당',
+      '<div class="instructor-chat"><div class="lumi-face" aria-label="안내 로봇 루미"><i></i><i></i></div><blockquote>'+(info.line||'모든 훈련을 마쳤어요! 이제 새로운 행성들이 탐험가님을 기다리고 있어요.')+'</blockquote></div>'+
+      '<div class="instructor-task"><span class="academy-tag">'+(info.zone||'ALL CLEAR / 훈련 수료')+'</span><h3>'+(info.title||'정식 탐험을 시작할 시간')+'</h3><p>'+(info.text||'본게임으로 이동해 자유롭게 탐험하세요.')+'</p></div>'+
+      (info.target?'<button id="instructor-go" class="primary-button">목표로 안내받기 →</button>':'')+
+      '<button id="instructor-continue" class="'+(info.target?'subtle-button':'primary-button')+'">'+(tutorial.complete?'본게임으로 출발':'직접 해볼게요')+'</button>');
+    if($('instructor-go'))$('instructor-go').onclick=()=>{closeModal();moveToTutorialGoal();hud(true);};
     $('instructor-continue').onclick=()=>{if(tutorial.complete)enterMainGame();else{closeModal();hud(true);}};
   }
-  const instructorButton=document.createElement('button');instructorButton.id='instructor-radio';instructorButton.className='subtle-button';instructorButton.textContent='루미에게 질문';instructorButton.onclick=showInstructor;$('tutorial-card').append(instructorButton);
+  const instructorButton=document.createElement('button');instructorButton.id='instructor-radio';instructorButton.className='subtle-button';instructorButton.textContent='루미와 무전하기';instructorButton.onclick=showInstructor;$('tutorial-card').append(instructorButton);
   function enterMainGame(){
     const next=session.destination(game);if(!next)return;
     // Write the main save first: an interrupted transition never loses training.
@@ -48,29 +69,35 @@
     session.finish();tutorial=session.tutorial;
     try{localStorage.setItem(TRAINING_KEY,JSON.stringify({version:1,active:false}));}catch(e){}
     completionShown=true;replaceGame(new Game(next));closeModal();save();
-    toast('본게임 시작! 다섯 행성을 탐험하고 나만의 기지를 넓혀보세요.');
+    showTransfer('정식 탐험 시작',session.main?'원래 탐험으로 돌아왔어요':'베르단트에 도착했어요 · 출발 재료 지급 완료');toast('본게임 시작! 다섯 행성을 탐험하고 나만의 기지를 넓혀보세요.');
   }
   function showTrainingComplete(){
-    completionShown=true;save();showModal('훈련 완료! 본게임을 시작해요','7 / 7 COMPLETE','<p class="modal-intro">이동, 채굴, 스캔, 건설, 교류, 우주 비행을 모두 해냈어요.</p><p class="modal-intro">'+(session.main?'이제 저장해 둔 본게임으로 돌아갑니다.':'지금까지 모은 자원과 지은 집을 가지고 자유 탐험을 시작하세요.')+'</p><button id="training-finish" class="primary-button">본게임 시작</button>');$('training-finish').onclick=enterMainGame;
+    completionShown=true;save();showModal('탐험가 훈련 수료!','ALL CLEAR / 7개 실습 완료',
+      '<div class="academy-graduate"><span>✦</span><h3>이제, 당신만의 탐험을 시작하세요.</h3><p>루미: 첫 만남부터 우주 비행까지 모두 해냈어요.<br>새로운 행성에서도 오늘 배운 걸 기억해 주세요!</p></div>'+
+      '<div class="reward">'+(session.main?'보관한 본게임의 원래 위치로 돌아갑니다.':'수료 선물 · 철광석 12 · 바이오매스 8 · 수정 4')+'</div><button id="training-finish" class="primary-button">본게임으로 출발 →</button>');$('training-finish').onclick=enterMainGame;
   }
   function updateTutorial(){
+    tutorial.sync(game);$('game-area').classList.toggle('training-active',session.active);
     setText('play-phase',session.active?'TUTORIAL / 탐험가 훈련':'MAIN GAME / 자유 탐험');
     setText('phase-status',session.active?'훈련 스테이션 · 교관 루미와 연습 중':'본게임 · 자유 탐험');
     if(session.active&&tutorial.complete&&!completionShown&&!startOpen&&!modal.open){showTrainingComplete();return;}
     if(tutorial.step!==tutorialStep){
       tutorialStep=tutorial.step;clearTutorialWaypoint();saveTutorial();
-      toast(tutorial.complete?'튜토리얼 완료! 이제 자유롭게 우주를 탐험하세요.':'목표 달성! 다음 안내를 확인하세요.');
+      toast(tutorial.complete?'모든 실습을 마쳤어요!':'루미: 잘했어요! 다음은 '+(window.OrbitTutorial.STEPS[tutorial.step]?.short||'출발')+' 실습이에요.');
     }
     const visible=session.active&&!startOpen&&!modal.open&&!buildOpen&&(tutorial.active||tutorial.complete);
     $('tutorial-card').hidden=!visible;$('game-area').classList.toggle('tutorial-visible',visible);
     tutorialControls.forEach(id=>$(id).classList.remove('tutorial-focus'));
     if(!visible)return;
     const info=tutorial.guide(game),count=tutorial.done.filter(Boolean).length;
-    if(info.target&&info.action==='mark'){tutorialWaypoint={...info.target,label:'튜토리얼 목표'};game.waypoint=tutorialWaypoint;}
-    setText('tutorial-step',tutorial.complete?'7 / 7 · 완료':(tutorial.step+1)+' / 7');
+    if(info.target){tutorialWaypoint={...info.target,label:info.zone||'실습 목표'};game.waypoint=tutorialWaypoint;}
+    setText('tutorial-step',tutorial.complete?'7 / 7 · 훈련 완료':(tutorial.step+1)+' / 7 · '+info.zone);
+    const route=window.OrbitTutorial.STEPS.map((step,i)=>'<span class="'+(tutorial.done[i]?'done':i===tutorial.step?'current':'')+'" aria-label="'+step.short+': '+(tutorial.done[i]?'완료':i===tutorial.step?'진행 중':'대기')+'" title="'+step.short+'">'+(tutorial.done[i]?'✓':i+1)+'</span>').join('');if($('tutorial-route').innerHTML!==route)$('tutorial-route').innerHTML=route;
+    setText('lumi-guidance',info.line||'멋진 탐험을 기대할게요!');
+    instructorButton.hidden=tutorial.step===0;
     setText('tutorial-title',tutorial.complete?'첫 탐험을 마쳤어요!':info.title);
     setText('tutorial-description',tutorial.complete?'준비가 끝났어요. 본게임 시작을 누르면 자유 탐험으로 넘어갑니다.':info.text);
-    setText('tutorial-note',tutorial.complete?'훈련에서 배운 조작으로 나만의 우주를 개척하세요.':info.note+(info.distance!==undefined?' · 목표까지 '+info.distance+'m':''));
+    setText('tutorial-note',tutorial.complete?'루미의 훈련을 수료했어요. 본게임으로 출발하세요.':info.note+(info.distance!==undefined?' · 목표까지 '+info.distance+'m':''));
     $('tutorial-body').hidden=tutorialCollapsed;$('tutorial-toggle').setAttribute('aria-expanded',String(!tutorialCollapsed));
     $('tutorial-toggle').setAttribute('aria-label',tutorialCollapsed?'튜토리얼 펼치기':'튜토리얼 접기');setText('tutorial-toggle',tutorialCollapsed?'+':'−');
     $('tutorial-skip').hidden=true;
@@ -87,7 +114,7 @@
   $('tutorial-action').onclick=()=>{
     if(tutorial.complete){dismissTutorial();return;}
     const info=tutorial.guide(game);
-    if(info.action==='mark'&&info.target){tutorialWaypoint={...info.target,label:'튜토리얼 목표'};game.waypoint=tutorialWaypoint;toast('목표를 표시했어요. 화면 가장자리의 화살표를 따라가세요.');}
+    if(info.action==='mark'&&info.target){moveToTutorialGoal();toast('목표로 이동합니다. WASD를 누르거나 다른 곳을 클릭하면 멈출 수 있어요.');}
     else if(info.action==='build')toggleBuild(true);
     else if(info.action==='map')showMap();
     else if(info.action==='land'){game.land();processEvents();}
@@ -178,12 +205,13 @@
   }
   function toggleBuild(force){
     if(game.state.mode!=='surface'){toast('행성에 착륙한 뒤 건설할 수 있어요.');return;}
+    if(session.active&&tutorial.step<3){toast('루미의 채굴·스캔 실습을 마치면 건설장이 열려요.');return;}
     buildOpen=typeof force==='boolean'?force:!buildOpen;$('build-panel').hidden=!buildOpen;$('build-button').classList.toggle('selected',buildOpen);$('interact-button').classList.toggle('selected',!buildOpen);
     if(!buildOpen){game.selectedBuild=null;renderer.mouse=null;}renderBuildOptions();
   }
   function renderBuildOptions(){
     if(!buildOpen)return;
-    $('build-options').innerHTML=Object.entries(BUILDINGS).map(([id,b])=>'<button class="build-option'+(game.selectedBuild===id?' active':'')+'" data-building="'+id+'" aria-pressed="'+(game.selectedBuild===id)+'"><span class="building-icon">'+b.icon+'</span><span><strong>'+b.name+'</strong><small>'+b.description+'</small><small class="cost">'+Object.entries(b.cost).map(([r,n])=>RESOURCE_NAMES[r]+' '+n).join(' · ')+'</small></span></button>').join('');
+    $('build-options').innerHTML=Object.entries(BUILDINGS).filter(([id])=>!session.active||id==='habitat').map(([id,b])=>'<button class="build-option'+(game.selectedBuild===id?' active':'')+'" data-building="'+id+'" aria-pressed="'+(game.selectedBuild===id)+'"><span class="building-icon">'+b.icon+'</span><span><strong>'+b.name+'</strong><small>'+b.description+'</small><small class="cost">'+Object.entries(b.cost).map(([r,n])=>RESOURCE_NAMES[r]+' '+n).join(' · ')+'</small></span></button>').join('');
     $('build-options').querySelectorAll('[data-building]').forEach(b=>b.onclick=()=>{game.selectedBuild=b.dataset.building;renderer.mouse=null;renderBuildOptions();if(!game.canAfford(game.selectedBuild))toast('자원이 부족해요. 비용을 확인하고 조금 더 모아주세요.',true);else toast('빈 땅을 클릭하거나, 이동 후 ‘여기에 건설’을 누르세요.');});
     const chosen=game.selectedBuild;$('place-building').disabled=!chosen||!game.canAfford(chosen);setText('place-building',chosen?'여기에 건설':'건물을 먼저 선택하세요');
   }
@@ -207,7 +235,7 @@
       $('confirm-import').onclick=()=>{replaceGame(new Game(valid));closeModal();save();toast('저장 기록을 가져왔어요. 탐험을 이어가세요!');};$('cancel-import').onclick=showSettings;
     }catch(e){toast('올바른 오르빗 저장 파일이 아니에요. JSON 파일을 확인해 주세요.',true);}
   }
-  function replaceGame(next){clearTutorialWaypoint();tutorialStep=tutorial.step;tutorialCollapsed=false;game=next;renderer.game=next;renderer.reset();buildOpen=false;$('build-panel').hidden=true;$('build-button').classList.remove('selected');$('interact-button').classList.add('selected');missionSignature='';locationSignature='';clearInput();hud(true);}
+  function replaceGame(next){clearTutorialWaypoint();tutorialStep=tutorial.step;tutorialCollapsed=false;game=next;tutorial.sync(game);renderer.game=next;renderer.reset();buildOpen=false;$('build-panel').hidden=true;$('build-button').classList.remove('selected');$('interact-button').classList.add('selected');missionSignature='';locationSignature='';clearInput();hud(true);}
   function showDialogue(e){
     const sp=SPECIES[e.species],bond=game.state.friendship[e.species]||0;
     showModal(sp.name+'와의 만남','FIRST CONTACT / '+sp.kind,'<div class="dialogue"><p class="speaker">'+sp.name+' <span class="bond">'+('♥'.repeat(bond)+'♡'.repeat(3-bond))+'</span></p><blockquote>'+sp.line.replace(/\n/g,'<br>')+'</blockquote>'+(e.first?'<div class="reward">첫 만남 선물 · '+Object.entries(sp.gift).map(([r,n])=>RESOURCE_NAMES[r]+' +'+n).join(' · ')+'</div>':'<p class="modal-intro">친밀도 '+bond+' / 3 · 친밀도 2부터 동행과 길 안내가 열려요.</p>')+'<div class="interaction-grid"><button data-care="pet">♡ 쓰다듬기<small>친밀도 +1 · 10초 간격</small></button><button data-care="feed">❋ 먹이 나누기<small>바이오매스 2 · 친밀도 +1</small></button><button data-care="follow" '+(bond<2?'disabled':'')+'>'+(game.state.companion===e.id?'동행 마치기':'함께 탐험하기')+'<small>내 뒤를 따라오는 친구</small></button><button data-care="guide" '+(bond<2?'disabled':'')+'>유적 길 물어보기<small>미탐사 유적의 위치 표시</small></button></div><button class="primary-button" id="dialogue-close">탐험으로 돌아가기</button></div>');
@@ -241,7 +269,7 @@
     for(const r of ['iron','crystal','biomass'])setText(r+'-count',s.inventory[r]);
     setText('oxygen-text',Math.ceil(s.oxygen)+'%');$('oxygen-bar').style.width=s.oxygen+'%';$('oxygen-bar').style.background=s.oxygen<25?'#ffb196':'';setText('fuel-text',Math.floor(s.fuel)+'%');$('fuel-bar').style.width=s.fuel+'%';setText('journal-count',s.discovered.length);
     const loc=space?'space':p.id;if(locationSignature!==loc||force){locationSignature=loc;setText('location-code',space?'SIGMA SYSTEM / OPEN SPACE':'시그마 성계 / '+String(PLANETS.indexOf(p)+1).padStart(2,'0'));$('location-name').innerHTML=(space?'시그마 성계':p.name)+'<span class="planet-tag">'+(space?'비행 중':'탐험 중')+'</span>';$('location-description').innerHTML=space?'새로운 행성으로 향하는 중':p.kind+' <span>·</span> '+p.temp;setText('ship-label',space?'착륙':'우주선');$('scan-button').title=space?'주변 행성 스캔':'주변 자원과 생명체 스캔';}
-    if(s.training){setText('location-code','TRAINING SIMULATION / 전용 공간');$('location-name').innerHTML=(space?'비행 시뮬레이터':'시그마 훈련 스테이션')+'<span class="planet-tag">훈련 중</span>';$('location-description').textContent=space?'모의 항로 · 다른 행성에 착륙해 보세요':'교관 루미 · 채굴장 · 건설 연습장';}
+    if(s.training){setText('location-code','TRAINING SIMULATION / 전용 공간');$('location-name').innerHTML=(space?'비행 시뮬레이터':s.planet==='verdant'?'시그마 훈련 기지':'모의 착륙 구역')+'<span class="planet-tag">훈련 중</span>';$('location-description').textContent=space?'모의 항로 · 다른 행성에 착륙해 보세요':'루미와 함께하는 첫 우주 탐험';}
     updateTutorial();$('space-action').hidden=!space||!$('tutorial-card').hidden;$('mission-card').hidden=space||!$('tutorial-card').hidden;
     if(space){const target=nearest?.kind==='planet'?nearest.entity:null;setText('space-target-name',target?target.name+' 궤도':'다음 목적지를 찾아보세요');setText('space-target-help',target?'착륙해 새로운 자원과 생명체를 만나보세요.':'방향키로 비행하거나 성계 지도에서 항로를 설정하세요.');$('land-button').disabled=!target||!!game.travel;setText('land-button',target?target.name+'에 착륙':'행성 가까이에서 착륙');setText('refuel-button',game.solarCharge>0?'태양광 비상 충전 · '+Math.ceil(game.solarCharge)+'초':s.inventory.biomass>=3?'연료 합성 · 바이오매스 3개':'비상 태양광 충전 · 6초');}
     let hint='자원 가까이에서 E를 누르세요',key='E';
@@ -249,10 +277,10 @@
     else if(space){hint=game.travel?'워프 항로를 따라 이동하고 있어요':nearest?'E 또는 F · '+nearest.entity.name+'에 착륙':'WASD 비행 · M 성계 지도';key=nearest?'E':'M';}
     else if(nearest){if(nearest.kind==='node')hint=RESOURCE_NAMES[nearest.entity.type]+' 채굴 · 길게 누르기';else if(nearest.kind==='creature')hint=SPECIES[nearest.entity.species].name+'에게 인사하기';else if(nearest.kind==='ship')hint='우주선 탑승 · 이륙';else if(nearest.kind==='npc')hint='교관 루미 · 대화하기';else if(nearest.kind==='relic')hint=nearest.entity.name+' · 별빛 기록 조사';else hint=BUILDINGS[nearest.entity.type].name+' · 사용하기';}
     $('interaction-hint').querySelector('kbd').textContent=key;$('interaction-hint').querySelector('span').textContent=hint;
-    setText('interact-label',space?'착륙':nearest?.kind==='creature'?'인사하기':nearest?.kind==='ship'?'탑승하기':nearest?.kind==='relic'?'조사하기':nearest?.kind==='building'?'사용하기':'채굴 / 교류');
-    setText('field-status','유적 '+s.relics.length+' / 15'+(s.companion?' · 동행 중':'')+' · '+Math.round(1000/renderer.frameMs)+' FPS');const actor=space?s.ship:s.player;setText('coordinate-label','X '+String(Math.round(actor.x)).padStart(4,'0')+' / Y '+String(Math.round(actor.y)).padStart(4,'0'));setText('day-label','탐험 '+(Math.floor(s.time/600)+1)+'일째');
+    setText('interact-label',space?'착륙':nearest?.kind==='npc'?'루미와 대화':nearest?.kind==='creature'?'인사하기':nearest?.kind==='ship'?'탑승하기':nearest?.kind==='relic'?'조사하기':nearest?.kind==='building'?'사용하기':'채굴 / 교류');
+    setText('field-status',s.training?'TRAINING / 안전한 실습 공간':'유적 '+s.relics.length+' / 15'+(s.companion?' · 동행 중':'')+' · '+Math.round(1000/renderer.frameMs)+' FPS');const actor=space?s.ship:s.player;setText('coordinate-label','X '+String(Math.round(actor.x)).padStart(4,'0')+' / Y '+String(Math.round(actor.y)).padStart(4,'0'));setText('day-label','탐험 '+(Math.floor(s.time/600)+1)+'일째');
     const nearHome=!space&&(dist(s.player,{x:0,y:0})<180||game.world().buildings.some(b=>b.type==='habitat'&&dist(s.player,b)<150));
-    setText('status-label',game.paused?'탐험 일시 정지':nearHome?'안전 구역 · 산소 충전 중':s.oxygen<25?'산소 부족 · 집이나 우주선으로 돌아가세요':space?'항법 장치 정상':'2D 탐사 장비 정상');
+    setText('status-label',game.paused?'탐험 일시 정지':s.training?'훈련 기지 · 산소 안전 공급':nearHome?'안전 구역 · 산소 충전 중':s.oxygen<25?'산소 부족 · 집이나 우주선으로 돌아가세요':space?'항법 장치 정상':'2D 탐사 장비 정상');
     if(s.oxygen<25&&!lowOxygenWarned){toast('산소가 얼마 남지 않았어요. 집이나 우주선 근처에서 충전하세요.',true);lowOxygenWarned=true;}if(s.oxygen>50)lowOxygenWarned=false;
     const goals=game.goals(),signature=goals.map(v=>v.done?'1':'0').join('');if(signature!==missionSignature||force){missionSignature=signature;$('mission-list').innerHTML=goals.map(v=>'<li class="'+(v.done?'done':'')+'">'+v.text+'</li>').join('');const completed=goals.filter(v=>v.done).length;$('mission-progress-bar').style.width=(completed/goals.length*100)+'%';if(completed===goals.length){setText('mission-title','이제 당신도 우주 개척자');setText('mission-description','남은 행성을 탐험하고 더 큰 기지를 만들어보세요.');setText('mission-note','모든 첫 탐험 목표를 달성했어요!');}else{setText('mission-title','작은 발걸음, 새로운 세계');setText('mission-description','우주에 첫 번째 나만의 집을 지어보세요.');setText('mission-note','천천히 둘러보세요. 모험은 이제 시작이에요.');}}
     if(nearest&&!space&&!game.selectedBuild&&nearest.kind!=='ship'){

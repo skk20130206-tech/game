@@ -41,7 +41,7 @@
     fresh(){return{version:VERSION,mode:'surface',planet:'verdant',player:{x:90,y:100,angle:0},ship:{x:-480,y:245,angle:-Math.PI/2},oxygen:100,fuel:100,inventory:{iron:0,crystal:0,biomass:0},worlds:{},visited:['verdant'],discovered:[],met:[],friendship:{},creatureCare:{},companion:null,relics:[],time:0,stats:{mined:0,buildings:0,travel:0,collected:{iron:0,crystal:0,biomass:0}},rewarded:false};}
     validate(input){
       if(!input||input.version!==VERSION||!['surface','space'].includes(input.mode)||!PLANETS.some(p=>p.id===input.planet))throw Error('Invalid save');
-      const s=this.fresh();s.training=input.training===true;
+      const s=this.fresh();s.training=input.training===true;if(s.training)s.trainingLayout=2;
       for(const key of ['player','ship']){
         if(!input[key]||!Number.isFinite(input[key].x)||!Number.isFinite(input[key].y))throw Error('Invalid position');
         const limit=key==='player'?WORLD_LIMIT:2600;
@@ -71,9 +71,17 @@
     }
     emit(type,data={}){this.events.push({type,...data});}
     planet(){return PLANETS.find(p=>p.id===this.state.planet);}
-    trainingNpc(){return this.state.training&&this.state.mode==='surface'?{id:'training-instructor',x:-90,y:145,name:'교관 루미'}:null;}
+    trainingNpc(){return this.state.training&&this.state.mode==='surface'?{id:'training-instructor',x:-350,y:140,name:'교관 루미'}:null;}
+    trainingGate(step,reason){
+      if(!this.state.training||!(this.trainingStep<step))return null;
+      this.emit('message',{text:reason});return{ok:false,reason};
+    }
     makeWorld(p,training=this.state.training){
       const random=rand(p.seed),nodes=[],creatures=[];
+      if(training){
+        const samples=[['iron',330,15],['iron',535,45],['crystal',645,135],['biomass',335,195],['biomass',505,215]];
+        return{nodes:samples.map(([type,x,y],i)=>({id:'training-v2-'+p.id+'-node-'+i,type,x,y,hp:type==='iron'?4:type==='crystal'?3:2,maxHp:type==='iron'?4:type==='crystal'?3:2,respawnAt:0,size:1,rotation:random()*TAU,seed:Math.floor(random()*10000)})),creatures:[{id:'training-v2-'+p.id+'-friend',species:p.species[0],x:-465,y:515,homeX:-465,homeY:515,phase:0,angle:0}],buildings:[],relics:[]};
+      }
       const resourceRadius=970*SURFACE_MAP_SCALE, creatureSpread=1900*SURFACE_MAP_SCALE;
       const fixed=[{x:190,y:115,type:'iron'},{x:285,y:65,type:'iron'},{x:185,y:230,type:'biomass'},{x:65,y:265,type:'biomass'},{x:-155,y:90,type:'crystal'},{x:-260,y:-70,type:'crystal'}];
       for(let i=0;i<(training?16:140);i++){
@@ -130,6 +138,7 @@
       actor.x+=this.velocity.x*dt;actor.y+=this.velocity.y*dt;
       if(moving){const difference=Math.atan2(Math.sin(Math.atan2(dy,dx)-actor.angle),Math.cos(Math.atan2(dy,dx)-actor.angle));actor.angle+=difference*(1-Math.exp(-dt*13));}
       const limit=s.mode==='surface'?WORLD_LIMIT:2300;actor.x=clamp(actor.x,-limit,limit);actor.y=clamp(actor.y,-limit,limit);
+      if(s.training&&s.mode==='surface'){actor.x=clamp(actor.x,-720,740);actor.y=clamp(actor.y,-270,660);}
       this.moving=Math.hypot(this.velocity.x,this.velocity.y)>2;this.boosting=this.moving&&!!input.run;
       if(s.mode==='space'){
         s.ship.altitude=0;this.velocity.z=0;
@@ -154,7 +163,7 @@
         }
         for(const n of w.nodes)if(n.hp<=0&&s.time>=n.respawnAt)n.hp=n.maxHp;
         const safe=dist(p,{x:0,y:0})<180||w.buildings.some(b=>b.type==='habitat'&&dist(p,b)<150);
-        s.oxygen=clamp(s.oxygen+dt*(safe?15:-this.planet().oxygen*(input.run?1.6:1)),0,100);
+        s.oxygen=s.training?100:clamp(s.oxygen+dt*(safe?15:-this.planet().oxygen*(input.run?1.6:1)),0,100);
         const solar=w.buildings.find(b=>b.type==='solar'&&dist(p,b)<200);if(solar)s.fuel=clamp(s.fuel+dt*(solar.level===2?7:3),0,100);
         if(s.oxygen<=0){s.player.x=90;s.player.y=90;s.oxygen=100;this.moveTarget=null;this.emit('message',{text:'산소가 부족해 우주선으로 긴급 귀환했어요. 자원은 안전합니다.',error:true});this.emit('save');}
       }else{s.oxygen=100;}
@@ -177,6 +186,7 @@
       if(n.kind==='npc'){this.emit('instructor');return{ok:true,type:'instructor'};}
       if(n.kind==='planet')return this.land(n.entity.id);
       if(n.kind==='node'){
+        const locked=this.trainingGate(1,'루미에게 먼저 인사해 주세요. 목표 표시를 따라 접수대로 가세요.');if(locked)return locked;
         const node=n.entity;this.cooldown=.38;node.hp--;this.beam={x:node.x,y:node.y,life:.28};
         const nodeColor=node.type==='crystal'?'#bccfff':node.type==='biomass'?'#c3f379':'#cad9df',broken=node.hp<=0;
         this.emit('effect',{kind:'mine',x:node.x,y:node.y,color:nodeColor,nodeType:node.type,remaining:node.hp,maxHp:node.maxHp,broken});
@@ -266,6 +276,7 @@
     }
     scan(){
       if(this.paused||this.travel)return{ok:false,reason:'탐험 중에 스캔할 수 있어요.'};
+      const locked=this.trainingGate(2,'먼저 루미를 만나고 철광석 하나를 끝까지 채굴하세요.');if(locked)return locked;
       if(this.scanCooldown>0){this.emit('message',{text:'스캐너 충전 중 · '+Math.ceil(this.scanCooldown)+'초'});return{ok:false,reason:'스캐너 충전 중'};}
       this.scanCooldown=5;const pos=this.state.mode==='surface'?this.state.player:this.state.ship;this.scanRing={x:pos.x,y:pos.y,age:0};this.emit('effect',{kind:'scan',scanAction:true});
       if(this.state.mode==='space'){this.emit('message',{text:'행성 5개 감지. M 키로 성계 지도를 열어보세요.'});return{ok:true,planets:PLANETS.length};}
@@ -276,6 +287,11 @@
     canAfford(type){return!!BUILDINGS[type]&&Object.entries(BUILDINGS[type].cost).every(([r,n])=>this.state.inventory[r]>=n);}
     canPlace(type,x,y){
       if(this.state.mode!=='surface')return{ok:false,reason:'행성에 착륙한 뒤 건설하세요.'};
+      if(this.state.training){
+        if(this.trainingStep<3)return{ok:false,reason:'채굴과 스캔을 마치면 건설 연습이 열려요.'};
+        if(type!=='habitat')return{ok:false,reason:'훈련에서는 탐험가의 집을 먼저 지어보세요.'};
+        if(x<270||x>640||y<410||y>585)return{ok:false,reason:'금색 테두리 안의 건설 연습장에 지어주세요.'};
+      }
       const def=BUILDINGS[type];if(!def||!Number.isFinite(x)||!Number.isFinite(y))return{ok:false,reason:'건물을 선택하세요.'};
       if(!this.canAfford(type))return{ok:false,reason:'자원이 부족해요. 비용을 확인하고 더 모아주세요.'};
       if(this.world().buildings.length>=80)return{ok:false,reason:'이 행성에는 건물을 80개까지 지을 수 있어요.'};
@@ -296,6 +312,7 @@
     launch(){
       if(this.paused||this.travel)return{ok:false,reason:'잠시 기다려주세요.'};
       if(this.state.mode==='space')return this.land();
+      const locked=this.trainingGate(5,'집을 짓고 생명체에게 인사하면 비행 훈련이 열려요.');if(locked)return locked;
       if(dist(this.state.player,{x:0,y:0})>190){this.moveTarget={x:80,y:60};this.emit('message',{text:'우주선으로 이동합니다. 도착하면 F를 눌러 이륙하세요.'});return{ok:false,reason:'우주선으로 이동 중'};}
       const p=this.planet();this.state.mode='space';this.state.ship={x:p.x,y:p.y+p.r+155,angle:-Math.PI/2,altitude:0};this.state.oxygen=100;this.moveTarget=null;this.selectedBuild=null;this.emit('launch');this.emit('message',{text:'이륙 완료! 방향키로 비행하거나 M 키로 성계 지도를 열어보세요.'});this.emit('save');return{ok:true,mode:'space'};
     }

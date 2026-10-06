@@ -11,7 +11,7 @@ const mine=(g,t,n)=>{g.state.player={x:n.x-65,y:n.y,angle:0};while(n.hp>0){g.coo
 
 test('station survives reload, supports NPC dialogue, and exits to the normal world',()=>{
   const session=new TrainingSession(null,null),g=new Game(session.state);
-  assert.equal(g.state.training,true);assert.equal(g.world().nodes.length,22);assert.equal(g.world().relics.length,0);
+  assert.equal(g.state.training,true);assert.equal(g.world().nodes.length,5);assert.equal(g.world().relics.length,0);
   const npc=g.trainingNpc();assert.equal(npc.name,'교관 루미');assert.equal(g.interact(npc.id).ok,false);
   g.state.player={x:npc.x+25,y:npc.y,angle:0};assert.equal(g.nearest().kind,'npc');
   assert.equal(g.interact().type,'instructor');assert.ok(g.events.some(e=>e.type==='instructor'));
@@ -25,11 +25,13 @@ test('station survives reload, supports NPC dialogue, and exits to the normal wo
 test('first-time training resumes its own world and cannot enter main before completion',()=>{
   const session=new TrainingSession(null,null),g=new Game(session.state);
   assert.equal(session.active,true);assert.equal(session.destination(g),null);
-  walk(g,session.tutorial,2);mine(g,session.tutorial,g.world().nodes.find(n=>n.type==='iron'));
+  walk(g,session.tutorial,.5);assert.equal(session.tutorial.step,0);
+  const npc=g.trainingNpc();g.state.player={x:npc.x-60,y:npc.y,angle:0};g.interact(npc.id);drain(g,session.tutorial);
+  mine(g,session.tutorial,g.world().nodes.find(n=>n.type==='iron'));
   const resumed=new TrainingSession(null,JSON.parse(JSON.stringify(session.snapshot(g))));
   assert.equal(resumed.tutorial.step,2);assert.equal(resumed.state.inventory.iron,6);
   resumed.tutorial.done.fill(true);const main=resumed.destination(new Game(resumed.state));
-  assert.equal(main.inventory.iron,6);resumed.finish();
+  assert.equal(main.inventory.iron,12);assert.equal(main.inventory.biomass,8);assert.equal(main.inventory.crystal,4);assert.equal(main.worlds.verdant.buildings.length,0);resumed.finish();
   const nextVisit=new TrainingSession(main,{version:1,active:false});
   assert.equal(nextVisit.active,false);assert.equal(nextVisit.tutorial.dismissed,true);
 });
@@ -58,6 +60,34 @@ test('new explorer completes all seven steps through actual game actions',()=>{
   g.state.player={x:90,y:90,angle:0};assert.ok(g.launch().ok);drain(g,t);assert.equal(t.step,6);
   const other=PLANETS.find(p=>p.id!==g.state.planet);assert.ok(g.warp(other.id).ok);g.finishTravel();assert.ok(g.land(other.id).ok);drain(g,t);
   assert.equal(t.complete,true);assert.equal(t.active,false);assert.deepEqual(t.done,Array(7).fill(true));
+});
+
+test('academy course requires meeting Lumi, supplies materials once, and completes all seven actions',()=>{
+  const session=new TrainingSession(null,null),g=new Game(session.state),t=session.tutorial;t.sync(g);
+  assert.equal(g.launch().ok,false);assert.equal(g.scan().ok,false);
+  const iron=g.world().nodes.find(n=>n.type==='iron');g.state.player={x:iron.x-65,y:iron.y,angle:0};assert.equal(g.interact(iron.id).ok,false);
+  const npc=g.trainingNpc();g.state.player={x:npc.x-60,y:npc.y,angle:0};g.interact(npc.id);drain(g,t);assert.equal(t.step,1);
+  mine(g,t,iron);assert.equal(t.step,2);assert.equal(g.launch().ok,false);
+  g.scan();drain(g,t);assert.equal(t.step,3);assert.equal(g.state.inventory.iron,12);assert.equal(g.state.inventory.biomass,8);
+  g.scanCooldown=0;g.scan();drain(g,t);assert.equal(g.state.inventory.iron,12);
+  const resumed=new TrainingSession(null,session.snapshot(g)),loaded=new Game(resumed.state);resumed.tutorial.sync(loaded);
+  assert.equal(loaded.world().nodes.find(n=>n.id===iron.id).hp,0);assert.equal(loaded.trainingStep,3);
+  g.state.player={x:450,y:370,angle:0};assert.equal(t.guide(g).action,'build');
+  assert.equal(g.build('habitat',100,370).ok,false);assert.ok(g.build('habitat',450,480).ok);drain(g,t);assert.equal(t.step,4);
+  const c=g.world().creatures[0];g.state.player={x:c.x+60,y:c.y,angle:0};g.cooldown=0;g.interact(c.id);drain(g,t);assert.equal(t.step,5);
+  g.state.player={x:90,y:90,angle:0};assert.ok(g.launch().ok);drain(g,t);assert.equal(t.step,6);
+  assert.ok(g.warp('solara').ok);g.finishTravel();assert.ok(g.land('solara').ok);drain(g,t);assert.equal(t.complete,true);
+  const main=new Game(session.destination(g));assert.equal(main.trainingNpc(),null);assert.equal(main.state.planet,'verdant');assert.equal(main.world().buildings.length,0);
+});
+
+test('academy deck confines movement, supplies oxygen and migrates the old layout',()=>{
+  const old=new Game().snapshot();old.training=true;old.player={x:1500,y:1500,angle:0};
+  const session=new TrainingSession(null,{version:1,active:true,game:old,tutorial:{done:[true,true]}}),g=new Game(session.state);
+  assert.equal(g.state.player.x,-610);assert.equal(session.tutorial.step,2);assert.equal(g.world().nodes.length,5);
+  g.state.player={x:739,y:659,angle:0};g.state.oxygen=20;
+  for(let i=0;i<300;i++)g.tick(1/60,{right:true,down:true});
+  assert.ok(g.state.player.x<=740&&g.state.player.y<=660);assert.equal(g.state.oxygen,100);
+  assert.ok(g.world().nodes.every(n=>n.id.startsWith('training-v2-')));
 });
 
 test('failed actions, mining hits, upgrades and guide effects do not pass tutorial steps',()=>{
@@ -101,4 +131,12 @@ test('deployed Worker includes tutorial controller and uses only the 2D player r
   assert.match(html,/id="tutorial-card"/);assert.match(html,/root\.OrbitTutorial=\{Tutorial,STEPS,TrainingSession\}/);assert.match(html,/튜토리얼 다시 시작/);
   assert.doesNotMatch(html,/<script src="tutorial\.js"/);assert.doesNotMatch(html,/OrbitPlayerRig|Orbit3D|player-k17\.webp/);
   const health=await (await worker.fetch(new Request('https://test.local/health'))).json();assert.equal(health.ok,true);assert.equal(health.tutorialSteps,7);
+});
+
+test('goal navigation reaches Lumi and then the ore without sticking on the ship',()=>{
+ const session=new TrainingSession(null,null),g=new Game(session.state),t=session.tutorial;t.sync(g);
+ const npc=g.trainingNpc();g.pendingInteraction=npc.id;g.moveTarget={x:npc.x,y:npc.y};
+ for(let i=0;i<300;i++){g.tick(1/60);t.tick(g);drain(g,t);}assert.equal(t.step,1);
+ const ore=g.world().nodes.find(n=>n.type==='iron');g.pendingInteraction=ore.id;g.moveTarget={x:ore.x,y:ore.y};
+ for(let i=0;i<600;i++){g.tick(1/60);t.tick(g);drain(g,t);}assert.ok(ore.hp<ore.maxHp);assert.equal(g.pendingInteraction,null);
 });

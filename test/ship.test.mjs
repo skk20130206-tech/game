@@ -27,3 +27,9 @@ test('old high-altitude space saves load in 2D and can land at a nearby planet',
 test('particles stop while paused and expire when resumed; effects stay bounded',()=>{
  const g=new Game(),r=new Renderer(canvas(),null,g);for(let n=0;n<30;n++)r.effect({kind:'break',x:90,y:90});assert.ok(r.particles.length<=160);g.paused=true;const n=r.particles.length;for(let i=0;i<100;i++)r.draw(.016);assert.equal(r.particles.length,n);g.paused=false;for(let i=0;i<100;i++)r.draw(.016);assert.equal(r.particles.length,0);
 });
+
+test('academy deck and instructor render throughout ground training',()=>{
+ const {TrainingSession}=require('../game/tutorial.js');const session=new TrainingSession(null,null),g=new Game(session.state),r=new Renderer(canvas(),canvas(160,126),g);
+ for(let stage=0;stage<7;stage++){g.trainingStep=stage;r.draw(.016);}
+ g.state.player={x:450,y:370,angle:1};g.state.inventory={iron:12,biomass:8,crystal:0};g.trainingStep=3;g.selectedBuild='habitat';r.draw(.016);
+});

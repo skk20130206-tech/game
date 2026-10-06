@@ -150,21 +150,49 @@
       for(let i=0;i<700;i++)items.push({x:(random()-.5)*WORLD_LIMIT*2.1,y:(random()-.5)*WORLD_LIMIT*2.1,r:8+random()*75,type:i%7,angle:random()*TAU});this.decoration.set(p.id,items);return items;
     }
     worldTransform(c){c.translate(this.width*.5,this.height*.53);c.scale(this.scale,this.scale);c.translate(-this.camera.x,-this.camera.y);}
+    trainingStation(c){
+      const stage=this.game.trainingStep??0,t=this.time;
+      c.fillStyle='#081321';c.fillRect(-2900,-2900,5800,5800);
+      const random=rand(527);for(let i=0;i<190;i++){const x=(random()-.5)*4400,y=(random()-.5)*3500;oval(c,x,y,i%8===0?2:1,i%8===0?2:1,i%3?'#baddea66':'#f3f4ca99');}
+      glow(c,1130,-540,510,'#24759233');drawPlanet(c,PLANETS[0],1120,-500,270,t);
+      // A bounded deck, outer hull, and room colors make this a separate place.
+      box(c,-787,-358,1594,1080,52,'#020b16','#426074');
+      box(c,-770,-340,1560,1040,44,'#162b3a','#87c6d0');
+      box(c,-747,-313,1514,990,32,'#203847','#3c5c6c');
+      for(let x=-720;x<750;x+=60)line(c,x,-280,x,650,'#62869514',1);
+      for(let y=-280;y<650;y+=60)line(c,-720,y,740,y,'#62869514',1);
+      for(let x=-695;x<=700;x+=85){box(c,x,-329,35,5,2,'#a4ece5');box(c,x,684,35,5,2,'#4d92a6');}
+      const rooms=[
+        {x:-705,y:-35,w:465,h:345,n:'01',name:'루미의 접수대',sub:'WELCOME / 이동 · 대화',color:'#87eee2',active:stage===0},
+        {x:215,y:-170,w:500,h:475,n:'02',name:'자원 실습실',sub:'MINING / 채굴 · 스캔',color:'#83d7f2',active:stage===1||stage===2},
+        {x:215,y:350,w:500,h:290,n:'03',name:'건설 실습실',sub:'BUILD / 첫 번째 보금자리',color:'#f5c87a',active:stage===3},
+        {x:-700,y:370,w:410,h:280,n:'04',name:'생태 실습실',sub:'LIFE / 새로운 친구',color:'#bae589',active:stage===4},
+        {x:-200,y:-225,w:365,h:430,n:'05',name:'비행 격납고',sub:'FLIGHT / 우주로 출발',color:'#a1bdfc',active:stage>=5}
+      ];
+      for(const r of rooms){
+        box(c,r.x,r.y,r.w,r.h,22,r.active?'#243f50':'#182e3e',r.color+(r.active?'dd':'50'));
+        box(c,r.x+15,r.y+15,31,28,7,r.color);c.textAlign='center';c.font='bold 13px sans-serif';c.fillStyle='#18313b';c.fillText(r.n,r.x+30,r.y+34);
+        c.textAlign='left';c.fillStyle=r.color;c.font='bold 17px sans-serif';c.fillText(r.name,r.x+56,r.y+34);
+        c.font='10px sans-serif';c.fillStyle='#99b6c6';c.fillText(r.sub,r.x+20,r.y+61);
+        if(r.active){c.font='bold 10px sans-serif';c.textAlign='right';c.fillStyle=r.color;c.fillText('● 현재 실습',r.x+r.w-18,r.y+32);}
+      }
+      c.textAlign='left';c.fillStyle='#d7edf2';c.font='bold 23px sans-serif';c.fillText('SIGMA / EXPLORER ACADEMY',-690,-252);
+      c.font='12px sans-serif';c.fillStyle='#87b7c8';c.fillText('시그마 탐험가 훈련 기지   ·   지상 실습 → 모의 비행 → 정식 탐험',-690,-225);
+      // Glowing approach route and arrival airlock.
+      box(c,-687,100,102,105,15,'#1b4553','#92e5df');c.textAlign='center';c.fillStyle='#b8efe8';c.font='10px sans-serif';c.fillText('ARRIVAL',-636,221);
+      for(let x=-563;x<-390;x+=32){path(c,[[x,139],[x-7,132],[x-7,146]],'#87eee2'+(stage===0?'bd':'40'));}
+      box(c,-496,35,108,32,8,'#345664','#94bcc1');box(c,-485,40,31,18,3,'#81e5e2');box(c,-447,40,42,18,3,'#1b3c4a');
+      // The gold build pad is always empty of resources.
+      c.setLineDash([10,7]);c.strokeStyle='#f5c87a99';c.lineWidth=2;c.strokeRect(270,410,370,175);c.setLineDash([]);
+      if(!this.game.world().buildings.length){c.textAlign='center';c.fillStyle='#f5cf8a90';c.font='bold 32px sans-serif';c.fillText('⌂',450,505);c.font='11px sans-serif';c.fillText('이 안에 집을 지어보세요',450,540);}
+      for(const [x,y]of[[-655,575],[-620,615],[-352,590]]){oval(c,x,y,25,14,'#74b8852a');line(c,x,y,x,y-22,'#98c39d',3);oval(c,x-7,y-17,10,5,'#92bc86');oval(c,x+6,y-26,9,5,'#bad796');}
+    }
     surface(c,dt){
       const g=this.game,s=g.state,p=g.planet(),w=g.world();
       const ground=c.createRadialGradient(this.width*.45,this.height*.35,20,this.width*.5,this.height*.48,Math.max(this.width,this.height)*.86);
       ground.addColorStop(0,p.ground[3]);ground.addColorStop(.5,p.ground[1]);ground.addColorStop(1,p.ground[0]);c.fillStyle=ground;c.fillRect(0,0,this.width,this.height);
       c.save();this.worldTransform(c);
-      if(s.training){
-        c.fillStyle='#102c40';c.fillRect(-2700,-2700,5400,5400);
-        box(c,-650,-380,1450,1080,36,'#21485a','#65dbe088');
-        for(let x=-600;x<800;x+=80)line(c,x,-350,x,680,'#77c7dd18',1);
-        for(let y=-350;y<700;y+=80)line(c,-630,y,780,y,'#77c7dd18',1);
-        for(const [x,y,w,h,label] of[[-220,85,240,190,'01 · 교관 루미'],[140,-30,220,310,'02 · 채굴 연습'],[220,320,350,250,'03 · 건설 연습']]){
-          box(c,x,y,w,h,16,'#15394d','#65dbe077');c.fillStyle='#a0e8ec';c.font='bold 14px sans-serif';c.textAlign='left';c.fillText(label,x+14,y+25);
-        }
-        c.fillStyle='#d8faff';c.font='bold 22px sans-serif';c.textAlign='center';c.fillText('SIGMA · TRAINING STATION',50,-220);
-      }
+      if(s.training)this.trainingStation(c);
       for(const d of (s.training?[]:this.getDecor(p))){
         if(!this.project(d.x,d.y).visible)continue;
         if(d.type===0){
@@ -184,8 +212,8 @@
         }
       }
       // World boundary and safe landing circle are drawn below all sprites.
-      c.setLineDash([12,10]);c.strokeStyle=p.light+'66';c.lineWidth=2;c.strokeRect(-WORLD_LIMIT,-WORLD_LIMIT,WORLD_LIMIT*2,WORLD_LIMIT*2);c.setLineDash([]);
-      oval(c,0,15,111,72,p.ground[0]);ring(c,0,0,155,p.accent+'24',1.5);c.fillStyle=p.light+'99';c.font='10px sans-serif';c.textAlign='center';c.fillText('LANDING ZONE',0,91);
+      if(!s.training){c.setLineDash([12,10]);c.strokeStyle=p.light+'66';c.lineWidth=2;c.strokeRect(-WORLD_LIMIT,-WORLD_LIMIT,WORLD_LIMIT*2,WORLD_LIMIT*2);c.setLineDash([]);}
+      oval(c,0,15,111,72,s.training?'#203748':p.ground[0]);ring(c,0,0,155,s.training?'#80d4ff50':p.accent+'24',1.5);c.fillStyle=p.light+'99';c.font='10px sans-serif';c.textAlign='center';c.fillText('LANDING ZONE',0,91);
       if(g.moveTarget){ring(c,g.moveTarget.x,g.moveTarget.y,10+Math.sin(this.time*5)*2,'#edf7c7',1.5);}
       const nearest=g.nearest(),actors=[{kind:'ship',x:0,y:0},...w.nodes.filter(n=>n.hp>0).map(n=>({...n,kind:'node'})),...w.buildings.map(b=>({...b,kind:'building'})),...w.relics.map(r=>({...r,kind:'relic'})),...w.creatures.map(v=>({...v,kind:'creature'})),{...s.player,kind:'player'}];
       actors.sort((a,b)=>a.y-b.y);
@@ -201,11 +229,12 @@
         if(a.kind==='player')astronaut(c,this.time,g.moving,s.player.angle,g.beam?'mine':null);
         if(a.kind==='npc'){
           oval(c,0,8,23,8,'#071b3388');c.translate(0,Math.sin(this.time*2)*3);
-          glow(c,0,-26,44,'#68e4f533');box(c,-17,-30,34,34,9,'#74cdd2','#d6f9f8');
+          glow(c,0,-26,44,'#68e4f533');box(c,-19,-32,38,39,10,'#d6e9e6','#80c9ce');box(c,-14,-5,28,8,3,'#f4bc6a');
           box(c,-24,-62,48,33,10,'#d3eeed','#75b7c9');box(c,-19,-56,38,20,6,'#12364b');
           oval(c,-9,-47,4,4,'#92fff1');oval(c,9,-47,4,4,'#92fff1');line(c,0,-63,0,-72,'#a6e5e3',2);oval(c,0,-75,4,4,'#ffdb83');
           line(c,-18,-22,-29,-9,'#9ce6e5',6);line(c,18,-22,31,-36+Math.sin(this.time*3)*6,'#9ce6e5',6);box(c,-8,-20,16,10,3,'#f0d48c');
           c.fillStyle='#dfffff';c.font='bold 12px sans-serif';c.textAlign='center';c.fillText('교관 루미 · E 대화',0,-92);
+          if(g.trainingStep===0){box(c,-93,-148,186,32,12,'#b9f3ed');c.fillStyle='#123946';c.font='bold 12px sans-serif';c.fillText('여기로 와서 인사해 주세요!',0,-127);}
         }
         if(a.kind==='relic'){oval(c,0,8,31,12,'#102b3740');path(c,[[-25,4],[-20,-45],[0,-64],[22,-46],[25,4]],p.dark,p.light+'55');line(c,-8,-32,0,-45,p.accent,3);line(c,0,-45,10,-31,p.accent,3);line(c,10,-31,0,-20,p.accent,3);if(!s.relics.includes(a.id))ring(c,0,-32,22+Math.sin(this.time*2)*2,p.accent+'50');}
         c.restore();}
