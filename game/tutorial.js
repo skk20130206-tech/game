@@ -2,7 +2,7 @@
   'use strict';
   const STEPS=[
     {short:'루미',zone:'01 · 도착 / 접수대',title:'루미에게 첫인사를 건네요',text:'빛나는 안내 로봇을 클릭해 다가가세요. 가까이에서는 E로 대화할 수 있어요.',note:'WASD·방향키로 이동 · 빈 땅 클릭으로 이동',line:'어서 와요! 저는 교관 루미예요. 제 쪽으로 걸어와 인사해 주세요. 함께 첫 탐험을 준비해요.',controls:['touch-pad','interact-button']},
-    {short:'채굴',zone:'02 · 자원 실습실',title:'철광석 하나를 채굴해요',text:'채굴장에 표시된 철광석 가까이에서 E 또는 ‘채굴 / 교류’를 꾹 누르세요.',note:'4번 채굴하면 철광석이 부서져요. 클릭으로도 채굴할 수 있어요.',line:'잘 왔어요! 오른쪽 실습실의 철광석을 캐 볼까요? 도구를 계속 사용해서 바위를 끝까지 부숴 보세요.',controls:['interact-button']},
+    {short:'채굴',zone:'02 · 자원 실습실',title:'곡괭이로 철광석을 채굴해요',text:'1번 곡괭이를 장착하고, 표시된 철광석 가까이에서 E 또는 ‘채굴 / 교류’를 꾹 누르세요.',note:'철광석 → 곡괭이 · 바이오매스 → 도끼 · 수정 → 칼',line:'탐사 도구 3개를 지급했어요! 철광석은 곡괭이, 바이오매스는 도끼, 수정은 칼로만 부술 수 있어요. 먼저 곡괭이를 사용해 볼까요?',controls:['interact-button']},
     {short:'스캔',zone:'02 · 자원 실습실',title:'스캐너를 작동시켜요',text:'Q 또는 아래 ‘스캔’을 누르세요. 주변 자원과 생명체를 감지해요.',note:'스캔을 마치면 집 짓기에 필요한 재료를 지급해요.',line:'첫 자원을 얻었네요! 이번에는 스캐너로 주변을 살펴봐요. 다음 실습에 쓸 건설 재료도 준비해 둘게요.',controls:['scan-button']},
     {short:'건설',zone:'03 · 건설 실습실',title:'나만의 첫 집을 지어요',text:'금색 건설장으로 이동해 B → ‘탐험가의 집’을 선택하고, 테두리 안의 빈 땅을 클릭하세요.',note:'철광석 12개 + 바이오매스 8개 · 건설 재료 지급 완료',line:'건설 재료를 받았죠? 금색 실습장에 집을 지어 보세요. 실제 탐험에서는 집 근처에서 산소를 채울 수 있어요.',controls:['build-button']},
     {short:'교류',zone:'04 · 생태 실습실',title:'모스링과 친구가 돼요',text:'초록빛 생태실의 생명체를 클릭하거나 가까이에서 E를 눌러 인사하세요.',note:'스캔은 발견, 대화는 교류예요. 직접 인사를 건네 보세요.',line:'멋진 집이에요! 이제 왼쪽 생태실로 가 볼까요? 모스링에게 인사하면 작은 선물을 받을 수 있어요.',controls:['interact-button']},
@@ -22,7 +22,7 @@
     sync(game){game.trainingStep=this.step;}
     tick(game){
       this.sync(game);const s=game.state,p=s.player;
-      if(!this.active||game.paused||s.mode!=='surface'){this.previous=null;return;}
+      if(!this.active||game.paused||game.flight||s.mode!=='surface'){this.previous=null;return;}
       if(this.previous&&this.previous.planet===s.planet){const d=Math.hypot(p.x-this.previous.x,p.y-this.previous.y);if(game.moving&&d<12)this.walked=Math.min(60,this.walked+d);}
       this.previous={x:p.x,y:p.y,planet:s.planet};
       // The new station starts with a real NPC encounter; legacy free-world guides still support walking.
@@ -47,6 +47,7 @@
     guide(game){
       const s=game.state,info={...(STEPS[this.step]||{}),controls:[...(STEPS[this.step]?.controls||[])]};
       if(!this.active)return info;
+      if(game.flight){Object.assign(info,{title:game.flight.kind==='launch'?'이륙 준비 · 궤도로 출발':'착륙 중 · 착륙장을 확인해요',text:'자동 조종 중이에요. 우주선의 움직임이 끝나면 다음 행동을 할 수 있어요.',note:'잠시 기다려주세요.',controls:[],action:null});return info;}
       if(s.mode==='space'){
         const canLand=game.nearest()?.kind==='planet'&&!game.travel;
         if(this.step<5)Object.assign(info,{title:'훈련장에 착륙해 이어가요',text:'이 단계는 지상에서 진행해요. 가까운 행성에 착륙하거나 성계 지도에서 항로를 선택하세요.'});
@@ -71,6 +72,7 @@
       if(this.step>=5)target={x:80,y:80};
       if(target){info.target={x:target.x,y:target.y};info.targetId=target.id;info.action='mark';info.label=info.label||(this.step===0?'루미에게 이동':this.step>=5?'우주선으로 이동':'목표로 이동');info.distance=Math.round(Math.hypot(target.x-s.player.x,target.y-s.player.y));}
       else if([1,4].includes(this.step)||this.step===3&&!game.canAfford('habitat'))info.note+=' · 채굴한 자원은 150초 뒤 다시 자라요.';
+      if(target?.type&&root.OrbitCore.RESOURCE_TOOLS[target.type]){const id=root.OrbitCore.RESOURCE_TOOLS[target.type],tool=root.OrbitCore.TOOLS[id];if(!s.tools.includes(id)){info.action='kit';info.label='탐사 도구 받기';info.note='루미 또는 우주선 근처에서 도구를 받으세요.';}else if(s.equippedTool!==id){info.action='equip';info.tool=id;info.label=tool.name+' 장착하기';info.note=tool.key+' 키 또는 아래 도구 버튼으로 장착하세요.';}}
       return info;
     }
   }
@@ -92,7 +94,7 @@
     destination(game){
       if(!this.active||!this.tutorial.complete)return null;
       if(this.main)return this.main;
-      const next=new root.OrbitCore.Game().snapshot();next.training=false;next.inventory={iron:12,biomass:8,crystal:4};return next;
+      const next=new root.OrbitCore.Game().snapshot();next.training=false;next.inventory={iron:12,biomass:8,crystal:4};next.tools=[...game.state.tools];next.equippedTool=game.state.equippedTool;return next;
     }
     finish(){this.active=false;this.tutorial.dismissed=true;}
   }

@@ -44,7 +44,7 @@ test('movement accelerates, stops and does not jump through a building', () => {
 });
 
 test('mining still awards once, requires range, and depleted nodes regrow', () => {
-  const g=new Game(),n=g.world().nodes[0];g.state.player={x:n.x-65,y:n.y,angle:0};
+  const g=new Game(),n=g.world().nodes[0];g.collectStarterTools();g.state.player={x:n.x-65,y:n.y,angle:0};
   for(let i=0;i<n.maxHp;i++){g.cooldown=0;assert.ok(g.interact(n.id).ok);}
   assert.equal(g.state.inventory.iron,6);assert.equal(g.state.stats.mined,1);
   g.cooldown=0;assert.equal(g.interact(n.id).ok,false);
@@ -53,7 +53,7 @@ test('mining still awards once, requires range, and depleted nodes regrow', () =
 });
 
 test('mining emits staged block-break metadata', async () => {
-  const g=new Game(),n=g.world().nodes[0];g.state.player={x:n.x-65,y:n.y,angle:0};g.events=[];
+  const g=new Game(),n=g.world().nodes[0];g.collectStarterTools();g.state.player={x:n.x-65,y:n.y,angle:0};g.events=[];
   for(let i=0;i<n.maxHp;i++){g.cooldown=0;assert.ok(g.interact(n.id).ok);}
   const effects=g.events.filter(e=>e.type==='effect'),hits=effects.filter(e=>e.kind==='mine'),broken=effects.find(e=>e.kind==='break');
   assert.equal(hits.length,n.maxHp);assert.equal(hits.at(-1).broken,true);assert.equal(hits.at(-1).remaining,0);
@@ -97,9 +97,9 @@ test('building placement, upgrade costs, light and charging survive saving', () 
 });
 
 test('launch, boost, 2D flight, warp, landing and emergency refuel remain playable', () => {
-  const g=new Game();assert.ok(g.launch().ok);tick(g,.5,{right:true,run:true,ascend:true});
+  const g=new Game();assert.ok(g.launch().ok);tick(g,2.9);tick(g,.5,{right:true,run:true,ascend:true});
   assert.equal(g.state.ship.altitude,0);assert.ok(g.state.fuel<100);
-  for(const p of PLANETS){g.state.fuel=100;assert.ok(g.warp(p.id).ok);tick(g,2.5);assert.equal(g.travel,null);assert.ok(g.land(p.id).ok);assert.equal(g.state.planet,p.id);assert.ok(g.launch().ok);}
+  for(const p of PLANETS){g.state.fuel=100;assert.ok(g.warp(p.id).ok);tick(g,2.5);assert.equal(g.travel,null);assert.ok(g.land(p.id).ok);tick(g,2.9);assert.equal(g.state.planet,p.id);assert.ok(g.launch().ok);tick(g,2.9);}
   g.state.fuel=0;g.state.inventory.biomass=0;assert.ok(g.refuel().ok);tick(g,6.1);assert.ok(g.state.fuel>=22);
 });
 

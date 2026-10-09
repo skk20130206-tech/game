@@ -21,7 +21,7 @@ test('screen and world coordinates round trip after camera pan, zoom and mode ch
  assert.deepEqual(r.input({right:true,up:true,ascend:true}),{up:true,down:false,left:false,right:true,run:false,interact:false});
 });
 test('old high-altitude space saves load in 2D and can land at a nearby planet',()=>{
- const g=new Game();g.launch();const saved=g.snapshot(),p=PLANETS[0];saved.ship={x:p.x,y:p.y+p.r+65,altitude:640,angle:0};saved.inventory.iron=24;saved.met=['mossling'];saved.friendship.mossling=2;
+ const g=new Game();g.launch();for(let i=0;i<170;i++)g.tick(1/60);const saved=g.snapshot(),p=PLANETS[0];saved.ship={x:p.x,y:p.y+p.r+65,altitude:640,angle:0};saved.inventory.iron=24;saved.met=['mossling'];saved.friendship.mossling=2;
  const loaded=new Game(saved);assert.equal(loaded.state.ship.altitude,0);assert.equal(loaded.state.inventory.iron,24);assert.equal(loaded.state.friendship.mossling,2);assert.ok(loaded.land(p.id).ok);
 });
 test('particles stop while paused and expire when resumed; effects stay bounded',()=>{
@@ -32,4 +32,14 @@ test('academy deck and instructor render throughout ground training',()=>{
  const {TrainingSession}=require('../game/tutorial.js');const session=new TrainingSession(null,null),g=new Game(session.state),r=new Renderer(canvas(),canvas(160,126),g);
  for(let stage=0;stage<7;stage++){g.trainingStep=stage;r.draw(.016);}
  g.state.player={x:450,y:370,angle:1};g.state.inventory={iron:12,biomass:8,crystal:0};g.trainingStep=3;g.selectedBuild='habitat';r.draw(.016);
+});
+
+test('takeoff, touchdown and three tool swings draw finite frames with effects disabled',()=>{
+ const g=new Game(),r=new Renderer(canvas(),null,g);r.immersive=false;g.collectStarterTools();
+ for(const [tool,resource]of [['pickaxe','iron'],['axe','biomass'],['sword','crystal']]){
+   const n=g.world().nodes.find(n=>n.type===resource);g.state.player={x:n.x-65,y:n.y,angle:0};g.equipTool(tool);g.cooldown=0;assert.ok(g.interact(n.id).ok);
+   for(let i=0;i<24;i++){g.tick(1/60);r.draw(1/60);}
+ }
+ g.state.player={x:90,y:100,angle:0};g.launch();for(let i=0;i<170;i++){g.tick(1/60);r.draw(1/60);}assert.equal(g.state.mode,'space');
+ const p=PLANETS[1];g.state.ship={x:p.x,y:p.y+p.r+65,angle:0};g.land(p.id);for(let i=0;i<170;i++){g.tick(1/60);r.draw(1/60);}assert.equal(g.flight,null);assert.equal(g.state.planet,p.id);
 });

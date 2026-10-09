@@ -3,11 +3,12 @@ import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import { loadWorker } from '../scripts/load-worker.mjs';
 const require=createRequire(import.meta.url);
-const {Game,PLANETS}=require('../game/core.js');
+const {Game,PLANETS,RESOURCE_TOOLS}=require('../game/core.js');
 const {Tutorial,TrainingSession}=require('../game/tutorial.js');
 const drain=(g,t)=>{while(g.events.length)t.event(g.events.shift(),g);};
 const walk=(g,t,seconds)=>{for(let i=0;i<seconds*60;i++){g.tick(1/60,{right:true});t.tick(g);drain(g,t);}};
-const mine=(g,t,n)=>{g.state.player={x:n.x-65,y:n.y,angle:0};while(n.hp>0){g.cooldown=0;assert.ok(g.interact(n.id).ok);drain(g,t);}};
+const finishFlight=g=>{for(let i=0;i<170;i++)g.tick(1/60);};
+const mine=(g,t,n)=>{assert.ok(g.equipTool(RESOURCE_TOOLS[n.type]).ok);g.state.player={x:n.x-65,y:n.y,angle:0};while(n.hp>0){g.cooldown=0;assert.ok(g.interact(n.id).ok);drain(g,t);}};
 
 test('station survives reload, supports NPC dialogue, and exits to the normal world',()=>{
   const session=new TrainingSession(null,null),g=new Game(session.state);
@@ -49,7 +50,7 @@ test('replaying training preserves the existing main expedition across reload an
 });
 
 test('new explorer completes all seven steps through actual game actions',()=>{
-  const g=new Game(),t=new Tutorial();
+  const g=new Game(),t=new Tutorial();g.collectStarterTools();
   walk(g,t,2);assert.equal(t.step,1);
   const iron=g.world().nodes.filter(n=>n.type==='iron');mine(g,t,iron[0]);assert.equal(t.step,2);
   assert.ok(g.scan().ok);drain(g,t);assert.equal(t.step,3);
@@ -57,8 +58,8 @@ test('new explorer completes all seven steps through actual game actions',()=>{
   let site;for(let x=250;x<1200&&!site;x+=50)for(let y=250;y<1200&&!site;y+=50){g.state.player={x:x-90,y,angle:0};if(g.canPlace('habitat',x,y).ok)site={x,y};}
   assert.ok(site);assert.ok(g.build('habitat',site.x,site.y).ok);drain(g,t);assert.equal(t.step,4);
   const c=g.world().creatures[0];g.state.player={x:c.x-60,y:c.y,angle:0};g.cooldown=0;assert.ok(g.interact(c.id).ok);drain(g,t);assert.equal(t.step,5);
-  g.state.player={x:90,y:90,angle:0};assert.ok(g.launch().ok);drain(g,t);assert.equal(t.step,6);
-  const other=PLANETS.find(p=>p.id!==g.state.planet);assert.ok(g.warp(other.id).ok);g.finishTravel();assert.ok(g.land(other.id).ok);drain(g,t);
+  g.state.player={x:90,y:90,angle:0};assert.ok(g.launch().ok);assert.equal(t.step,5);finishFlight(g);drain(g,t);assert.equal(t.step,6);
+  const other=PLANETS.find(p=>p.id!==g.state.planet);assert.ok(g.warp(other.id).ok);g.finishTravel();assert.ok(g.land(other.id).ok);assert.equal(t.complete,false);finishFlight(g);drain(g,t);
   assert.equal(t.complete,true);assert.equal(t.active,false);assert.deepEqual(t.done,Array(7).fill(true));
 });
 
@@ -75,8 +76,8 @@ test('academy course requires meeting Lumi, supplies materials once, and complet
   g.state.player={x:450,y:370,angle:0};assert.equal(t.guide(g).action,'build');
   assert.equal(g.build('habitat',100,370).ok,false);assert.ok(g.build('habitat',450,480).ok);drain(g,t);assert.equal(t.step,4);
   const c=g.world().creatures[0];g.state.player={x:c.x+60,y:c.y,angle:0};g.cooldown=0;g.interact(c.id);drain(g,t);assert.equal(t.step,5);
-  g.state.player={x:90,y:90,angle:0};assert.ok(g.launch().ok);drain(g,t);assert.equal(t.step,6);
-  assert.ok(g.warp('solara').ok);g.finishTravel();assert.ok(g.land('solara').ok);drain(g,t);assert.equal(t.complete,true);
+  g.state.player={x:90,y:90,angle:0};assert.ok(g.launch().ok);assert.equal(t.step,5);finishFlight(g);drain(g,t);assert.equal(t.step,6);
+  assert.ok(g.warp('solara').ok);g.finishTravel();assert.ok(g.land('solara').ok);assert.equal(t.complete,false);finishFlight(g);drain(g,t);assert.equal(t.complete,true);
   const main=new Game(session.destination(g));assert.equal(main.trainingNpc(),null);assert.equal(main.state.planet,'verdant');assert.equal(main.world().buildings.length,0);
 });
 
@@ -91,7 +92,7 @@ test('academy deck confines movement, supplies oxygen and migrates the old layou
 });
 
 test('failed actions, mining hits, upgrades and guide effects do not pass tutorial steps',()=>{
-  const g=new Game(),t=new Tutorial(),n=g.world().nodes.find(n=>n.type==='iron');
+  const g=new Game(),t=new Tutorial(),n=g.world().nodes.find(n=>n.type==='iron');g.collectStarterTools();
   g.state.player={x:n.x-65,y:n.y,angle:0};g.interact(n.id);drain(g,t);assert.equal(t.done[1],false);
   g.paused=true;g.scan();g.build('habitat',400,400);drain(g,t);assert.equal(t.done[2],false);assert.equal(t.done[3],false);
   t.event({type:'effect',kind:'scan',x:20,y:30},g);t.event({type:'effect',kind:'build',x:20,y:30},g);
@@ -110,18 +111,18 @@ test('movement ignores teleportation and pauses and resumes saved progress',()=>
 });
 
 test('same-planet landing is not a new-planet completion; flight progress survives reload',()=>{
-  const g=new Game(),t=new Tutorial();g.launch();drain(g,t);
-  const p=g.planet();g.state.ship={x:p.x,y:p.y+p.r+65,altitude:0};g.land();drain(g,t);assert.equal(t.done[6],false);
-  g.launch();drain(g,t);const resumed=new Tutorial(t.snapshot());
-  const target=PLANETS.find(p=>p.id!==g.state.planet);g.warp(target.id);g.finishTravel();g.land(target.id);drain(g,resumed);assert.equal(resumed.done[6],true);
+  const g=new Game(),t=new Tutorial();g.launch();finishFlight(g);drain(g,t);
+  const p=g.planet();g.state.ship={x:p.x,y:p.y+p.r+65,altitude:0};g.land();finishFlight(g);drain(g,t);assert.equal(t.done[6],false);
+  g.launch();finishFlight(g);drain(g,t);const resumed=new Tutorial(t.snapshot());
+  const target=PLANETS.find(p=>p.id!==g.state.planet);g.warp(target.id);g.finishTravel();g.land(target.id);finishFlight(g);drain(g,resumed);assert.equal(resumed.done[6],true);
 });
 
 test('guide finds needed resources, offers building only with funds, and recovers from early launch',()=>{
-  const g=new Game(),t=new Tutorial({done:[true,true,true]});
+  const g=new Game(),t=new Tutorial({done:[true,true,true]});g.collectStarterTools();
   assert.equal(t.guide(g).action,'mark');assert.ok(g.world().nodes.some(n=>n.type==='iron'&&n.x===t.guide(g).target.x));
-  g.state.inventory.iron=12;assert.ok(g.world().nodes.some(n=>n.type==='biomass'&&n.x===t.guide(g).target.x));
+  g.state.inventory.iron=12;assert.equal(t.guide(g).action,'equip');assert.equal(t.guide(g).tool,'axe');g.equipTool('axe');assert.ok(g.world().nodes.some(n=>n.type==='biomass'&&n.x===t.guide(g).target.x));
   g.state.inventory.biomass=8;assert.equal(t.guide(g).action,'build');
-  g.launch();drain(g,t);assert.equal(t.guide(g).action,'map');
+  g.launch();finishFlight(g);drain(g,t);assert.equal(t.guide(g).action,'map');
   const p=g.planet();g.state.ship={x:p.x,y:p.y+p.r+65,altitude:0};assert.equal(t.guide(g).action,'land');
   g.warp(PLANETS[1].id);assert.equal(t.guide(g).action,null);
 });
