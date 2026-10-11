@@ -76,7 +76,7 @@
       }).join('');
       for(const f of M.fields(this.id)){
         const slider=this.$('motion-'+f.key),number=this.$('motion-number-'+f.key),factor=f.percent?100:1;
-        const update=(input,other)=>{if(input.value===''||!Number.isFinite(input.valueAsNumber))return;const value=clamp(input.valueAsNumber/factor,f.min,f.max);this.config[this.id][f.key]=Number(value.toFixed(4));other.value=String(Number((value*factor).toFixed(2)));this.changed();};
+        const update=(input,other)=>{if(input.value===''||!Number.isFinite(input.valueAsNumber))return;const value=M.normalizeGroup(this.id,{...this.config[this.id],[f.key]:input.valueAsNumber/factor})[f.key];this.config[this.id][f.key]=Number(value.toFixed(4));other.value=String(Number((value*factor).toFixed(2)));this.changed();};
         slider.oninput=()=>update(slider,number);number.oninput=()=>update(number,slider);number.onblur=()=>{number.value=String(Number((this.config[this.id][f.key]*factor).toFixed(2)));};
       }
       this.presets();this.marker();

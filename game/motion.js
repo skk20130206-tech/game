@@ -28,7 +28,7 @@
     {key:'thrust',label:'엔진 분사 세기',min:.3,max:1.8,step:.05,unit:'×',hint:'불꽃의 길이와 밝기'}
   ]:TOOL_FIELDS):[];
   function normalizeGroup(id,input){
-    const result={};for(const f of fields(id)){const n=input?.[f.key];result[f.key]=typeof n==='number'&&Number.isFinite(n)?clamp(n,f.min,f.max):DEFAULTS[id][f.key];}return result;
+    const result={};for(const f of fields(id)){const n=input?.[f.key];result[f.key]=typeof n==='number'&&Number.isFinite(n)?Number(clamp(f.min+Math.round((clamp(n,f.min,f.max)-f.min)/f.step)*f.step,f.min,f.max).toFixed(4)):DEFAULTS[id][f.key];}return result;
   }
   function normalize(input){const result={version:VERSION};for(const id of Object.keys(DEFAULTS))result[id]=normalizeGroup(id,input?.[id]);return result;}
   function parse(text){
