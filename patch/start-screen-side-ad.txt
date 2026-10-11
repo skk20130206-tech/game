@@ -11,7 +11,7 @@
 <div class="orbit-start-hero"><section>
 <h1 class="orbit-start-logo">just<span>game</span></h1><h2 class="orbit-start-headline">낯선 행성에서,<br><em>나만의 집이 있는 우주로.</em></h2>
 <p class="orbit-start-copy">우주선을 타고 착륙한 곳이 새로운 시작.<br>자원을 캐고, 기지를 짓고, 작은 생명체와 친구가 되어 다섯 행성을 탐험하세요.</p>
-<div class="orbit-start-actions"><button id="orbit-start-button" class="orbit-start-primary" type="button">튜토리얼부터 시작하기 ↗</button><button id="orbit-start-guide" class="orbit-start-secondary" type="button" aria-expanded="false" aria-controls="orbit-start-manual">조작법 보기</button></div>
+<div class="orbit-start-actions"><button id="orbit-start-button" class="orbit-start-primary" type="button">튜토리얼부터 시작하기 ↗</button><button id="orbit-motion-button" class="orbit-start-secondary" type="button">모션 스튜디오</button><button id="orbit-start-guide" class="orbit-start-secondary" type="button" aria-expanded="false" aria-controls="orbit-start-manual">조작법 보기</button></div>
 <p class="orbit-start-small">튜토리얼 플레이 → 7단계 완료 → 본게임 시작</p>
 </section><figure class="orbit-start-visual" style="margin:0"><canvas id="orbit-start-preview" width="720" height="430" aria-label="2D 행성 위 우주선, 탐험가, 작은 친구와 건설한 기지"></canvas><div class="orbit-scene-top"><span>01 / VERDANT</span><span>2D 탐험 미리보기</span></div><figcaption class="orbit-scene-caption"><small>YOUR FIRST OUTPOST</small><strong>여기서, 당신의 탐험이 시작됩니다.</strong><p>우주선 한 대. 작은 친구. 그리고 내가 세운 첫 기지.</p></figcaption></figure></div>
 <section class="orbit-start-features" aria-label="게임에서 할 수 있는 일">
@@ -34,7 +34,7 @@
  guide.addEventListener('click',()=>{manual.hidden=!manual.hidden;guide.setAttribute('aria-expanded',String(!manual.hidden));guide.textContent=manual.hidden?'조작법 보기':'조작법 접기';if(!manual.hidden)manual.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'nearest'});});
  let starting=false;
  const block=e=>{
-  if(starting)return;
+  if(starting||document.querySelector('#modal.motion-modal[open]'))return;
   if(e.key==='Tab'){const items=[...screen.querySelectorAll('button,a[href]')].filter(el=>!el.disabled&&el.getClientRects().length),first=items[0],last=items[items.length-1];if(e.shiftKey&&(document.activeElement===first||!screen.contains(document.activeElement))){e.preventDefault();last?.focus();}else if(!e.shiftKey&&(document.activeElement===last||!screen.contains(document.activeElement))){e.preventDefault();first?.focus();}return;}
   e.stopImmediatePropagation();
   if(e.key==='Escape'&&!manual.hidden){manual.hidden=true;guide.setAttribute('aria-expanded','false');guide.textContent='조작법 보기';guide.focus();}
@@ -42,6 +42,8 @@
  };
  window.addEventListener('keydown',block,true);
  start.addEventListener('click',()=>{if(starting)return;starting=true;start.disabled=true;screen.classList.add('orbit-start-screen-hidden');setTimeout(()=>{window.removeEventListener('keydown',block,true);screen.remove();window.dispatchEvent(new Event('orbit:start'));window.dispatchEvent(new Event('focus'));document.getElementById('world')?.focus({preventScroll:true});},320);});
+ document.getElementById('orbit-motion-button').onclick=()=>window.dispatchEvent(new Event('orbit:motion'));
  start.focus({preventScroll:true});
+ if(new URLSearchParams(location.search).get('motion')==='1')window.dispatchEvent(new Event('orbit:motion'));
 })();
 </script>

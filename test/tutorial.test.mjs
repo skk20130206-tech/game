@@ -7,8 +7,9 @@ const {Game,PLANETS,RESOURCE_TOOLS}=require('../game/core.js');
 const {Tutorial,TrainingSession}=require('../game/tutorial.js');
 const drain=(g,t)=>{while(g.events.length)t.event(g.events.shift(),g);};
 const walk=(g,t,seconds)=>{for(let i=0;i<seconds*60;i++){g.tick(1/60,{right:true});t.tick(g);drain(g,t);}};
+const tick=(g,seconds)=>{for(let i=0;i<seconds*60;i++)g.tick(1/60);};
 const finishFlight=g=>{for(let i=0;i<170;i++)g.tick(1/60);};
-const mine=(g,t,n)=>{assert.ok(g.equipTool(RESOURCE_TOOLS[n.type]).ok);g.state.player={x:n.x-65,y:n.y,angle:0};while(n.hp>0){g.cooldown=0;assert.ok(g.interact(n.id).ok);drain(g,t);}};
+const mine=(g,t,n)=>{assert.ok(g.equipTool(RESOURCE_TOOLS[n.type]).ok);g.state.player={x:n.x-65,y:n.y,angle:0};while(n.hp>0){g.cooldown=0;assert.ok(g.interact(n.id).ok);tick(g,.8);drain(g,t);}};
 
 test('station survives reload, supports NPC dialogue, and exits to the normal world',()=>{
   const session=new TrainingSession(null,null),g=new Game(session.state);

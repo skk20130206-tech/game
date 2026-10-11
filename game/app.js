@@ -2,12 +2,15 @@
   'use strict';
   const {Game,PLANETS,SPECIES,BUILDINGS,RESOURCE_NAMES,TOOLS,RESOURCE_TOOLS,WORLD_LIMIT,dist,clamp}=window.OrbitCore;
   const {Renderer,drawPlanet,creature}=window.OrbitRenderer;
+  const Motion=window.OrbitMotion;
+  let motionSettings=Motion.normalize();try{motionSettings=Motion.normalize(JSON.parse(localStorage.getItem(Motion.STORAGE_KEY)||'null'));}catch(e){}
+  let motionEditor=null;
   const $=id=>document.getElementById(id),SAVE_KEY='orbit-frontier-save-v1',SOUND_KEY='orbit-frontier-sound',TUTORIAL_KEY='justgame-tutorial-v2',TRAINING_KEY='justgame-training-v1';
   let saved=null,storageAvailable=true;
   try{const raw=localStorage.getItem(SAVE_KEY);if(raw)saved=JSON.parse(raw);}catch(e){storageAvailable=false;}
   let trainingRecord=null;try{trainingRecord=JSON.parse(localStorage.getItem(TRAINING_KEY)||'null');}catch(e){}
   let session=new window.OrbitTutorial.TrainingSession(saved,trainingRecord);
-  let game=new Game(session.state);
+  let game=new Game(session.state,motionSettings);
   window.OrbitEntry={training:session.active,resuming:!!trainingRecord?.active,main:!!saved};
   let renderer;
   try{renderer=new Renderer($('world'),$('radar'),game);}catch(error){
@@ -158,7 +161,7 @@
   function updateEngineAudio(){
     if(!audioContext||!engineSound)return;const s=game.state,active=soundEnabled&&!game.paused;
     audioBus.gain.setTargetAtTime(soundEnabled?.5:0,audioContext.currentTime,.06);
-    const thrust=active&&game.flight?.kind==='launch'?.055:active&&game.flight?.kind==='land'?.04:active&&s.mode==='space'?(game.travel?.075:game.moving?(game.boosting?.05:.025):.008):0;
+    const thrust=active&&game.flight?Motion.flightPose(game.flight.kind,game.flight.motion||Motion.DEFAULTS[game.flight.kind],game.flight.age/game.flight.duration).thrust*.05:active&&s.mode==='space'?(game.travel?.075:game.moving?(game.boosting?.05:.025):.008):0;
     engineSound.gain.gain.setTargetAtTime(thrust,audioContext.currentTime,.12);engineSound.o.frequency.setTargetAtTime(game.flight?75:game.travel?140:game.boosting?90:game.moving?62:39,audioContext.currentTime,.15);
     if(active&&s.mode==='surface'&&game.moving&&s.time-lastFootstep>.33&&renderer.jumpHeight===0){sound('step');lastFootstep=s.time;}
   }
@@ -178,10 +181,21 @@
     try{localStorage.setItem(session.active?TRAINING_KEY:SAVE_KEY,JSON.stringify(session.active?session.snapshot(game):game.snapshot()));storageAvailable=true;setText('save-indicator',session.active?'튜토리얼 저장됨':'자동 저장됨');if(!silent)toast('이 브라우저에 탐험 기록을 저장했어요.');return true;}catch(e){storageAvailable=false;setText('save-indicator','저장 불가 · 파일로 백업');if(!silent)toast('브라우저 저장 공간을 사용할 수 없어요. 저장 파일을 내보내 주세요.',true);return false;}
   }
   function showModal(title,eyebrow,html){
+    if(motionEditor){motionEditor.destroy();motionEditor=null;}modal.classList.remove('motion-modal');
     clearInput();game.paused=true;renderer.stopHaptics();updateEngineAudio();game.moveTarget=null;$('modal-title').textContent=title;$('modal-eyebrow').textContent=eyebrow;$('modal-content').innerHTML=html;if(!modal.open)modal.showModal();updateTutorial();
   }
-  function closeModal(){if(modal.open)modal.close();game.paused=startOpen||document.hidden;clearInput();$('map-tab').classList.remove('active');$('journal-tab').classList.remove('active');$('explore-tab').classList.add('active');if(!startOpen)$('world').focus({preventScroll:true});}
-  modal.addEventListener('close',()=>{game.paused=startOpen||document.hidden;clearInput();$('map-tab').classList.remove('active');$('journal-tab').classList.remove('active');$('explore-tab').classList.add('active');});
+  function closeModal(force=false){if(motionEditor?.dirty&&force!==true){motionEditor.requestClose();return;}if(modal.open)modal.close();game.paused=startOpen||document.hidden;clearInput();$('map-tab').classList.remove('active');$('journal-tab').classList.remove('active');$('explore-tab').classList.add('active');if(!startOpen)$('world').focus({preventScroll:true});}
+  modal.addEventListener('close',()=>{if(motionEditor){motionEditor.destroy();motionEditor=null;}modal.classList.remove('motion-modal');game.paused=startOpen||document.hidden;clearInput();$('map-tab').classList.remove('active');$('journal-tab').classList.remove('active');$('explore-tab').classList.add('active');});
+  function showMotionEditor(){
+    showModal('모션 스튜디오','JUSTGAME / MOTION LAB','');modal.classList.add('motion-modal');
+    motionEditor=new window.OrbitMotionEditor.MotionEditor($('modal-content'),motionSettings,{
+      apply(config){try{localStorage.setItem(Motion.STORAGE_KEY,JSON.stringify(config));}catch(e){return{ok:false,reason:'설정 저장에 실패했어요. 설정 내보내기로 파일을 보관해 주세요.'};}motionSettings=config;game.setMotion(config);return{ok:true};},
+      close:()=>closeModal(true)
+    });
+    $('motion-play').focus();
+  }
+  window.addEventListener('orbit:motion',showMotionEditor);
+  modal.addEventListener('cancel',e=>{if(motionEditor){e.preventDefault();motionEditor.requestClose();}});
   window.addEventListener('orbit:start',()=>{startOpen=false;game.paused=modal.open||document.hidden;lastFrame=performance.now();clearInput();ensureAudio();if(session.active&&!tutorial.complete)showTrainingIntro();hud(true);});
   modal.addEventListener('click',e=>{if(e.target===modal){const r=modal.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)closeModal();}});
   $('modal-close').onclick=closeModal;
@@ -238,7 +252,7 @@
       $('confirm-import').onclick=()=>{replaceGame(new Game(valid));closeModal();save();toast('저장 기록을 가져왔어요. 탐험을 이어가세요!');};$('cancel-import').onclick=showSettings;
     }catch(e){toast('올바른 오르빗 저장 파일이 아니에요. JSON 파일을 확인해 주세요.',true);}
   }
-  function replaceGame(next){clearTutorialWaypoint();tutorialStep=tutorial.step;tutorialCollapsed=false;game=next;tutorial.sync(game);renderer.game=next;renderer.reset();buildOpen=false;$('build-panel').hidden=true;$('build-button').classList.remove('selected');$('interact-button').classList.add('selected');missionSignature='';locationSignature='';clearInput();hud(true);}
+  function replaceGame(next){clearTutorialWaypoint();tutorialStep=tutorial.step;tutorialCollapsed=false;game=next;game.setMotion(motionSettings);tutorial.sync(game);renderer.game=next;renderer.reset();buildOpen=false;$('build-panel').hidden=true;$('build-button').classList.remove('selected');$('interact-button').classList.add('selected');missionSignature='';locationSignature='';clearInput();hud(true);}
   function showDialogue(e){
     const sp=SPECIES[e.species],bond=game.state.friendship[e.species]||0;
     showModal(sp.name+'와의 만남','FIRST CONTACT / '+sp.kind,'<div class="dialogue"><p class="speaker">'+sp.name+' <span class="bond">'+('♥'.repeat(bond)+'♡'.repeat(3-bond))+'</span></p><blockquote>'+sp.line.replace(/\n/g,'<br>')+'</blockquote>'+(e.first?'<div class="reward">첫 만남 선물 · '+Object.entries(sp.gift).map(([r,n])=>RESOURCE_NAMES[r]+' +'+n).join(' · ')+'</div>':'<p class="modal-intro">친밀도 '+bond+' / 3 · 친밀도 2부터 동행과 길 안내가 열려요.</p>')+'<div class="interaction-grid"><button data-care="pet">♡ 쓰다듬기<small>친밀도 +1 · 10초 간격</small></button><button data-care="feed">❋ 먹이 나누기<small>바이오매스 2 · 친밀도 +1</small></button><button data-care="follow" '+(bond<2?'disabled':'')+'>'+(game.state.companion===e.id?'동행 마치기':'함께 탐험하기')+'<small>내 뒤를 따라오는 친구</small></button><button data-care="guide" '+(bond<2?'disabled':'')+'>유적 길 물어보기<small>미탐사 유적의 위치 표시</small></button></div><button class="primary-button" id="dialogue-close">탐험으로 돌아가기</button></div>');
@@ -275,7 +289,7 @@
     document.querySelectorAll('[data-tool]').forEach(button=>{const id=button.dataset.tool,owned=s.tools.includes(id),selected=s.equippedTool===id;button.disabled=!owned||!!flight;button.setAttribute('aria-pressed',String(selected));button.setAttribute('aria-label',TOOLS[id].name+' · '+(owned?selected?'장착 중':'장착하기':'미보유')+' · '+RESOURCE_NAMES[TOOLS[id].resource]+' 전용');button.querySelector('small').textContent=owned?(selected?'장착 중 · ':'')+RESOURCE_NAMES[TOOLS[id].resource]:'미보유';});
     $('game-area').classList.toggle('in-flight',!!flight);$('flight-status').hidden=!flight||startOpen;
     for(const id of ['interact-button','scan-button','build-button','ship-button','map-tab','radar-button'])$(id).disabled=!!flight;
-    if(flight){const t=flight.age/flight.duration,launch=flight.kind==='launch';setText('flight-phase',launch?'TAKEOFF / 이륙 중':'LANDING / 착륙 중');setText('flight-title',launch?t<.2?'엔진 점화':t<.75?'상승 중':'궤도 진입':t<.65?'착륙장 접근':t<.9?'하강 중':'착지 · 엔진 정지');$('flight-progress').style.width=Math.min(100,t*100)+'%';}
+    if(flight){const t=flight.age/flight.duration,launch=flight.kind==='launch';setText('flight-phase',launch?'TAKEOFF / 이륙 중':'LANDING / 착륙 중');setText('flight-title',Motion.flightPose(flight.kind,flight.motion||Motion.DEFAULTS[flight.kind],t).phase);$('flight-progress').style.width=Math.min(100,t*100)+'%';}
     for(const r of ['iron','crystal','biomass'])setText(r+'-count',s.inventory[r]);
     setText('oxygen-text',Math.ceil(s.oxygen)+'%');$('oxygen-bar').style.width=s.oxygen+'%';$('oxygen-bar').style.background=s.oxygen<25?'#ffb196':'';setText('fuel-text',Math.floor(s.fuel)+'%');$('fuel-bar').style.width=s.fuel+'%';setText('journal-count',s.discovered.length);
     const loc=space?'space':p.id;if(locationSignature!==loc||force){locationSignature=loc;setText('location-code',space?'SIGMA SYSTEM / OPEN SPACE':'시그마 성계 / '+String(PLANETS.indexOf(p)+1).padStart(2,'0'));$('location-name').innerHTML=(space?'시그마 성계':p.name)+'<span class="planet-tag">'+(space?'비행 중':'탐험 중')+'</span>';$('location-description').innerHTML=space?'새로운 행성으로 향하는 중':p.kind+' <span>·</span> '+p.temp;setText('ship-label',space?'착륙':'우주선');$('scan-button').title=space?'주변 행성 스캔':'주변 자원과 생명체 스캔';}
@@ -298,7 +312,7 @@
     }else $('world-label').hidden=true;
   }
   function interact(){sound('click');const wasBuilding=!!game.selectedBuild;const result=game.interact();if(wasBuilding&&result.ok)toggleBuild(false);processEvents();}
-  $('explore-tab').onclick=()=>{if(modal.open)closeModal();};$('map-tab').onclick=showMap;$('radar-button').onclick=showMap;$('journal-tab').onclick=showJournal;$('help-button').onclick=showHelp;$('settings-button').onclick=showSettings;
+  $('explore-tab').onclick=()=>{if(modal.open)closeModal();};$('map-tab').onclick=showMap;$('radar-button').onclick=showMap;$('journal-tab').onclick=showJournal;$('help-button').onclick=showHelp;$('motion-button').onclick=showMotionEditor;$('settings-button').onclick=showSettings;
   $('view-button').onclick=toggleCamera;$('immersion-button').onclick=showImmersion;
   $('fullscreen-button').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else if($('game-area').requestFullscreen)await $('game-area').requestFullscreen();else toast('이 브라우저에서는 전체 화면 버튼을 사용할 수 없어요.');}catch(e){toast('전체 화면을 열지 못했어요. 브라우저 설정을 확인해주세요.');}};
   $('pause-button').onclick=()=>{showModal('잠시, 별을 바라보세요','EXPEDITION PAUSED','<div class="pause-content"><p>탐험을 잠시 멈췄어요.<br>준비가 되면 언제든 다시 떠나세요.</p><button id="resume-button" class="primary-button">이어서 탐험하기</button></div>');$('resume-button').onclick=closeModal;save();};
@@ -324,6 +338,7 @@
     else if(e.code==='KeyE'){e.preventDefault();interact();}
     else if(e.code==='KeyQ'){e.preventDefault();game.scan();processEvents();}
     else if(e.code==='KeyV'){e.preventDefault();toggleCamera();}
+    else if(e.code==='KeyP'){e.preventDefault();showMotionEditor();}
     else if(e.code==='KeyX'){e.preventDefault();showImmersion();}
     else if(e.code==='KeyB'){e.preventDefault();toggleBuild();}
     else if(e.code==='KeyF'){e.preventDefault();game.launch();processEvents();}
@@ -368,6 +383,7 @@
     if(game.paused)accumulator=0;else accumulator+=elapsed;
     let steps=0;while(accumulator>=1/60&&steps++<6){game.tick(1/60,renderer.input(keys));tutorial.tick(game);processEvents();accumulator-=1/60;if(game.paused){accumulator=0;break;}}
     if(!game.paused||now-previousDraw>66){renderer.draw(elapsed);previousDraw=now;}
+    if(motionEditor)motionEditor.draw(elapsed);
     updateEngineAudio();if(now-lastHud>110){hud();lastHud=now;}
     if(now-lastSave>8000){if(!game.paused)save();lastSave=now;}requestAnimationFrame(frame);
   }

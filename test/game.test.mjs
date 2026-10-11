@@ -45,7 +45,7 @@ test('movement accelerates, stops and does not jump through a building', () => {
 
 test('mining still awards once, requires range, and depleted nodes regrow', () => {
   const g=new Game(),n=g.world().nodes[0];g.collectStarterTools();g.state.player={x:n.x-65,y:n.y,angle:0};
-  for(let i=0;i<n.maxHp;i++){g.cooldown=0;assert.ok(g.interact(n.id).ok);}
+  for(let i=0;i<n.maxHp;i++){g.cooldown=0;assert.ok(g.interact(n.id).ok);tick(g,.8);}
   assert.equal(g.state.inventory.iron,6);assert.equal(g.state.stats.mined,1);
   g.cooldown=0;assert.equal(g.interact(n.id).ok,false);
   tick(g,151);assert.equal(n.hp,n.maxHp);
@@ -54,7 +54,7 @@ test('mining still awards once, requires range, and depleted nodes regrow', () =
 
 test('mining emits staged block-break metadata', async () => {
   const g=new Game(),n=g.world().nodes[0];g.collectStarterTools();g.state.player={x:n.x-65,y:n.y,angle:0};g.events=[];
-  for(let i=0;i<n.maxHp;i++){g.cooldown=0;assert.ok(g.interact(n.id).ok);}
+  for(let i=0;i<n.maxHp;i++){g.cooldown=0;assert.ok(g.interact(n.id).ok);tick(g,.8);}
   const effects=g.events.filter(e=>e.type==='effect'),hits=effects.filter(e=>e.kind==='mine'),broken=effects.find(e=>e.kind==='break');
   assert.equal(hits.length,n.maxHp);assert.equal(hits.at(-1).broken,true);assert.equal(hits.at(-1).remaining,0);
   assert.equal(broken.nodeType,n.type);assert.equal(broken.maxHp,n.maxHp);assert.equal(broken.x,n.x);assert.equal(broken.y,n.y);

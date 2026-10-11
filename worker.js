@@ -5,7 +5,7 @@ import shareFeature from "./patch/share-feature.txt";
 import siteReady from "./patch/adsense-ready.txt";
 import {homePage,guidePage,aboutPage,updatesPage,privacyPage,termsPage,contactPage,notFoundPage,robots,sitemap} from "./site.js";
 
-const BUILD="justgame-tools-flight-20261009-v25";
+const BUILD="justgame-motion-studio-20261011-v26";
 const ADSENSE_CLIENT="ca-pub-6073295964667681";
 const ADSENSE_SNIPPET=`<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}" crossorigin="anonymous"></script>`;
 let gameHtmlPromise;
@@ -70,7 +70,7 @@ export default {
       try{
         if(!gameHtmlPromise) gameHtmlPromise=loadGameHtml();
         const html=await gameHtmlPromise;
-        return new Response(JSON.stringify({ok:true,build:BUILD,rendering:"Canvas 2D",perspective:"top-down",webglRequired:false,immersive:true,tutorialSteps:7,creatureCare:true,companions:true,relics:15,htmlLength:html.length,creatures:11,mystic:true,startScreen:true,share:true,adsenseReviewReady:true,adsenseClient:ADSENSE_CLIENT,adsenseSnippetOnContentPages:true,gameRoute:"/play",contentPages:["/","/guide","/about","/updates","/privacy","/terms","/contact"],playAds:false,preApprovalAdPlaceholders:false}),{headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store",...securityHeaders}});
+        return new Response(JSON.stringify({ok:true,build:BUILD,rendering:"Canvas 2D",perspective:"top-down",webglRequired:false,immersive:true,tutorialSteps:7,motionEditor:true,creatureCare:true,companions:true,relics:15,htmlLength:html.length,creatures:11,mystic:true,startScreen:true,share:true,adsenseReviewReady:true,adsenseClient:ADSENSE_CLIENT,adsenseSnippetOnContentPages:true,gameRoute:"/play",contentPages:["/","/guide","/about","/updates","/privacy","/terms","/contact"],playAds:false,preApprovalAdPlaceholders:false}),{headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store",...securityHeaders}});
       }catch(error){
         gameHtmlPromise=undefined;
         return new Response(JSON.stringify({ok:false,build:BUILD,error:error instanceof Error?error.message:String(error)}),{status:500,headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store",...securityHeaders}});

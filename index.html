@@ -68,6 +68,19 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
 .tool-rack{pointer-events:auto;display:flex;flex-direction:column;align-items:stretch;gap:5px;margin-bottom:8px}.tool-belt{display:flex;gap:4px;padding:4px;border-radius:12px}.equipment-slot{display:flex;align-items:center;gap:7px;padding:7px 9px;border:1px solid transparent;border-radius:8px;min-width:119px;text-align:left;color:#c2d8d3}.equipment-slot svg{width:25px;height:29px;fill:#80aeb344;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round}.equipment-slot strong{display:block;font-size:12px;font-weight:650}.equipment-slot small{display:block;font-size:10px;line-height:1.5;color:#94aca8}.equipment-slot kbd{margin-left:auto;font-size:10px}.equipment-slot[aria-pressed="true"]{background:#b7e87920;border-color:#c3f3799c;color:#d9ffae}.equipment-slot[aria-pressed="true"] small{color:#d1edb3}.equipment-slot:disabled{opacity:.42}.starter-tools{border:1px solid #e7b77588;border-radius:8px;padding:8px 12px;background:#293b3ded;color:#ffdb9a;font-size:12px}.flight-status{position:absolute;left:28px;top:204px;width:270px;padding:17px 23px;border-radius:14px;text-align:center;pointer-events:none;z-index:3;background:#112b3af0}.flight-status>span{display:block;color:#99dfe7;font-size:10px;letter-spacing:2px;margin-bottom:6px}.flight-status strong{display:block;font-size:21px;letter-spacing:-.4px}.flight-status p{font-size:11px;color:#aacacb;margin:8px 0 14px}.flight-meter{height:3px;overflow:hidden;background:#4c727866;border-radius:3px}.flight-meter i{display:block;width:0;height:100%;background:#acede8}.game-area.in-flight .interaction-hint,.game-area.in-flight .touch-pad,.game-area.in-flight .tutorial-card{display:none!important}.game-area.in-flight .toolbar{opacity:.5}
 @media(max-width:760px){.equipment-slot{min-width:89px;padding:5px 6px;gap:4px}.equipment-slot svg{width:19px;height:24px}.equipment-slot strong{font-size:11px}.equipment-slot small{font-size:9px}.tool-rack{margin-bottom:5px}.flight-status{top:auto;bottom:160px;left:50%;transform:translateX(-50%);width:250px;padding:14px 18px}.flight-status strong{font-size:18px}}
 @media(max-height:650px){.tool-rack{margin-bottom:3px}.equipment-slot{padding:3px 7px}.flight-status{top:150px;bottom:auto;padding:10px 17px}.flight-status p{margin:5px 0 8px}}
+
+/* Motion Studio: shared game artwork, editable timing, local profiles. */
+.motion-open-button{border:1px solid #95d5bd55;border-radius:8px;padding:9px 12px;font-size:12px;color:#caedb7;white-space:nowrap}
+#modal.motion-modal{width:min(1220px,calc(100vw - 28px));max-height:calc(100dvh - 28px);padding:25px 28px 18px;background:#101d25;border-color:#53716d;border-radius:18px}
+.motion-modal .modal-heading{padding-bottom:0;border:0;margin-bottom:10px}.motion-modal .modal-heading h2{font-size:27px;margin-top:6px}.motion-modal .modal-heading .eyebrow{font-size:10px;letter-spacing:2.8px;color:#87c9bd}.motion-intro{font-size:12px;color:#9cb4b5;margin-bottom:23px;line-height:1.6}
+.motion-workspace{display:grid;grid-template-columns:172px minmax(260px,1fr) 268px;gap:22px}.motion-caption{display:block;font-size:9px;font-weight:600;color:#7c999d;letter-spacing:1.8px;margin-bottom:15px}.motion-library{padding-top:5px}.motion-library>button{display:flex;align-items:center;width:100%;gap:10px;padding:16px 10px;margin-bottom:5px;border:1px solid transparent;border-radius:9px;text-align:left;transition:background .12s}.motion-library>button[aria-pressed=true]{background:#c3f37910;border-color:#c3f37966;color:#ddf7bc}.motion-library>button:hover{background:#bdded70a}.motion-item-icon{font-size:21px;width:23px;text-align:center;color:#8fb5b5}.motion-library>button[aria-pressed=true] .motion-item-icon{color:#d5f89b}.motion-library strong{font-size:13px;display:block;margin-bottom:5px}.motion-library small{display:block;font-size:9px;color:#89a2a7}.motion-library em{margin-left:auto;font-size:9px;font-style:normal;color:#59767c}.motion-library-note{margin-top:30px;padding:17px 10px;border-top:1px solid #74948b23;font-size:10px;color:#739398;line-height:1.8}.motion-library-note>span{display:block;font-size:18px;margin-bottom:9px;color:#b6dca2}
+.motion-preview{min-width:0}.motion-stage{position:relative;border:1px solid #74938e35;border-radius:12px;overflow:hidden;background:#10222a}.motion-stage canvas{display:block;width:100%;height:clamp(270px,40vh,370px)}.motion-stage-top{position:absolute;top:15px;left:16px;right:16px;display:flex;justify-content:space-between;align-items:center;z-index:1}.motion-stage-top>span{font-size:9px;letter-spacing:1.5px;color:#95c0b7}.motion-stage-top i{display:inline-block;width:5px;height:5px;background:#bff392;border-radius:50%;margin-right:5px}.motion-stage-top button{font-size:10px;padding:6px 8px;border-radius:5px;border:1px solid #8eb5b538;background:#0c202977;color:#9bafb6}.motion-stage-top button[aria-pressed=true]{color:#dcf7ba;border-color:#c3f37977}.motion-stage-bottom{position:absolute;bottom:14px;left:16px;right:16px;display:flex;align-items:center;justify-content:space-between;gap:8px}.motion-stage-bottom>span{font-size:11px;color:#d5efc0;background:#122522dd;border:1px solid #c3f37935;padding:7px 10px;border-radius:5px}.motion-stage-bottom>small{font-size:9px;color:#869d9f;text-align:right}
+.motion-transport{display:flex;justify-content:space-between;align-items:center;padding:15px 0 17px;gap:9px}.motion-transport>div{display:flex;gap:5px;align-items:center}.motion-transport button{min-height:34px;min-width:30px;border-radius:7px;border:1px solid #78999128;font-size:14px}.motion-transport .motion-play{background:#bedc9c1b;border-color:#b7db9c55;padding:0 12px;font-size:11px;min-width:84px;color:#d6efbf}.motion-speed{display:flex;gap:8px;align-items:center;font-size:10px;color:#93abad}.motion-speed select{padding:6px;color:#c9dad5;border:1px solid #78999136;border-radius:6px;background:#172a31;font:inherit}
+.motion-timeline-head,.motion-timeline-foot{display:flex;align-items:center;justify-content:space-between;font-size:10px;gap:8px}.motion-timeline-head{color:#b4c8c5}.motion-timeline-head output{font-variant-numeric:tabular-nums;color:#d3eac5}.motion-scrub-wrap{position:relative;margin:12px 6px 7px}.motion-scrub-wrap input{display:block;width:100%;margin:0;accent-color:#bfe68e;height:15px;cursor:ew-resize}.motion-scrub-wrap i{position:absolute;top:-3px;width:2px;height:20px;background:#ffc57b;pointer-events:none}.motion-timeline-foot{color:#a8babe;margin-top:11px}.motion-timeline-foot>span{color:#f0bf83;font-size:10px}.motion-timeline-foot label{display:flex;align-items:center;gap:5px;font-size:10px}.motion-timeline-foot input{accent-color:#bedc9c;margin:0}.motion-preview-tip{color:#769396;font-size:10px;line-height:1.7;margin-top:18px}
+.motion-inspector{border-left:1px solid #74948b23;padding-left:22px}.motion-inspector-heading{display:flex;align-items:baseline;justify-content:space-between;gap:10px}.motion-inspector-heading h3{font-size:12px;font-weight:600;color:#cbded6}.motion-inspector-heading .motion-caption{font-size:8px;margin-bottom:13px}.motion-presets{display:flex;gap:5px;margin-bottom:20px}.motion-presets button{flex:1;border:1px solid #84a39e2f;border-radius:6px;font-size:11px;padding:8px 4px;color:#97b0b1}.motion-presets button[aria-pressed=true]{border-color:#badd9266;background:#c3f3790c;color:#d6edb5}.motion-field{margin-bottom:16px}.motion-field>div{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:7px}.motion-field label{font-size:11px;color:#c6d9d4}.motion-field>div>span{display:flex;align-items:center;justify-content:flex-end;gap:4px}.motion-field input[type=number]{font-size:11px;width:55px;padding:4px 1px 4px 5px;font-variant-numeric:tabular-nums;border:1px solid #83a89c3a;background:#0b1921;color:#d5eebb;border-radius:4px;text-align:right}.motion-field small{font-size:9px;color:#839c9e;min-width:9px}.motion-field input[type=range]{display:block;accent-color:#b9e58f;width:100%;height:13px;margin:0;cursor:ew-resize}.motion-field p{font-size:9px;line-height:1.5;color:#7d989b;margin:5px 0 0}.motion-reset{font-size:10px;border:1px solid #78999135;border-radius:6px;padding:8px 11px;color:#98b1b2;width:100%}
+.motion-footer{display:flex;align-items:center;justify-content:space-between;gap:15px;border-top:1px solid #74948b2b;margin-top:20px;padding-top:17px}.motion-footer>div{display:flex;gap:8px;align-items:center}.motion-footer button{font-size:11px;padding:10px 13px;border-radius:7px;border:1px solid #78999136;color:#bbcec8}.motion-footer .primary-button{font-size:12px;background:#c6ec9d;color:#1d3324;border:1px solid #d2f3b0;font-weight:750;padding:12px 20px;width:auto}.motion-save-line{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:10px;color:#b5d297;margin-top:12px;line-height:1.6}.motion-save-line small{font-size:9px;color:#789598}.motion-save-line .error{color:#ffc2a6}.motion-exit{margin-top:15px;border:1px solid #e4b27360;border-radius:8px;background:#b57e2312;padding:13px;display:flex;align-items:center;gap:10px;font-size:11px;color:#f1d3a5}.motion-exit span{margin-right:auto}.motion-exit button{padding:8px;border-radius:5px;border:1px solid #e4b27350}.motion-exit button:last-child{background:#e7ba8230}.motion-modal input:focus-visible,.motion-modal select:focus-visible{outline:2px solid #c3f379;outline-offset:3px}
+@media(max-width:1030px){#modal.motion-modal{padding:22px}.motion-workspace{grid-template-columns:minmax(260px,1fr) 250px;gap:18px}.motion-library{grid-column:1/-1;display:flex;gap:6px;overflow-x:auto;padding:0 0 8px}.motion-library .motion-caption,.motion-library-note{display:none}.motion-library>button{width:auto;flex:1;min-width:104px;padding:11px 9px;margin:0;gap:7px}.motion-library small,.motion-library em{display:none}.motion-library strong{margin:0;font-size:12px}.motion-inspector{padding-left:18px}.motion-intro{margin-bottom:16px}.motion-stage canvas{height:340px}}
+@media(max-width:660px){.motion-open-button{padding:7px;font-size:10px}#modal.motion-modal{width:calc(100vw - 16px);max-height:calc(100dvh - 16px);padding:18px 14px;border-radius:14px}.motion-modal .modal-heading h2{font-size:23px}.motion-intro{font-size:11px}.motion-workspace{grid-template-columns:1fr;gap:15px}.motion-library{gap:5px}.motion-library>button{min-width:76px;flex-direction:column;gap:6px;padding:9px 7px}.motion-library strong{font-size:10px}.motion-library .motion-item-icon{font-size:19px}.motion-stage canvas{height:270px}.motion-stage-bottom>small{font-size:8px}.motion-inspector{border-left:0;padding-left:0;border-top:1px solid #74948b2b;padding-top:20px}.motion-preview-tip{margin-top:10px}.motion-field{margin-bottom:20px}.motion-field label{font-size:12px}.motion-field p{font-size:10px}.motion-field input[type=range]{height:22px}.motion-field input[type=number]{font-size:13px;width:70px;padding:6px}.motion-field small{font-size:10px}.motion-presets button{padding:10px}.motion-footer{flex-direction:column;align-items:stretch;gap:12px}.motion-footer>div{justify-content:space-between}.motion-footer .motion-footer-actions{justify-content:flex-end}.motion-save-line{align-items:flex-start;flex-direction:column;gap:3px}.motion-exit{flex-wrap:wrap}.motion-exit span{width:100%}.motion-transport{padding-bottom:16px}.motion-transport button{min-height:38px}}
 </style>
 </head>
 <body>
@@ -79,7 +92,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
         <button id="map-tab" class="nav-item"><span class="nav-symbol">◎</span> 성계 지도 <kbd>M</kbd></button>
         <button id="journal-tab" class="nav-item"><span class="nav-symbol">▤</span> 도감 <span class="count" id="journal-count">0</span></button>
       </nav>
-      <div class="header-actions"><span id="save-indicator" class="save-indicator">이 기기에 자동 저장</span><button id="sound-button" class="icon-button" aria-label="소리 켜기" aria-pressed="false" title="소리 켜기">♪</button><button id="help-button" class="icon-button" aria-label="조작 방법" title="조작 방법">?</button><button id="pause-button" class="icon-button pause-icon" aria-label="일시 정지" title="일시 정지">Ⅱ</button></div>
+      <div class="header-actions"><span id="save-indicator" class="save-indicator">이 기기에 자동 저장</span><button id="motion-button" class="motion-open-button" title="P: 모션 편집">모션 편집</button><button id="sound-button" class="icon-button" aria-label="소리 켜기" aria-pressed="false" title="소리 켜기">♪</button><button id="help-button" class="icon-button" aria-label="조작 방법" title="조작 방법">?</button><button id="pause-button" class="icon-button pause-icon" aria-label="일시 정지" title="일시 정지">Ⅱ</button></div>
     </header>
     <main id="game-area" class="game-area">
       <canvas id="world" tabindex="0" aria-label="2D 행성 탐험 게임. 빈 땅 클릭으로 이동하고 드래그로 지도를 둘러보세요. WASD 또는 방향키로 이동하고 E로 채굴·교류하세요. M은 지도, B는 건설입니다."></canvas>
@@ -131,6 +144,76 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
 <script>
 (function(root){
   'use strict';
+  const STORAGE_KEY='justgame-motion-v1',VERSION=1;
+  const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+  const mix=(a,b,t)=>a+(b-a)*t,smooth=t=>{t=clamp(t,0,1);return t*t*(3-2*t);};
+  const DEFAULTS={
+    pickaxe:{duration:.56,impact:.48,windup:40,swing:115,body:9,recoil:5},
+    axe:{duration:.62,impact:.5,windup:55,swing:130,body:13,recoil:7},
+    sword:{duration:.42,impact:.42,windup:30,swing:150,body:7,recoil:3},
+    launch:{duration:2.8,mark:.18,height:340,ease:1.65,recoil:2,thrust:1},
+    land:{duration:2.8,mark:.87,height:340,ease:2,recoil:4,thrust:1}
+  };
+  const GROUPS={pickaxe:{name:'곡괭이',detail:'철광석 · 내려찍기',icon:'⛏'},axe:{name:'도끼',detail:'바이오매스 · 대각선 찍기',icon:'◩'},sword:{name:'칼',detail:'수정 · 가로 베기',icon:'⚔'},launch:{name:'이륙',detail:'점화 · 상승 · 궤도 진입',icon:'↗'},land:{name:'착륙',detail:'접근 · 감속 · 착지',icon:'↘'}};
+  const TOOL_FIELDS=[
+    {key:'duration',label:'전체 동작 시간',min:.35,max:1.4,step:.01,unit:'초',hint:'준비부터 원래 자세로 돌아올 때까지'},
+    {key:'impact',label:'타격 시점',min:.25,max:.7,step:.01,unit:'%',percent:true,hint:'이 순간에 피해·파편·효과음이 발생해요'},
+    {key:'windup',label:'준비 각도',min:0,max:100,step:1,unit:'°',hint:'휘두르기 전에 뒤로 젖히는 크기'},
+    {key:'swing',label:'휘두르는 각도',min:60,max:170,step:1,unit:'°',hint:'도구가 타격 지점까지 움직이는 각도'},
+    {key:'body',label:'몸 기울기',min:0,max:22,step:1,unit:'°',hint:'어깨와 허리가 도구를 따라 움직여요'},
+    {key:'recoil',label:'타격 반동',min:0,max:12,step:.5,unit:'',hint:'타격 직후 몸이 되돌아오는 힘'}
+  ];
+  const fields=id=>Object.hasOwn(DEFAULTS,id)?(['launch','land'].includes(id)?[
+    {key:'duration',label:'전체 비행 시간',min:1.5,max:6,step:.1,unit:'초',hint:'모션이 끝나면 조작을 다시 시작해요'},
+    {key:'mark',label:id==='launch'?'상승 시작 시점':'지면에 닿는 시점',min:id==='launch'?.05:.65,max:id==='launch'?.4:.92,step:.01,unit:'%',percent:true,hint:id==='launch'?'점화를 마치고 떠오르는 순간':'남은 시간 동안 착지 충격을 흡수해요'},
+    {key:'height',label:'비행 높이',min:180,max:480,step:10,unit:'',hint:'화면에서 이동하는 높이'},
+    {key:'ease',label:id==='launch'?'상승 가속':'하강 감속',min:1.1,max:3,step:.05,unit:'',hint:'값을 높이면 속도 변화가 더 뚜렷해져요'},
+    {key:'recoil',label:id==='launch'?'점화 진동':'착지 충격',min:0,max:12,step:.5,unit:'',hint:id==='launch'?'이륙 준비 중 선체의 작은 떨림':'착륙 다리가 눌렸다가 회복하는 크기'},
+    {key:'thrust',label:'엔진 분사 세기',min:.3,max:1.8,step:.05,unit:'×',hint:'불꽃의 길이와 밝기'}
+  ]:TOOL_FIELDS):[];
+  function normalizeGroup(id,input){
+    const result={};for(const f of fields(id)){const n=input?.[f.key];result[f.key]=typeof n==='number'&&Number.isFinite(n)?clamp(n,f.min,f.max):DEFAULTS[id][f.key];}return result;
+  }
+  function normalize(input){const result={version:VERSION};for(const id of Object.keys(DEFAULTS))result[id]=normalizeGroup(id,input?.[id]);return result;}
+  function parse(text){
+    if(typeof text!=='string'||text.length>65536)throw Error('64KB 이하의 모션 설정 파일을 선택해 주세요.');
+    const data=JSON.parse(text);if(!data||data.version!==VERSION||Object.keys(DEFAULTS).some(id=>!data[id]||fields(id).some(f=>typeof data[id][f.key]!=='number'||!Number.isFinite(data[id][f.key]))))throw Error('Justgame 모션 설정 파일이 아니에요.');
+    return normalize(data);
+  }
+  function preset(id,name){
+    const v={...DEFAULTS[id]};if(name==='light'){v.duration*=.8;v.recoil*=.5;if('windup'in v){v.windup*=.7;v.body*=.7;}else v.ease=1.4;}
+    if(name==='heavy'){v.duration*=1.25;v.recoil*=1.5;if('windup'in v){v.windup*=1.3;v.body*=1.3;}else{v.ease=2.6;v.thrust=1.3;}}
+    return normalizeGroup(id,v);
+  }
+  function toolPose(id,p,progress){
+    const t=clamp(progress,0,1),hit=p.impact,ready=hit*.64,finish=hit+(1-hit)*.26;
+    let angle,load,phase;
+    if(t<ready){const q=smooth(t/ready);angle=-p.windup*q;load=-q*.45;phase='준비';}
+    else if(t<hit){const q=Math.pow((t-ready)/(hit-ready),2);angle=mix(-p.windup,p.swing,q);load=mix(-.45,1,q);phase='휘두르기';}
+    else if(t<finish){const q=smooth((t-hit)/(finish-hit));angle=p.swing+Math.sin(q*Math.PI)*p.recoil*1.7;load=1-q*.25;phase='타격 · 반동';}
+    else{const q=smooth((t-finish)/(1-finish));angle=mix(p.swing,0,q);load=.75*(1-q);phase='자세 복귀';}
+    const pulse=t>=hit&&t<hit+.2?Math.sin((t-hit)/.2*Math.PI):0;
+    return{angle:(angle-16)*Math.PI/180,body:load*p.body*Math.PI/180,crouch:Math.max(0,load)*p.recoil*.4,reach:Math.max(0,load)*(id==='sword'?12:7),pulse,phase,contact:t>=hit};
+  }
+  function flightPose(kind,p,progress){
+    const t=clamp(progress,0,1),launch=kind==='launch';
+    const rise=launch?Math.pow(clamp((t-p.mark)/(1-p.mark),0,1),p.ease):Math.pow(1-clamp(t/p.mark,0,1),p.ease);
+    const settled=clamp((t-p.mark)/(1-p.mark),0,1);
+    const compression=launch?0:Math.sin(settled*Math.PI)*Math.exp(-settled*2)*p.recoil;
+    const thrust=(launch?(.25+.75*smooth(t/p.mark))*(1-smooth((t-.97)/.03)):(.6+.4*smooth(t/p.mark))*(1-smooth((t-p.mark)/(1-p.mark))))*p.thrust;
+    return{rise,height:rise*p.height,scale:1-rise*.36,compression,thrust,alpha:launch?1-smooth((t-.94)/.06):smooth(t/.09),jitter:launch&&t<p.mark?Math.sin(t*170)*p.recoil*.32*(1-t/p.mark):0,
+      dust:launch?Math.sin(clamp(t/.65,0,1)*Math.PI):Math.sin(clamp((t-(p.mark-.22))/(1-p.mark+.22),0,1)*Math.PI),
+      phase:launch?(t<p.mark?'엔진 점화':t<.85?'상승 중':'궤도 진입'):(t<p.mark*.72?'착륙장 접근':t<p.mark?'하강 중':'착지 · 엔진 정지')};
+  }
+  const api={VERSION,STORAGE_KEY,DEFAULTS,GROUPS,fields,normalizeGroup,normalize,parse,preset,toolPose,flightPose};root.OrbitMotion=api;
+  if(typeof module!=='undefined'&&module.exports)module.exports=api;
+})(typeof globalThis!=='undefined'?globalThis:this);
+
+</script>
+<script>
+(function(root){
+  'use strict';
+  const Motion=root.OrbitMotion||(typeof require==='function'?require('./motion.js'):null);
   const VERSION=1, SURFACE_MAP_SCALE=1.5, WORLD_LIMIT=Math.round(1320*SURFACE_MAP_SCALE), TERRAIN_LIMIT=Math.round(1750*SURFACE_MAP_SCALE), TAU=Math.PI*2;
   const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
   const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
@@ -164,7 +247,8 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
   const TOOLS={pickaxe:{name:'곡괭이',resource:'iron',key:'1'},axe:{name:'도끼',resource:'biomass',key:'2'},sword:{name:'칼',resource:'crystal',key:'3'}};
   const RESOURCE_TOOLS={iron:'pickaxe',biomass:'axe',crystal:'sword'},FLIGHT_DURATION=2.8;
   class Game{
-    constructor(saved){
+    constructor(saved,motion){
+      this.motion=Motion.normalize(motion);
       this.events=[];this.keys={};this.paused=false;this.moveTarget=null;this.selectedBuild=null;this.interactHeld=false;this.cooldown=0;this.scanCooldown=0;this.scanRing=null;this.beam=null;this.solarCharge=0;this.travel=null;this.pulse=0;
       this.state=this.fresh();
       if(saved){try{this.state=this.validate(saved);}catch(e){this.emit('message',{text:'저장 파일을 읽지 못했어요. 새 탐험을 시작합니다.',error:true});}}
@@ -185,7 +269,10 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
       // Older expeditions receive their starter equipment once; explicit empty bags stay empty.
       s.tools=input.tools===undefined?Object.keys(TOOLS):[...new Set((Array.isArray(input.tools)?input.tools:[]).filter(id=>Object.hasOwn(TOOLS,id)))];
       s.equippedTool=s.tools.includes(input.equippedTool)?input.equippedTool:input.tools===undefined?'pickaxe':null;
-      if(s.mode==='surface'&&['launch','land'].includes(input.flight?.kind)&&input.flight.planet===s.planet&&Number.isFinite(input.flight.age))s.flight={kind:input.flight.kind,planet:s.planet,age:clamp(input.flight.age,0,FLIGHT_DURATION),duration:FLIGHT_DURATION};
+      if(s.mode==='surface'&&['launch','land'].includes(input.flight?.kind)&&input.flight.planet===s.planet&&Number.isFinite(input.flight.age)){
+        const motion=Motion.normalizeGroup(input.flight.kind,input.flight.motion||{duration:input.flight.duration});
+        s.flight={kind:input.flight.kind,planet:s.planet,age:clamp(input.flight.age,0,motion.duration),duration:motion.duration,motion};
+      }
       for(const key of ['discovered','met'])s[key]=[...new Set((Array.isArray(input[key])?input[key]:[]).filter(id=>SPECIES[id]))];
       s.visited=[...new Set((Array.isArray(input.visited)?input.visited:[]).filter(id=>PLANETS.some(p=>p.id===id)))];if(!s.visited.includes(s.planet)&&s.flight?.kind!=='land')s.visited.push(s.planet);
       s.stats.mined=clamp(Number(input.stats?.mined)||0,0,1e9);s.stats.travel=clamp(Number(input.stats?.travel)||0,0,1e9);
@@ -207,6 +294,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
       return s;
     }
     emit(type,data={}){this.events.push({type,...data});}
+    setMotion(config){this.motion=Motion.normalize(config);}
     planet(){return PLANETS.find(p=>p.id===this.state.planet);}
     trainingNpc(){return this.state.training&&this.state.mode==='surface'?{id:'training-instructor',x:-350,y:140,name:'교관 루미'}:null;}
     trainingGate(step,reason){
@@ -273,7 +361,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
       if(this.paused)return;
       dt=clamp(dt,0,.05);const s=this.state;s.time+=dt;this.pulse+=dt;
       this.cooldown=Math.max(0,this.cooldown-dt);this.scanCooldown=Math.max(0,this.scanCooldown-dt);
-      if(this.beam){this.beam.life-=dt;if(this.beam.life<=0)this.beam=null;}
+      if(this.beam){const action=this.beam;action.life=Math.max(0,action.life-dt);if(!action.hit&&1-action.life/action.duration>=action.motion.impact){action.hit=true;this.applyToolImpact(action);}if(action.life<=0)this.beam=null;}
       if(this.scanRing){this.scanRing.age+=dt;if(this.scanRing.age>2)this.scanRing=null;}
       if(this.flight){this.flight.age+=dt;if(this.flight.age>=this.flight.duration)this.finishFlight();return;}
       if(this.travel){this.travel.age+=dt;if(this.travel.age>2.4)this.finishTravel();return;}
@@ -343,17 +431,24 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
         const locked=this.trainingGate(1,'루미에게 먼저 인사해 주세요. 목표 표시를 따라 접수대로 가세요.');if(locked)return locked;
         const node=n.entity,required=RESOURCE_TOOLS[node.type];
         if(!this.state.tools.includes(required)||this.state.equippedTool!==required){const owned=this.state.tools.includes(required),reason=RESOURCE_NAMES[node.type]+'은 '+TOOLS[required].name+'로만 부술 수 있어요. '+(owned?TOOLS[required].key+' 키로 장착하세요.':'루미나 우주선에서 도구를 받으세요.');this.cooldown=.55;this.emit('message',{text:reason,error:true});return{ok:false,reason,requiredTool:required};}
-        this.cooldown=.38;node.hp--;this.state.player.angle=Math.atan2(node.y-this.state.player.y,node.x-this.state.player.x);this.beam={x:node.x,y:node.y,life:.32,duration:.32,tool:required};
-        const nodeColor=node.type==='crystal'?'#bccfff':node.type==='biomass'?'#c3f379':'#cad9df',broken=node.hp<=0;
-        this.emit('effect',{kind:'mine',x:node.x,y:node.y,color:nodeColor,nodeType:node.type,remaining:node.hp,maxHp:node.maxHp,broken});
-        if(broken){const amount=node.type==='iron'?6:node.type==='biomass'?5:4;this.addResource(node.type,amount);this.state.stats.mined++;node.respawnAt=this.state.time+150;this.emit('message',{text:RESOURCE_NAMES[node.type]+' +'+amount});this.emit('effect',{kind:'break',x:node.x,y:node.y,color:nodeColor,nodeType:node.type,maxHp:node.maxHp});this.emit('effect',{kind:'collect',x:node.x,y:node.y,color:this.planet().accent,label:'+'+amount+' '+RESOURCE_NAMES[node.type]});this.emit('save');}
-        return{ok:true,type:'mine',resource:node.type,remaining:node.hp};
+        const motion={...this.motion[required]};this.cooldown=motion.duration+.06;this.state.player.angle=Math.atan2(node.y-this.state.player.y,node.x-this.state.player.x);
+        this.beam={x:node.x,y:node.y,nodeId:node.id,planet:this.state.planet,life:motion.duration,duration:motion.duration,tool:required,motion,hit:false};
+        return{ok:true,type:'mine',phase:'windup',resource:node.type,remaining:node.hp};
       }
       if(n.kind==='creature')return this.befriend(n.entity);
       if(n.kind==='ship')return this.launch();
       if(n.kind==='building'){this.emit('building-menu',{id:n.entity.id});return{ok:true,type:'building'};}
       if(n.kind==='relic')return this.studyRelic(n.entity.id);
       return{ok:false};
+    }
+    applyToolImpact(action){
+        if(this.state.mode!=='surface'||this.flight||this.state.planet!==action.planet||!this.state.tools.includes(action.tool)||this.state.equippedTool!==action.tool)return;
+        const node=this.world().nodes.find(n=>n.id===action.nodeId);
+        if(!node||node.hp<=0||dist(node,this.state.player)>=160)return;
+        node.hp--;
+        const nodeColor=node.type==='crystal'?'#bccfff':node.type==='biomass'?'#c3f379':'#cad9df',broken=node.hp<=0;
+        this.emit('effect',{kind:'mine',x:node.x,y:node.y,color:nodeColor,nodeType:node.type,remaining:node.hp,maxHp:node.maxHp,broken});
+        if(broken){const amount=node.type==='iron'?6:node.type==='biomass'?5:4;this.addResource(node.type,amount);this.state.stats.mined++;node.respawnAt=this.state.time+150;this.emit('message',{text:RESOURCE_NAMES[node.type]+' +'+amount});this.emit('effect',{kind:'break',x:node.x,y:node.y,color:nodeColor,nodeType:node.type,maxHp:node.maxHp});this.emit('effect',{kind:'collect',x:node.x,y:node.y,color:this.planet().accent,label:'+'+amount+' '+RESOURCE_NAMES[node.type]});this.emit('save');}
     }
     discover(id,announce=true){if(this.state.discovered.includes(id))return false;this.state.discovered.push(id);if(announce)this.emit('discovery',{species:id});this.emit('save');return true;}
     befriend(c){
@@ -482,7 +577,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
       this.startFlight('land');return{ok:true,phase:'landing',planet:target.id};
     }
     startFlight(kind){
-      this.state.flight={kind,planet:this.state.planet,age:0,duration:FLIGHT_DURATION};this.moveTarget=null;this.pendingInteraction=null;this.selectedBuild=null;this.waypoint=null;this.beam=null;this.velocity={x:0,y:0,z:0};this.moving=false;this.boosting=false;
+      const motion={...this.motion[kind]};this.state.flight={kind,planet:this.state.planet,age:0,duration:motion.duration,motion};this.moveTarget=null;this.pendingInteraction=null;this.selectedBuild=null;this.waypoint=null;this.beam=null;this.velocity={x:0,y:0,z:0};this.moving=false;this.boosting=false;
       this.emit('flight-start',{kind});this.emit('save');
     }
     finishFlight(){
@@ -651,7 +746,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
 (function(root){
   'use strict';
   const {Game,PLANETS,SPECIES,BUILDINGS,RESOURCE_NAMES,WORLD_LIMIT,rand,dist,clamp}=root.OrbitCore;
-  const {creature,drawPlanet}=root.OrbitPortraits,TAU=Math.PI*2;
+  const {creature,drawPlanet}=root.OrbitPortraits,Motion=root.OrbitMotion,TAU=Math.PI*2;
   // Reuse the supplied transparent artwork for every iron deposit.
   const ironOreImage=typeof root.Image==='function'?new root.Image():null;
   if(ironOreImage){ironOreImage.decoding='async';ironOreImage.src=root.OrbitIronOreSource||'/assets/iron-ore-20261001-v22.png';}
@@ -662,10 +757,9 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
   const ring=(c,x,y,r,color,width=2)=>{c.beginPath();c.arc(x,y,r,0,TAU);c.strokeStyle=color;c.lineWidth=width;c.stroke();};
   const glow=(c,x,y,r,color)=>{const g=c.createRadialGradient(x,y,0,x,y,Math.max(1,r));g.addColorStop(0,color);g.addColorStop(1,'transparent');c.fillStyle=g;c.beginPath();c.arc(x,y,Math.max(1,r),0,TAU);c.fill();};
   const gradient=(c,x1,y1,x2,y2,stops)=>{const g=c.createLinearGradient(x1,y1,x2,y2);for(const [at,color] of stops)g.addColorStop(at,color);return g;};
-  function heldTool(c,id,swing,angle){
+  function heldTool(c,id,pose){
     if(!id)return;
-    c.save();c.translate(Math.cos(angle)<0?-21:21,-12);if(Math.cos(angle)<0)c.scale(-1,1);
-    c.rotate(-.28+swing*(id==='sword'?2.5:1.9));
+    c.save();c.translate(21+pose.reach,-12-pose.reach*.65);c.rotate(pose.angle);
     line(c,0,6,0,-34,id==='sword'?'#485c72':'#92704e',5);line(c,-1,4,-1,-31,'#eac38b',1.4);
     if(id==='pickaxe'){path(c,[[-23,-26],[-14,-38],[0,-41],[15,-37],[25,-25],[10,-31],[0,-32],[-11,-31]],'#cde8ec','#426879');line(c,-13,-37,12,-36,'#f5ffed',1.4);}
     else if(id==='axe'){path(c,[[-5,-37],[15,-43],[23,-35],[23,-19],[10,-20],[-4,-26]],'#d3e6e3','#426577');line(c,21,-33,21,-22,'#f6ffef',2);box(c,-4,-34,8,12,2,'#e7b461');}
@@ -673,32 +767,31 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     oval(c,0,0,5,5,'#355362');c.restore();
   }
   function astronaut(c,time,moving,angle,action,equipped){
-    const walk=moving?Math.sin(time*12)*5:0,breath=Math.sin(time*2)*.8;
-    glow(c,0,5,34,'#07192340');c.save();c.translate(0,breath);
-    // Life-support pack and articulated shadow layer.
+    const walk=moving?Math.sin(time*12)*5:0,breath=Math.sin(time*2)*.8,id=action?.tool||equipped;
+    const pose=Motion.toolPose(id||'pickaxe',action?.motion||Motion.DEFAULTS[id||'pickaxe'],action?1-action.life/action.duration:0);
+    glow(c,0,5,34,'#07192340');c.save();
+    // Planted boots and legs stay separate from the moving upper body.
+    box(c,-12,-5+walk,10,16,4,'#263e50','#172f3d');box(c,3,-5-walk,10,16,4,'#263e50','#172f3d');
+    box(c,-13,9+walk,12,6,2,'#1c3443');box(c,2,9-walk,12,6,2,'#1c3443');line(c,-12,12+walk,-3,12+walk,'#d4e4d8',1);line(c,4,12-walk,13,12-walk,'#d4e4d8',1);
+    c.translate(0,breath+pose.crouch);c.scale(Math.cos(angle)<0?-1:1,1);c.rotate(pose.body);
     box(c,-25,-33,50,28,8,'#304b58','#193542');box(c,-20,-30,40,21,6,'#456d76');
     line(c,-17,-26,17,-26,'#81a9a2',2);line(c,-15,-19,15,-19,'#193845',2);
-    box(c,-12,-5+walk,10,16,4,'#263e50','#172f3d');box(c,3,-5-walk,10,16,4,'#263e50','#172f3d');
     box(c,-14,-35,28,34,9,gradient(c,-14,-35,14,0,[[0,'#ffffff'],[.42,'#e7f0df'],[1,'#b1c8b9']]),'#5c8987');
     box(c,-3,-31,6,24,2,'#f3ba65');line(c,-11,-5,10,-5,'#6d9990',1);line(c,-10,-1,9,-1,'#9db9ae',1);
-    // Shoulder armor, chest badge and utility belt add small readable forms.
     box(c,-22,-30,8,15,3,'#d6e4d8','#71938d');box(c,14,-30,8,15,3,'#d6e4d8','#71938d');
     box(c,-8,-21,16,7,2,'#5c8b8b','#294f5c');oval(c,0,-17,3,2,'#c7f79f');
     box(c,-16,-8,32,5,2,'#405a63');line(c,-8,-8,-8,-3,'#e8cf8e',1);line(c,8,-8,8,-3,'#e8cf8e',1);
-    const swing=action?Math.sin((1-action.life/action.duration)*Math.PI):0,reach=swing*9;
-    box(c,-23,-29-walk*.7,9,24,4,'#d2e0d6','#718c87');box(c,15,-29+walk*.7-reach,9,24,4,'#d2e0d6','#718c87');
-    box(c,-22,-20-walk*.7,7,8,2,'#7ca59b');box(c,16,-20+walk*.7-reach,7,8,2,'#7ca59b');
-    oval(c,0,-43,21,20,'#edf6df','#');
-    const visor=gradient(c,-15,-54,15,-33,[[0,'#6ed1d4'],[.45,'#2d6676'],[1,'#102e43']]);oval(c,Math.cos(angle)*2,-44+Math.sin(angle)*1.5,16,13,visor);
+    box(c,-23,-29-walk*.7,9,24,4,'#d2e0d6','#718c87');box(c,-22,-20-walk*.7,7,8,2,'#7ca59b');
+    const hx=21+pose.reach,hy=-12-pose.reach*.65,ex=27+pose.reach*.3,ey=-17+walk*.35;
+    c.lineCap='round';line(c,18,-26,ex,ey,'#6b9190',11);line(c,ex,ey,hx,hy,'#6b9190',10);line(c,18,-26,ex,ey,'#d2e0d6',8);line(c,ex,ey,hx,hy,'#d2e0d6',7);oval(c,ex,ey,4,4,'#7ca59b');
+    oval(c,0,-43,21,20,'#edf6df');
+    const visor=gradient(c,-15,-54,15,-33,[[0,'#6ed1d4'],[.45,'#2d6676'],[1,'#102e43']]);oval(c,2,-44+Math.sin(angle)*1.5,16,13,visor);
     oval(c,-5,-49,8,3,'#d9ffff55');line(c,-11,-55,6,-55,'#f6ffe7',2);line(c,12,-48,16,-42,'#ffffffaa',1.2);box(c,-6,-24,12,6,2,'#6bcbd0');
-    // Boots catch the planet light and make the walking cycle easier to read.
-    box(c,-13,9+walk,12,6,2,'#1c3443');box(c,2,9-walk,12,6,2,'#1c3443');line(c,-12,12+walk,-3,12+walk,'#d4e4d8',1);line(c,4,12-walk,13,12-walk,'#d4e4d8',1);
-    heldTool(c,action?.tool||equipped,swing,angle);
-    c.restore();
+    heldTool(c,id,pose);c.restore();
   }
-  function ship(c,time,flying,moving){
-    glow(c,0,25,105,'#081c2735');c.save();if(flying)c.scale(.8,.8);
-    if(moving){for(const x of[-38,38]){glow(c,x,56,25,'#68ddf855');path(c,[[x-10,40],[x,81+Math.sin(time*31)*10],[x+10,40]],'#73ddf8aa');path(c,[[x-5,40],[x,63],[x+5,40]],'#fff5bc');}}
+  function ship(c,time,flying,moving,compression=0){
+    glow(c,0,25,105,'#081c2735');c.save();c.translate(0,compression);if(flying)c.scale(.8,.8);
+    if(moving){for(const x of[-38,38]){glow(c,x,56,25,'#68ddf855');path(c,[[x-10,40],[x,40+(41+Math.sin(time*31)*10)*Number(moving)],[x+10,40]],'#73ddf8aa');path(c,[[x-5,40],[x,40+23*Number(moving)],[x+5,40]],'#fff5bc');}}
     path(c,[[-61,-19],[-82,29],[-50,26],[-32,-20]],'#759790','#294b54');path(c,[[61,-19],[82,29],[50,26],[32,-20]],'#759790','#294b54');
     line(c,-63,14,-49,7,'#b8d8c4',2);line(c,63,14,49,7,'#b8d8c4',2);
     for(const x of[-39,39]){box(c,x-15,-44,30,92,10,'#344e5d','#183844');box(c,x-12,-38,24,62,8,gradient(c,x-12,-38,x+12,24,[[0,'#f4f5e5'],[.6,'#d6ddca'],[1,'#9ab4aa']]),'#6e908b');box(c,x-13,8,26,10,2,'#edaf5f');oval(c,x,40,11,7,'#172e40');oval(c,x,41,7,4,moving?'#c6f9ff':'#75d6dc');line(c,x-8,-27,x+8,-27,'#ffffff77',1);}
@@ -707,20 +800,15 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     path(c,[[-22,-29],[-12,-55],[12,-55],[22,-29],[16,-16],[-16,-16]],gradient(c,-18,-54,18,-17,[[0,'#4a9aa1'],[.5,'#204e63'],[1,'#102b43']]),'#88c9c6');line(c,-8,-48,8,-48,'#d6fbf3',3);line(c,-16,-23,16,-23,'#9ee4df66',1);
     box(c,-19,-6,38,21,5,'#9aada5','#607d79');box(c,-10,-2,20,12,2,'#bdcebd');line(c,-6,2,6,2,'#e9f4d5',1);box(c,-4,20,8,9,2,'#eab465');
     line(c,18,-42,27,-77,'#739a98',3);oval(c,28,-78,4,4,'#e5f8b7');line(c,28,-78,28,-66,'#efffc3',1);
-    if(!flying)for(const x of[-47,47]){line(c,x,37,x*1.23,55,'#3b5760',6);box(c,x*1.23-12,52,24,7,3,'#c3d3be');oval(c,x*1.23,55,9,2,'#dcf6be77');}
+    if(!flying)for(const x of[-47,47]){line(c,x,37,x*1.23,55-compression,'#3b5760',6);box(c,x*1.23-12,52-compression,24,7,3,'#c3d3be');oval(c,x*1.23,55-compression,9,2,'#dcf6be77');}
     c.restore();
   }
   function animatedShip(c,flight,time){
-    const t=clamp(flight.age/flight.duration,0,1),launch=flight.kind==='launch';
-    const rise=launch?Math.pow(clamp((t-.16)/.84,0,1),1.65):Math.pow(1-clamp(t/.87,0,1),2);
-    const height=rise*340,scale=1-rise*.36,engine=launch||t<.92;
-    c.save();c.translate(0,-height+(launch?0:Math.sin(clamp((t-.87)/.13,0,1)*Math.PI)*4));c.scale(scale,scale);
-    c.globalAlpha=launch?1-clamp((t-.92)/.08,0,1):clamp(t/.1,0,1);
-    if(engine)for(const x of[-39,39]){glow(c,x,57,35,'#81dfff66');path(c,[[x-11,40],[x-6,68],[x,95+Math.sin(time*39)*9],[x+6,68],[x+11,40]],'#9eeeffb0');}
-    ship(c,time,false,engine);c.restore();
-    // Ground exhaust expands separately from the ship's height.
-    const exhaust=launch?Math.sin(clamp(t/.65,0,1)*Math.PI):Math.sin(clamp((t-.62)/.38,0,1)*Math.PI);
-    if(exhaust>0){c.save();c.globalAlpha=exhaust*.38;for(let i=0;i<10;i++){const a=i*TAU/10,r=54+exhaust*65;oval(c,Math.cos(a)*r,35+Math.sin(a)*r*.32,16+exhaust*11,5+exhaust*4,'#b2d4d1');}c.restore();}
+    const p=flight.motion||Motion.DEFAULTS[flight.kind],pose=Motion.flightPose(flight.kind,p,flight.age/flight.duration);
+    c.save();c.translate(pose.jitter,-pose.height);c.scale(pose.scale,pose.scale);c.globalAlpha=pose.alpha;
+    if(pose.thrust>.05)for(const x of[-39,39]){glow(c,x,57,35*pose.thrust,'#81dfff66');path(c,[[x-11,40],[x-6,68],[x,40+(55+Math.sin(time*39)*9)*pose.thrust],[x+6,68],[x+11,40]],'#9eeeffb0');}
+    ship(c,time,false,pose.thrust,pose.compression);c.restore();
+    if(pose.dust>0){c.save();c.globalAlpha=pose.dust*.38;for(let i=0;i<10;i++){const a=i*TAU/10,r=54+pose.dust*65;oval(c,Math.cos(a)*r,35+Math.sin(a)*r*.32,16+pose.dust*11,5+pose.dust*4,'#b2d4d1');}c.restore();}
   }
   function resource(c,n,time){
     const damaged=n.hp<n.maxHp;c.save();c.scale(n.size||1,n.size||1);oval(c,0,6,27,10,'#10292836');
@@ -894,7 +982,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
         if(a.kind==='node'&&(a.type==='crystal'||a.type==='iron'))glow(c,0,-18,a.type==='crystal'?78:45,a.type==='crystal'?p.accent+'16':p.light+'0c');
         if(a.kind==='creature')glow(c,0,-20,48,p.light+'0a');
         if(nearest?.entity?.id===a.id&&a.id){ring(c,0,2,a.kind==='building'?66:35,p.accent+'bb',1.5);}
-        if(a.kind==='ship'){if(!g.flight)ship(c,this.time,false,false);else{const t=clamp(g.flight.age/g.flight.duration,0,1),h=g.flight.kind==='launch'?t:1-t;oval(c,0,28,72-h*30,22-h*9,'#05182455');}}
+        if(a.kind==='ship'){if(!g.flight)ship(c,this.time,false,false);else{const h=Motion.flightPose(g.flight.kind,g.flight.motion||Motion.DEFAULTS[g.flight.kind],g.flight.age/g.flight.duration).rise;oval(c,0,28,72-h*30,22-h*9,'#05182455');}}
         if(a.kind==='node')resource(c,a,this.time);
         if(a.kind==='building')building(c,a,this.time);
         if(a.kind==='creature')creature(c,a.species,this.time+a.phase,1,s.met.includes(a.species));
@@ -911,7 +999,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
         if(a.kind==='relic'){oval(c,0,8,31,12,'#102b3740');path(c,[[-25,4],[-20,-45],[0,-64],[22,-46],[25,4]],p.dark,p.light+'55');line(c,-8,-32,0,-45,p.accent,3);line(c,0,-45,10,-31,p.accent,3);line(c,10,-31,0,-20,p.accent,3);if(!s.relics.includes(a.id))ring(c,0,-32,22+Math.sin(this.time*2)*2,p.accent+'50');}
         c.restore();}
       if(g.flight)animatedShip(c,g.flight,this.time);
-      if(g.beam){const b=g.beam,t=1-b.life/b.duration;c.save();c.globalAlpha=(1-t)*.7;c.translate(b.x,b.y-20);c.rotate(s.player.angle);c.beginPath();c.arc(-12,0,24+t*18,-1.15,1.15);c.strokeStyle=b.tool==='sword'?'#b7efff':b.tool==='axe'?'#d2fa92':'#ffe1a5';c.lineWidth=5*(1-t)+1;c.stroke();c.restore();}
+      if(g.beam&&g.beam.hit){const b=g.beam,t=clamp((1-b.life/b.duration-b.motion.impact)/(1-b.motion.impact),0,1);c.save();c.globalAlpha=(1-t)*.7;c.translate(b.x,b.y-20);c.rotate(s.player.angle);c.beginPath();c.arc(-12,0,24+t*18,-1.15,1.15);c.strokeStyle=b.tool==='sword'?'#b7efff':b.tool==='axe'?'#d2fa92':'#ffe1a5';c.lineWidth=5*(1-t)+1;c.stroke();c.restore();}
       if(g.scanRing){const t=g.scanRing.age;c.globalAlpha=Math.max(0,1-t/2);ring(c,g.scanRing.x,g.scanRing.y,t*330,p.accent,3);c.globalAlpha=1;}
       if(g.waypoint){const t=g.waypoint;ring(c,t.x,t.y,36+Math.sin(this.time*3)*4,p.accent,3);if(!(s.training&&g.trainingStep===0)){line(c,t.x,t.y-11,t.x,t.y-78,p.accent,2);path(c,[[t.x-8,t.y-76],[t.x+8,t.y-76],[t.x,t.y-66]],p.accent);c.fillStyle='#f2ffd7';c.font='bold 11px sans-serif';c.textAlign='center';c.fillText(t.label||'목표',t.x,t.y-87);}}
       if(g.selectedBuild){const target=this.mouse||{x:s.player.x+Math.cos(s.player.angle)*105,y:s.player.y+Math.sin(s.player.angle)*105},valid=g.canPlace(g.selectedBuild,target.x,target.y).ok;c.globalAlpha=.65;c.save();c.translate(target.x,target.y);building(c,{type:g.selectedBuild},this.time);ring(c,0,5,BUILDINGS[g.selectedBuild].radius+8,valid?'#d2ff99':'#ff9b8e',3);c.restore();c.globalAlpha=1;}
@@ -951,7 +1039,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
   }
   function drawPreview(canvas){const g=new Game();g.state.player={x:70,y:115,angle:0};g.world().buildings.push({type:'habitat',x:220,y:0,level:1},{type:'solar',x:270,y:120});const friend=g.world().creatures[0];friend.x=130;friend.y=150;g.state.met.push(friend.species);const r=new Renderer(canvas,null,g);r.zoom=.9;r.camera={x:80,y:60};r.time=1.2;r.draw(0);return r;}
   root.OrbitRenderer={Renderer,drawPlanet,creature,drawPreview};
-  root.Orbit2D={Renderer,ship,astronaut,building,resource,drawPreview};
+  root.Orbit2D={Renderer,ship,animatedShip,astronaut,building,resource,drawPreview};
   if(typeof module!=='undefined')module.exports=root.Orbit2D;
 })(typeof globalThis!=='undefined'?globalThis:this);
 
@@ -1063,16 +1151,139 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
 
 </script>
 <script>
+(function(root){
+  'use strict';
+  const M=root.OrbitMotion;
+  const copy=v=>M.normalize(v),clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
+  class MotionEditor{
+    constructor(container,config,{apply,close}){
+      this.el=container;this.config=copy(config);this.baseline=copy(config);this.apply=apply;this.close=close;
+      this.id='pickaxe';this.progress=0;this.playing=!root.matchMedia?.('(prefers-reduced-motion: reduce)').matches;this.rate=1;this.loop=true;this.mirror=false;this.disposed=false;
+      container.innerHTML=this.markup();this.bind();this.select('pickaxe');this.changed();
+    }
+    $(id){return this.el.querySelector('#'+id);}
+    get dirty(){return !same(this.config,this.baseline);}
+    markup(){return `
+      <p class="motion-intro">움직임을 직접 다듬어 보세요. 미리보기에서 확인한 뒤 게임에 적용할 수 있어요.</p>
+      <div class="motion-workspace">
+        <aside class="motion-library" aria-label="편집할 모션"><span class="motion-caption">MOTION LIBRARY</span>
+          ${Object.entries(M.GROUPS).map(([id,g],i)=>`<button data-motion="${id}" aria-pressed="false"><span class="motion-item-icon" aria-hidden="true">${g.icon}</span><span><strong>${g.name}</strong><small>${g.detail}</small></span><em>0${i+1}</em></button>`).join('')}
+          <div class="motion-library-note"><span>✦</span>실제 게임의 캐릭터와<br>우주선으로 미리 봅니다.</div>
+        </aside>
+        <section class="motion-preview" aria-label="모션 미리보기">
+          <div class="motion-stage"><div class="motion-stage-top"><span><i></i> LIVE PREVIEW</span><button id="motion-mirror" aria-pressed="false">좌우 반전 ⇄</button></div>
+            <canvas id="motion-canvas" aria-label="곡괭이 모션 미리보기"></canvas>
+            <div class="motion-stage-bottom"><span id="motion-phase">준비</span><small>미리보기에서는 자원을 소모하지 않아요</small></div>
+          </div>
+          <div class="motion-transport"><div><button id="motion-restart" aria-label="처음부터 재생" title="처음부터 재생">↺</button><button id="motion-prev" aria-label="이전 프레임" title="이전 프레임">Ⅰ‹</button><button id="motion-play" class="motion-play">일시정지</button><button id="motion-next" aria-label="다음 프레임" title="다음 프레임">›Ⅰ</button></div><label class="motion-speed">속도 <select id="motion-speed" aria-label="미리보기 재생 속도"><option value=".25">0.25배</option><option value=".5">0.5배</option><option value="1" selected>1배</option></select></label></div>
+          <div class="motion-timeline-head"><label for="motion-scrub">타임라인</label><output id="motion-clock">0.00 / 0.56초</output></div>
+          <div class="motion-scrub-wrap"><input type="range" id="motion-scrub" min="0" max="1000" step="1" value="0" aria-label="모션 타임라인"><i id="motion-marker" aria-hidden="true"></i></div>
+          <div class="motion-timeline-foot"><span id="motion-contact">● 타격</span><label><input type="checkbox" id="motion-loop" checked> 반복 재생</label></div>
+          <p class="motion-preview-tip">타임라인을 움직여 자세를 확인하세요. 프레임 버튼은 1/30초씩 이동합니다.</p>
+        </section>
+        <section class="motion-inspector" aria-label="모션 상세 설정"><div class="motion-inspector-heading"><span class="motion-caption">PARAMETERS</span><h3 id="motion-parameter-title">곡괭이 설정</h3></div>
+          <div class="motion-presets" role="group" aria-label="모션 프리셋"><button data-preset="balanced">균형</button><button data-preset="light">경쾌</button><button data-preset="heavy">묵직</button></div>
+          <div id="motion-fields"></div><button id="motion-reset" class="motion-reset">이 모션을 기본값으로 ↺</button>
+        </section>
+      </div>
+      <div id="motion-exit" class="motion-exit" hidden role="alert"><span>적용하지 않은 변경이 있어요.</span><button id="motion-keep">계속 편집</button><button id="motion-discard">변경 버리고 닫기</button></div>
+      <div class="motion-footer"><div class="motion-file-actions"><button id="motion-export">설정 내보내기 ↗</button><button id="motion-import">설정 불러오기</button><input id="motion-file" type="file" accept=".json,application/json" hidden></div><div class="motion-footer-actions"><button id="motion-close">닫기</button><button id="motion-apply" class="primary-button">게임에 적용 · 저장</button></div></div>
+      <div class="motion-save-line"><span id="motion-save-state" role="status" aria-live="polite">게임에 적용된 설정</span><small>이 브라우저에 저장 · 다른 기기에서는 설정 파일을 불러오세요</small></div>`;
+    }
+    bind(){
+      this.el.querySelectorAll('[data-motion]').forEach(b=>b.onclick=()=>this.select(b.dataset.motion));
+      this.el.querySelectorAll('[data-preset]').forEach(b=>b.onclick=()=>{this.config[this.id]=M.preset(this.id,b.dataset.preset);this.progress=0;this.controls();this.changed();});
+      this.$('motion-reset').onclick=()=>{this.config[this.id]=M.normalizeGroup(this.id);this.progress=0;this.controls();this.changed();};
+      this.$('motion-play').onclick=()=>{if(this.progress>=1)this.progress=0;this.playing=!this.playing;this.transport();};
+      this.$('motion-restart').onclick=()=>{this.progress=0;this.playing=true;this.transport();};
+      for(const [id,sign] of [['motion-prev',-1],['motion-next',1]])this.$(id).onclick=()=>{this.progress=clamp(this.progress+sign/(30*this.config[this.id].duration),0,1);this.playing=false;this.transport();};
+      this.$('motion-speed').onchange=e=>{this.rate=Number(e.target.value);};
+      this.$('motion-loop').onchange=e=>{this.loop=e.target.checked;};
+      this.$('motion-mirror').onclick=()=>{this.mirror=!this.mirror;this.$('motion-mirror').setAttribute('aria-pressed',String(this.mirror));};
+      this.$('motion-scrub').oninput=e=>{this.progress=Number(e.target.value)/1000;this.playing=false;this.transport();};
+      this.$('motion-apply').onclick=()=>{
+        const result=this.apply(copy(this.config));if(!result.ok){this.status(result.reason,true);return;}
+        this.baseline=copy(this.config);this.changed();this.status('저장 완료 · 다음 동작부터 적용됩니다.');this.$('motion-exit').hidden=true;
+      };
+      this.$('motion-close').onclick=()=>this.requestClose();
+      this.$('motion-keep').onclick=()=>{this.$('motion-exit').hidden=true;this.$('motion-close').focus();};
+      this.$('motion-discard').onclick=()=>{this.baseline=copy(this.config);this.close();};
+      this.$('motion-export').onclick=()=>this.export();
+      this.$('motion-import').onclick=()=>this.$('motion-file').click();
+      this.$('motion-file').onchange=async e=>{
+        const file=e.target.files?.[0];if(!file)return;
+        try{if(file.size>65536)throw Error('64KB 이하의 설정 파일을 선택해 주세요.');const data=M.parse(await file.text());if(this.disposed)return;this.config=data;this.progress=0;this.controls();this.changed();this.status('설정을 불러왔어요. 확인한 뒤 게임에 적용해 주세요.');}
+        catch(err){if(!this.disposed)this.status(err instanceof SyntaxError?'JSON 형식의 모션 설정 파일을 선택해 주세요.':err.message,true);}
+        finally{if(!this.disposed)e.target.value='';}
+      };
+    }
+    select(id){
+      this.id=id;this.progress=0;this.el.querySelectorAll('[data-motion]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.motion===id)));
+      this.$('motion-parameter-title').textContent=M.GROUPS[id].name+' 설정';this.$('motion-canvas').setAttribute('aria-label',M.GROUPS[id].name+' 모션 미리보기');this.controls();this.transport();
+    }
+    controls(){
+      this.$('motion-fields').innerHTML=M.fields(this.id).map(f=>{
+        const factor=f.percent?100:1,value=Number((this.config[this.id][f.key]*factor).toFixed(2));
+        return `<div class="motion-field"><div><label for="motion-${f.key}">${f.label}</label><span><input type="number" id="motion-number-${f.key}" data-number="${f.key}" min="${f.min*factor}" max="${f.max*factor}" step="${f.step*factor}" value="${value}" aria-label="${f.label} 값"><small>${f.unit}</small></span></div><input type="range" id="motion-${f.key}" data-range="${f.key}" min="${f.min*factor}" max="${f.max*factor}" step="${f.step*factor}" value="${value}"><p>${f.hint}</p></div>`;
+      }).join('');
+      for(const f of M.fields(this.id)){
+        const slider=this.$('motion-'+f.key),number=this.$('motion-number-'+f.key),factor=f.percent?100:1;
+        const update=(input,other)=>{if(input.value===''||!Number.isFinite(input.valueAsNumber))return;const value=clamp(input.valueAsNumber/factor,f.min,f.max);this.config[this.id][f.key]=Number(value.toFixed(4));other.value=String(Number((value*factor).toFixed(2)));this.changed();};
+        slider.oninput=()=>update(slider,number);number.oninput=()=>update(number,slider);number.onblur=()=>{number.value=String(Number((this.config[this.id][f.key]*factor).toFixed(2)));};
+      }
+      this.presets();this.marker();
+    }
+    marker(){const p=this.config[this.id],flight='mark'in p,at=flight?p.mark:p.impact;this.$('motion-marker').style.left=(at*100)+'%';this.$('motion-contact').textContent='● '+(flight?this.id==='launch'?'상승 시작':'착지':'타격')+' '+(p.duration*at).toFixed(2)+'초';}
+    presets(){this.el.querySelectorAll('[data-preset]').forEach(b=>b.setAttribute('aria-pressed',String(same(this.config[this.id],M.preset(this.id,b.dataset.preset)))));}
+    changed(){this.$('motion-apply').disabled=!this.dirty;this.status(this.dirty?'● 적용하지 않은 변경':'게임에 적용된 설정');this.marker();this.presets();}
+    status(text,error=false){const el=this.$('motion-save-state');el.textContent=text;el.classList.toggle('error',error);}
+    transport(){this.$('motion-play').textContent=this.playing?'Ⅱ 일시정지':'▶ 재생';this.$('motion-play').setAttribute('aria-label',this.playing?'미리보기 일시정지':'미리보기 재생');}
+    requestClose(){if(this.dirty){this.$('motion-exit').hidden=false;this.$('motion-keep').focus();}else this.close();}
+    export(){const blob=new Blob([JSON.stringify(this.config,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='justgame-motion.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);this.status('현재 편집 중인 모션 설정을 내보냈어요.');}
+    draw(dt){
+      if(this.disposed)return;const p=this.config[this.id],flight='mark'in p;
+      if(this.playing){this.progress+=Math.min(dt,.05)*this.rate/p.duration;if(this.progress>1+(this.loop?.4/p.duration:0)){this.progress=this.loop?0:1;if(!this.loop){this.playing=false;this.transport();}}}
+      const t=clamp(this.progress,0,1);this.$('motion-clock').textContent=(t*p.duration).toFixed(2)+' / '+p.duration.toFixed(2)+'초';this.$('motion-scrub').value=String(Math.round(t*1000));
+      const pose=flight?M.flightPose(this.id,p,t):M.toolPose(this.id,p,t);this.$('motion-phase').textContent=pose.phase;
+      const canvas=this.$('motion-canvas'),rect=canvas.getBoundingClientRect();if(!rect.width||!rect.height)return;
+      const dpr=Math.min(root.devicePixelRatio||1,2),w=Math.round(rect.width*dpr),h=Math.round(rect.height*dpr);if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;}
+      const c=canvas.getContext('2d');c.setTransform(w/640,0,0,h/420,0,0);c.clearRect(0,0,640,420);
+      const bg=c.createRadialGradient(320,220,10,320,220,420);bg.addColorStop(0,'#253d40');bg.addColorStop(1,'#0b1822');c.fillStyle=bg;c.fillRect(0,0,640,420);
+      c.strokeStyle='#8cafb510';c.lineWidth=1;for(let x=-300;x<900;x+=50){c.beginPath();c.moveTo(320+(x-320)*.45,190);c.lineTo(x,420);c.stroke();}for(let y=205;y<420;y+=24){c.beginPath();c.moveTo(0,y);c.lineTo(640,y);c.stroke();}
+      c.save();c.translate(320,flight?333:298);if(this.mirror)c.scale(-1,1);
+      if(flight){
+        const scale=Math.min(1.15,275/(p.height+55));c.scale(scale,scale);c.strokeStyle='#91d9d04a';c.lineWidth=2;c.beginPath();c.ellipse(0,35,117,32,0,0,Math.PI*2);c.stroke();
+        c.fillStyle='#0005';c.beginPath();c.ellipse(0,28,72-pose.rise*30,22-pose.rise*9,0,0,Math.PI*2);c.fill();
+        root.Orbit2D.animatedShip(c,{kind:this.id,motion:p,age:t*p.duration,duration:p.duration},t*p.duration);
+      }else{
+        c.scale(2.7,2.7);const type={pickaxe:'iron',axe:'biomass',sword:'crystal'}[this.id];
+        c.save();c.translate(39+Math.sin(t*90)*pose.pulse*2,6);root.Orbit2D.resource(c,{type,hp:3,maxHp:4,size:.72,seed:4,rotation:0},t);c.restore();
+        c.save();c.translate(-31,0);root.Orbit2D.astronaut(c,t*p.duration,false,0,{tool:this.id,motion:p,duration:p.duration,life:(1-t)*p.duration},this.id);c.restore();
+        const elapsed=(t-p.impact)*p.duration;if(elapsed>=0&&elapsed<.22){const q=elapsed/.22;c.save();c.globalAlpha=1-q;c.strokeStyle='#ffdc98';c.lineWidth=1.5;for(let i=0;i<9;i++){const a=i*Math.PI*2/9;c.beginPath();c.moveTo(30+Math.cos(a)*(5+q*8),-14+Math.sin(a)*(5+q*8));c.lineTo(30+Math.cos(a)*(10+q*20),-14+Math.sin(a)*(10+q*20));c.stroke();}c.restore();}
+      }
+      c.restore();
+    }
+    destroy(){this.disposed=true;}
+  }
+  root.OrbitMotionEditor={MotionEditor};
+})(typeof globalThis!=='undefined'?globalThis:this);
+
+</script>
+<script>
 (function(){
   'use strict';
   const {Game,PLANETS,SPECIES,BUILDINGS,RESOURCE_NAMES,TOOLS,RESOURCE_TOOLS,WORLD_LIMIT,dist,clamp}=window.OrbitCore;
   const {Renderer,drawPlanet,creature}=window.OrbitRenderer;
+  const Motion=window.OrbitMotion;
+  let motionSettings=Motion.normalize();try{motionSettings=Motion.normalize(JSON.parse(localStorage.getItem(Motion.STORAGE_KEY)||'null'));}catch(e){}
+  let motionEditor=null;
   const $=id=>document.getElementById(id),SAVE_KEY='orbit-frontier-save-v1',SOUND_KEY='orbit-frontier-sound',TUTORIAL_KEY='justgame-tutorial-v2',TRAINING_KEY='justgame-training-v1';
   let saved=null,storageAvailable=true;
   try{const raw=localStorage.getItem(SAVE_KEY);if(raw)saved=JSON.parse(raw);}catch(e){storageAvailable=false;}
   let trainingRecord=null;try{trainingRecord=JSON.parse(localStorage.getItem(TRAINING_KEY)||'null');}catch(e){}
   let session=new window.OrbitTutorial.TrainingSession(saved,trainingRecord);
-  let game=new Game(session.state);
+  let game=new Game(session.state,motionSettings);
   window.OrbitEntry={training:session.active,resuming:!!trainingRecord?.active,main:!!saved};
   let renderer;
   try{renderer=new Renderer($('world'),$('radar'),game);}catch(error){
@@ -1223,7 +1434,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
   function updateEngineAudio(){
     if(!audioContext||!engineSound)return;const s=game.state,active=soundEnabled&&!game.paused;
     audioBus.gain.setTargetAtTime(soundEnabled?.5:0,audioContext.currentTime,.06);
-    const thrust=active&&game.flight?.kind==='launch'?.055:active&&game.flight?.kind==='land'?.04:active&&s.mode==='space'?(game.travel?.075:game.moving?(game.boosting?.05:.025):.008):0;
+    const thrust=active&&game.flight?Motion.flightPose(game.flight.kind,game.flight.motion||Motion.DEFAULTS[game.flight.kind],game.flight.age/game.flight.duration).thrust*.05:active&&s.mode==='space'?(game.travel?.075:game.moving?(game.boosting?.05:.025):.008):0;
     engineSound.gain.gain.setTargetAtTime(thrust,audioContext.currentTime,.12);engineSound.o.frequency.setTargetAtTime(game.flight?75:game.travel?140:game.boosting?90:game.moving?62:39,audioContext.currentTime,.15);
     if(active&&s.mode==='surface'&&game.moving&&s.time-lastFootstep>.33&&renderer.jumpHeight===0){sound('step');lastFootstep=s.time;}
   }
@@ -1243,10 +1454,21 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     try{localStorage.setItem(session.active?TRAINING_KEY:SAVE_KEY,JSON.stringify(session.active?session.snapshot(game):game.snapshot()));storageAvailable=true;setText('save-indicator',session.active?'튜토리얼 저장됨':'자동 저장됨');if(!silent)toast('이 브라우저에 탐험 기록을 저장했어요.');return true;}catch(e){storageAvailable=false;setText('save-indicator','저장 불가 · 파일로 백업');if(!silent)toast('브라우저 저장 공간을 사용할 수 없어요. 저장 파일을 내보내 주세요.',true);return false;}
   }
   function showModal(title,eyebrow,html){
+    if(motionEditor){motionEditor.destroy();motionEditor=null;}modal.classList.remove('motion-modal');
     clearInput();game.paused=true;renderer.stopHaptics();updateEngineAudio();game.moveTarget=null;$('modal-title').textContent=title;$('modal-eyebrow').textContent=eyebrow;$('modal-content').innerHTML=html;if(!modal.open)modal.showModal();updateTutorial();
   }
-  function closeModal(){if(modal.open)modal.close();game.paused=startOpen||document.hidden;clearInput();$('map-tab').classList.remove('active');$('journal-tab').classList.remove('active');$('explore-tab').classList.add('active');if(!startOpen)$('world').focus({preventScroll:true});}
-  modal.addEventListener('close',()=>{game.paused=startOpen||document.hidden;clearInput();$('map-tab').classList.remove('active');$('journal-tab').classList.remove('active');$('explore-tab').classList.add('active');});
+  function closeModal(force=false){if(motionEditor?.dirty&&force!==true){motionEditor.requestClose();return;}if(modal.open)modal.close();game.paused=startOpen||document.hidden;clearInput();$('map-tab').classList.remove('active');$('journal-tab').classList.remove('active');$('explore-tab').classList.add('active');if(!startOpen)$('world').focus({preventScroll:true});}
+  modal.addEventListener('close',()=>{if(motionEditor){motionEditor.destroy();motionEditor=null;}modal.classList.remove('motion-modal');game.paused=startOpen||document.hidden;clearInput();$('map-tab').classList.remove('active');$('journal-tab').classList.remove('active');$('explore-tab').classList.add('active');});
+  function showMotionEditor(){
+    showModal('모션 스튜디오','JUSTGAME / MOTION LAB','');modal.classList.add('motion-modal');
+    motionEditor=new window.OrbitMotionEditor.MotionEditor($('modal-content'),motionSettings,{
+      apply(config){try{localStorage.setItem(Motion.STORAGE_KEY,JSON.stringify(config));}catch(e){return{ok:false,reason:'설정 저장에 실패했어요. 설정 내보내기로 파일을 보관해 주세요.'};}motionSettings=config;game.setMotion(config);return{ok:true};},
+      close:()=>closeModal(true)
+    });
+    $('motion-play').focus();
+  }
+  window.addEventListener('orbit:motion',showMotionEditor);
+  modal.addEventListener('cancel',e=>{if(motionEditor){e.preventDefault();motionEditor.requestClose();}});
   window.addEventListener('orbit:start',()=>{startOpen=false;game.paused=modal.open||document.hidden;lastFrame=performance.now();clearInput();ensureAudio();if(session.active&&!tutorial.complete)showTrainingIntro();hud(true);});
   modal.addEventListener('click',e=>{if(e.target===modal){const r=modal.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)closeModal();}});
   $('modal-close').onclick=closeModal;
@@ -1303,7 +1525,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
       $('confirm-import').onclick=()=>{replaceGame(new Game(valid));closeModal();save();toast('저장 기록을 가져왔어요. 탐험을 이어가세요!');};$('cancel-import').onclick=showSettings;
     }catch(e){toast('올바른 오르빗 저장 파일이 아니에요. JSON 파일을 확인해 주세요.',true);}
   }
-  function replaceGame(next){clearTutorialWaypoint();tutorialStep=tutorial.step;tutorialCollapsed=false;game=next;tutorial.sync(game);renderer.game=next;renderer.reset();buildOpen=false;$('build-panel').hidden=true;$('build-button').classList.remove('selected');$('interact-button').classList.add('selected');missionSignature='';locationSignature='';clearInput();hud(true);}
+  function replaceGame(next){clearTutorialWaypoint();tutorialStep=tutorial.step;tutorialCollapsed=false;game=next;game.setMotion(motionSettings);tutorial.sync(game);renderer.game=next;renderer.reset();buildOpen=false;$('build-panel').hidden=true;$('build-button').classList.remove('selected');$('interact-button').classList.add('selected');missionSignature='';locationSignature='';clearInput();hud(true);}
   function showDialogue(e){
     const sp=SPECIES[e.species],bond=game.state.friendship[e.species]||0;
     showModal(sp.name+'와의 만남','FIRST CONTACT / '+sp.kind,'<div class="dialogue"><p class="speaker">'+sp.name+' <span class="bond">'+('♥'.repeat(bond)+'♡'.repeat(3-bond))+'</span></p><blockquote>'+sp.line.replace(/\n/g,'<br>')+'</blockquote>'+(e.first?'<div class="reward">첫 만남 선물 · '+Object.entries(sp.gift).map(([r,n])=>RESOURCE_NAMES[r]+' +'+n).join(' · ')+'</div>':'<p class="modal-intro">친밀도 '+bond+' / 3 · 친밀도 2부터 동행과 길 안내가 열려요.</p>')+'<div class="interaction-grid"><button data-care="pet">♡ 쓰다듬기<small>친밀도 +1 · 10초 간격</small></button><button data-care="feed">❋ 먹이 나누기<small>바이오매스 2 · 친밀도 +1</small></button><button data-care="follow" '+(bond<2?'disabled':'')+'>'+(game.state.companion===e.id?'동행 마치기':'함께 탐험하기')+'<small>내 뒤를 따라오는 친구</small></button><button data-care="guide" '+(bond<2?'disabled':'')+'>유적 길 물어보기<small>미탐사 유적의 위치 표시</small></button></div><button class="primary-button" id="dialogue-close">탐험으로 돌아가기</button></div>');
@@ -1340,7 +1562,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     document.querySelectorAll('[data-tool]').forEach(button=>{const id=button.dataset.tool,owned=s.tools.includes(id),selected=s.equippedTool===id;button.disabled=!owned||!!flight;button.setAttribute('aria-pressed',String(selected));button.setAttribute('aria-label',TOOLS[id].name+' · '+(owned?selected?'장착 중':'장착하기':'미보유')+' · '+RESOURCE_NAMES[TOOLS[id].resource]+' 전용');button.querySelector('small').textContent=owned?(selected?'장착 중 · ':'')+RESOURCE_NAMES[TOOLS[id].resource]:'미보유';});
     $('game-area').classList.toggle('in-flight',!!flight);$('flight-status').hidden=!flight||startOpen;
     for(const id of ['interact-button','scan-button','build-button','ship-button','map-tab','radar-button'])$(id).disabled=!!flight;
-    if(flight){const t=flight.age/flight.duration,launch=flight.kind==='launch';setText('flight-phase',launch?'TAKEOFF / 이륙 중':'LANDING / 착륙 중');setText('flight-title',launch?t<.2?'엔진 점화':t<.75?'상승 중':'궤도 진입':t<.65?'착륙장 접근':t<.9?'하강 중':'착지 · 엔진 정지');$('flight-progress').style.width=Math.min(100,t*100)+'%';}
+    if(flight){const t=flight.age/flight.duration,launch=flight.kind==='launch';setText('flight-phase',launch?'TAKEOFF / 이륙 중':'LANDING / 착륙 중');setText('flight-title',Motion.flightPose(flight.kind,flight.motion||Motion.DEFAULTS[flight.kind],t).phase);$('flight-progress').style.width=Math.min(100,t*100)+'%';}
     for(const r of ['iron','crystal','biomass'])setText(r+'-count',s.inventory[r]);
     setText('oxygen-text',Math.ceil(s.oxygen)+'%');$('oxygen-bar').style.width=s.oxygen+'%';$('oxygen-bar').style.background=s.oxygen<25?'#ffb196':'';setText('fuel-text',Math.floor(s.fuel)+'%');$('fuel-bar').style.width=s.fuel+'%';setText('journal-count',s.discovered.length);
     const loc=space?'space':p.id;if(locationSignature!==loc||force){locationSignature=loc;setText('location-code',space?'SIGMA SYSTEM / OPEN SPACE':'시그마 성계 / '+String(PLANETS.indexOf(p)+1).padStart(2,'0'));$('location-name').innerHTML=(space?'시그마 성계':p.name)+'<span class="planet-tag">'+(space?'비행 중':'탐험 중')+'</span>';$('location-description').innerHTML=space?'새로운 행성으로 향하는 중':p.kind+' <span>·</span> '+p.temp;setText('ship-label',space?'착륙':'우주선');$('scan-button').title=space?'주변 행성 스캔':'주변 자원과 생명체 스캔';}
@@ -1363,7 +1585,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     }else $('world-label').hidden=true;
   }
   function interact(){sound('click');const wasBuilding=!!game.selectedBuild;const result=game.interact();if(wasBuilding&&result.ok)toggleBuild(false);processEvents();}
-  $('explore-tab').onclick=()=>{if(modal.open)closeModal();};$('map-tab').onclick=showMap;$('radar-button').onclick=showMap;$('journal-tab').onclick=showJournal;$('help-button').onclick=showHelp;$('settings-button').onclick=showSettings;
+  $('explore-tab').onclick=()=>{if(modal.open)closeModal();};$('map-tab').onclick=showMap;$('radar-button').onclick=showMap;$('journal-tab').onclick=showJournal;$('help-button').onclick=showHelp;$('motion-button').onclick=showMotionEditor;$('settings-button').onclick=showSettings;
   $('view-button').onclick=toggleCamera;$('immersion-button').onclick=showImmersion;
   $('fullscreen-button').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else if($('game-area').requestFullscreen)await $('game-area').requestFullscreen();else toast('이 브라우저에서는 전체 화면 버튼을 사용할 수 없어요.');}catch(e){toast('전체 화면을 열지 못했어요. 브라우저 설정을 확인해주세요.');}};
   $('pause-button').onclick=()=>{showModal('잠시, 별을 바라보세요','EXPEDITION PAUSED','<div class="pause-content"><p>탐험을 잠시 멈췄어요.<br>준비가 되면 언제든 다시 떠나세요.</p><button id="resume-button" class="primary-button">이어서 탐험하기</button></div>');$('resume-button').onclick=closeModal;save();};
@@ -1389,6 +1611,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     else if(e.code==='KeyE'){e.preventDefault();interact();}
     else if(e.code==='KeyQ'){e.preventDefault();game.scan();processEvents();}
     else if(e.code==='KeyV'){e.preventDefault();toggleCamera();}
+    else if(e.code==='KeyP'){e.preventDefault();showMotionEditor();}
     else if(e.code==='KeyX'){e.preventDefault();showImmersion();}
     else if(e.code==='KeyB'){e.preventDefault();toggleBuild();}
     else if(e.code==='KeyF'){e.preventDefault();game.launch();processEvents();}
@@ -1433,6 +1656,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     if(game.paused)accumulator=0;else accumulator+=elapsed;
     let steps=0;while(accumulator>=1/60&&steps++<6){game.tick(1/60,renderer.input(keys));tutorial.tick(game);processEvents();accumulator-=1/60;if(game.paused){accumulator=0;break;}}
     if(!game.paused||now-previousDraw>66){renderer.draw(elapsed);previousDraw=now;}
+    if(motionEditor)motionEditor.draw(elapsed);
     updateEngineAudio();if(now-lastHud>110){hud();lastHud=now;}
     if(now-lastSave>8000){if(!game.paused)save();lastSave=now;}requestAnimationFrame(frame);
   }
@@ -1465,7 +1689,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
 <div class="orbit-start-hero"><section>
 <h1 class="orbit-start-logo">just<span>game</span></h1><h2 class="orbit-start-headline">낯선 행성에서,<br><em>나만의 집이 있는 우주로.</em></h2>
 <p class="orbit-start-copy">우주선을 타고 착륙한 곳이 새로운 시작.<br>자원을 캐고, 기지를 짓고, 작은 생명체와 친구가 되어 다섯 행성을 탐험하세요.</p>
-<div class="orbit-start-actions"><button id="orbit-start-button" class="orbit-start-primary" type="button">튜토리얼부터 시작하기 ↗</button><button id="orbit-start-guide" class="orbit-start-secondary" type="button" aria-expanded="false" aria-controls="orbit-start-manual">조작법 보기</button></div>
+<div class="orbit-start-actions"><button id="orbit-start-button" class="orbit-start-primary" type="button">튜토리얼부터 시작하기 ↗</button><button id="orbit-motion-button" class="orbit-start-secondary" type="button">모션 스튜디오</button><button id="orbit-start-guide" class="orbit-start-secondary" type="button" aria-expanded="false" aria-controls="orbit-start-manual">조작법 보기</button></div>
 <p class="orbit-start-small">튜토리얼 플레이 → 7단계 완료 → 본게임 시작</p>
 </section><figure class="orbit-start-visual" style="margin:0"><canvas id="orbit-start-preview" width="720" height="430" aria-label="2D 행성 위 우주선, 탐험가, 작은 친구와 건설한 기지"></canvas><div class="orbit-scene-top"><span>01 / VERDANT</span><span>2D 탐험 미리보기</span></div><figcaption class="orbit-scene-caption"><small>YOUR FIRST OUTPOST</small><strong>여기서, 당신의 탐험이 시작됩니다.</strong><p>우주선 한 대. 작은 친구. 그리고 내가 세운 첫 기지.</p></figcaption></figure></div>
 <section class="orbit-start-features" aria-label="게임에서 할 수 있는 일">
@@ -1488,7 +1712,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
  guide.addEventListener('click',()=>{manual.hidden=!manual.hidden;guide.setAttribute('aria-expanded',String(!manual.hidden));guide.textContent=manual.hidden?'조작법 보기':'조작법 접기';if(!manual.hidden)manual.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'nearest'});});
  let starting=false;
  const block=e=>{
-  if(starting)return;
+  if(starting||document.querySelector('#modal.motion-modal[open]'))return;
   if(e.key==='Tab'){const items=[...screen.querySelectorAll('button,a[href]')].filter(el=>!el.disabled&&el.getClientRects().length),first=items[0],last=items[items.length-1];if(e.shiftKey&&(document.activeElement===first||!screen.contains(document.activeElement))){e.preventDefault();last?.focus();}else if(!e.shiftKey&&(document.activeElement===last||!screen.contains(document.activeElement))){e.preventDefault();first?.focus();}return;}
   e.stopImmediatePropagation();
   if(e.key==='Escape'&&!manual.hidden){manual.hidden=true;guide.setAttribute('aria-expanded','false');guide.textContent='조작법 보기';guide.focus();}
@@ -1496,7 +1720,9 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
  };
  window.addEventListener('keydown',block,true);
  start.addEventListener('click',()=>{if(starting)return;starting=true;start.disabled=true;screen.classList.add('orbit-start-screen-hidden');setTimeout(()=>{window.removeEventListener('keydown',block,true);screen.remove();window.dispatchEvent(new Event('orbit:start'));window.dispatchEvent(new Event('focus'));document.getElementById('world')?.focus({preventScroll:true});},320);});
+ document.getElementById('orbit-motion-button').onclick=()=>window.dispatchEvent(new Event('orbit:motion'));
  start.focus({preventScroll:true});
+ if(new URLSearchParams(location.search).get('motion')==='1')window.dispatchEvent(new Event('orbit:motion'));
 })();
 </script>
 

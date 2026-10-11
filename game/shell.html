@@ -18,7 +18,7 @@
         <button id="map-tab" class="nav-item"><span class="nav-symbol">◎</span> 성계 지도 <kbd>M</kbd></button>
         <button id="journal-tab" class="nav-item"><span class="nav-symbol">▤</span> 도감 <span class="count" id="journal-count">0</span></button>
       </nav>
-      <div class="header-actions"><span id="save-indicator" class="save-indicator">이 기기에 자동 저장</span><button id="sound-button" class="icon-button" aria-label="소리 켜기" aria-pressed="false" title="소리 켜기">♪</button><button id="help-button" class="icon-button" aria-label="조작 방법" title="조작 방법">?</button><button id="pause-button" class="icon-button pause-icon" aria-label="일시 정지" title="일시 정지">Ⅱ</button></div>
+      <div class="header-actions"><span id="save-indicator" class="save-indicator">이 기기에 자동 저장</span><button id="motion-button" class="motion-open-button" title="P: 모션 편집">모션 편집</button><button id="sound-button" class="icon-button" aria-label="소리 켜기" aria-pressed="false" title="소리 켜기">♪</button><button id="help-button" class="icon-button" aria-label="조작 방법" title="조작 방법">?</button><button id="pause-button" class="icon-button pause-icon" aria-label="일시 정지" title="일시 정지">Ⅱ</button></div>
     </header>
     <main id="game-area" class="game-area">
       <canvas id="world" tabindex="0" aria-label="2D 행성 탐험 게임. 빈 땅 클릭으로 이동하고 드래그로 지도를 둘러보세요. WASD 또는 방향키로 이동하고 E로 채굴·교류하세요. M은 지도, B는 건설입니다."></canvas>
@@ -67,10 +67,12 @@
 
 
 
+<script src="motion.js"></script>
 <script src="core.js"></script>
 <script src="portraits.js"></script>
 <script src="renderer-2d.js"></script>
 <script src="tutorial.js"></script>
+<script src="motion-editor.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

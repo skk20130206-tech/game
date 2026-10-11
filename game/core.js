@@ -1,5 +1,6 @@
 (function(root){
   'use strict';
+  const Motion=root.OrbitMotion||(typeof require==='function'?require('./motion.js'):null);
   const VERSION=1, SURFACE_MAP_SCALE=1.5, WORLD_LIMIT=Math.round(1320*SURFACE_MAP_SCALE), TERRAIN_LIMIT=Math.round(1750*SURFACE_MAP_SCALE), TAU=Math.PI*2;
   const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
   const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
@@ -33,7 +34,8 @@
   const TOOLS={pickaxe:{name:'곡괭이',resource:'iron',key:'1'},axe:{name:'도끼',resource:'biomass',key:'2'},sword:{name:'칼',resource:'crystal',key:'3'}};
   const RESOURCE_TOOLS={iron:'pickaxe',biomass:'axe',crystal:'sword'},FLIGHT_DURATION=2.8;
   class Game{
-    constructor(saved){
+    constructor(saved,motion){
+      this.motion=Motion.normalize(motion);
       this.events=[];this.keys={};this.paused=false;this.moveTarget=null;this.selectedBuild=null;this.interactHeld=false;this.cooldown=0;this.scanCooldown=0;this.scanRing=null;this.beam=null;this.solarCharge=0;this.travel=null;this.pulse=0;
       this.state=this.fresh();
       if(saved){try{this.state=this.validate(saved);}catch(e){this.emit('message',{text:'저장 파일을 읽지 못했어요. 새 탐험을 시작합니다.',error:true});}}
@@ -54,7 +56,10 @@
       // Older expeditions receive their starter equipment once; explicit empty bags stay empty.
       s.tools=input.tools===undefined?Object.keys(TOOLS):[...new Set((Array.isArray(input.tools)?input.tools:[]).filter(id=>Object.hasOwn(TOOLS,id)))];
       s.equippedTool=s.tools.includes(input.equippedTool)?input.equippedTool:input.tools===undefined?'pickaxe':null;
-      if(s.mode==='surface'&&['launch','land'].includes(input.flight?.kind)&&input.flight.planet===s.planet&&Number.isFinite(input.flight.age))s.flight={kind:input.flight.kind,planet:s.planet,age:clamp(input.flight.age,0,FLIGHT_DURATION),duration:FLIGHT_DURATION};
+      if(s.mode==='surface'&&['launch','land'].includes(input.flight?.kind)&&input.flight.planet===s.planet&&Number.isFinite(input.flight.age)){
+        const motion=Motion.normalizeGroup(input.flight.kind,input.flight.motion||{duration:input.flight.duration});
+        s.flight={kind:input.flight.kind,planet:s.planet,age:clamp(input.flight.age,0,motion.duration),duration:motion.duration,motion};
+      }
       for(const key of ['discovered','met'])s[key]=[...new Set((Array.isArray(input[key])?input[key]:[]).filter(id=>SPECIES[id]))];
       s.visited=[...new Set((Array.isArray(input.visited)?input.visited:[]).filter(id=>PLANETS.some(p=>p.id===id)))];if(!s.visited.includes(s.planet)&&s.flight?.kind!=='land')s.visited.push(s.planet);
       s.stats.mined=clamp(Number(input.stats?.mined)||0,0,1e9);s.stats.travel=clamp(Number(input.stats?.travel)||0,0,1e9);
@@ -76,6 +81,7 @@
       return s;
     }
     emit(type,data={}){this.events.push({type,...data});}
+    setMotion(config){this.motion=Motion.normalize(config);}
     planet(){return PLANETS.find(p=>p.id===this.state.planet);}
     trainingNpc(){return this.state.training&&this.state.mode==='surface'?{id:'training-instructor',x:-350,y:140,name:'교관 루미'}:null;}
     trainingGate(step,reason){
@@ -142,7 +148,7 @@
       if(this.paused)return;
       dt=clamp(dt,0,.05);const s=this.state;s.time+=dt;this.pulse+=dt;
       this.cooldown=Math.max(0,this.cooldown-dt);this.scanCooldown=Math.max(0,this.scanCooldown-dt);
-      if(this.beam){this.beam.life-=dt;if(this.beam.life<=0)this.beam=null;}
+      if(this.beam){const action=this.beam;action.life=Math.max(0,action.life-dt);if(!action.hit&&1-action.life/action.duration>=action.motion.impact){action.hit=true;this.applyToolImpact(action);}if(action.life<=0)this.beam=null;}
       if(this.scanRing){this.scanRing.age+=dt;if(this.scanRing.age>2)this.scanRing=null;}
       if(this.flight){this.flight.age+=dt;if(this.flight.age>=this.flight.duration)this.finishFlight();return;}
       if(this.travel){this.travel.age+=dt;if(this.travel.age>2.4)this.finishTravel();return;}
@@ -212,17 +218,24 @@
         const locked=this.trainingGate(1,'루미에게 먼저 인사해 주세요. 목표 표시를 따라 접수대로 가세요.');if(locked)return locked;
         const node=n.entity,required=RESOURCE_TOOLS[node.type];
         if(!this.state.tools.includes(required)||this.state.equippedTool!==required){const owned=this.state.tools.includes(required),reason=RESOURCE_NAMES[node.type]+'은 '+TOOLS[required].name+'로만 부술 수 있어요. '+(owned?TOOLS[required].key+' 키로 장착하세요.':'루미나 우주선에서 도구를 받으세요.');this.cooldown=.55;this.emit('message',{text:reason,error:true});return{ok:false,reason,requiredTool:required};}
-        this.cooldown=.38;node.hp--;this.state.player.angle=Math.atan2(node.y-this.state.player.y,node.x-this.state.player.x);this.beam={x:node.x,y:node.y,life:.32,duration:.32,tool:required};
-        const nodeColor=node.type==='crystal'?'#bccfff':node.type==='biomass'?'#c3f379':'#cad9df',broken=node.hp<=0;
-        this.emit('effect',{kind:'mine',x:node.x,y:node.y,color:nodeColor,nodeType:node.type,remaining:node.hp,maxHp:node.maxHp,broken});
-        if(broken){const amount=node.type==='iron'?6:node.type==='biomass'?5:4;this.addResource(node.type,amount);this.state.stats.mined++;node.respawnAt=this.state.time+150;this.emit('message',{text:RESOURCE_NAMES[node.type]+' +'+amount});this.emit('effect',{kind:'break',x:node.x,y:node.y,color:nodeColor,nodeType:node.type,maxHp:node.maxHp});this.emit('effect',{kind:'collect',x:node.x,y:node.y,color:this.planet().accent,label:'+'+amount+' '+RESOURCE_NAMES[node.type]});this.emit('save');}
-        return{ok:true,type:'mine',resource:node.type,remaining:node.hp};
+        const motion={...this.motion[required]};this.cooldown=motion.duration+.06;this.state.player.angle=Math.atan2(node.y-this.state.player.y,node.x-this.state.player.x);
+        this.beam={x:node.x,y:node.y,nodeId:node.id,planet:this.state.planet,life:motion.duration,duration:motion.duration,tool:required,motion,hit:false};
+        return{ok:true,type:'mine',phase:'windup',resource:node.type,remaining:node.hp};
       }
       if(n.kind==='creature')return this.befriend(n.entity);
       if(n.kind==='ship')return this.launch();
       if(n.kind==='building'){this.emit('building-menu',{id:n.entity.id});return{ok:true,type:'building'};}
       if(n.kind==='relic')return this.studyRelic(n.entity.id);
       return{ok:false};
+    }
+    applyToolImpact(action){
+        if(this.state.mode!=='surface'||this.flight||this.state.planet!==action.planet||!this.state.tools.includes(action.tool)||this.state.equippedTool!==action.tool)return;
+        const node=this.world().nodes.find(n=>n.id===action.nodeId);
+        if(!node||node.hp<=0||dist(node,this.state.player)>=160)return;
+        node.hp--;
+        const nodeColor=node.type==='crystal'?'#bccfff':node.type==='biomass'?'#c3f379':'#cad9df',broken=node.hp<=0;
+        this.emit('effect',{kind:'mine',x:node.x,y:node.y,color:nodeColor,nodeType:node.type,remaining:node.hp,maxHp:node.maxHp,broken});
+        if(broken){const amount=node.type==='iron'?6:node.type==='biomass'?5:4;this.addResource(node.type,amount);this.state.stats.mined++;node.respawnAt=this.state.time+150;this.emit('message',{text:RESOURCE_NAMES[node.type]+' +'+amount});this.emit('effect',{kind:'break',x:node.x,y:node.y,color:nodeColor,nodeType:node.type,maxHp:node.maxHp});this.emit('effect',{kind:'collect',x:node.x,y:node.y,color:this.planet().accent,label:'+'+amount+' '+RESOURCE_NAMES[node.type]});this.emit('save');}
     }
     discover(id,announce=true){if(this.state.discovered.includes(id))return false;this.state.discovered.push(id);if(announce)this.emit('discovery',{species:id});this.emit('save');return true;}
     befriend(c){
@@ -351,7 +364,7 @@
       this.startFlight('land');return{ok:true,phase:'landing',planet:target.id};
     }
     startFlight(kind){
-      this.state.flight={kind,planet:this.state.planet,age:0,duration:FLIGHT_DURATION};this.moveTarget=null;this.pendingInteraction=null;this.selectedBuild=null;this.waypoint=null;this.beam=null;this.velocity={x:0,y:0,z:0};this.moving=false;this.boosting=false;
+      const motion={...this.motion[kind]};this.state.flight={kind,planet:this.state.planet,age:0,duration:motion.duration,motion};this.moveTarget=null;this.pendingInteraction=null;this.selectedBuild=null;this.waypoint=null;this.beam=null;this.velocity={x:0,y:0,z:0};this.moving=false;this.boosting=false;
       this.emit('flight-start',{kind});this.emit('save');
     }
     finishFlight(){

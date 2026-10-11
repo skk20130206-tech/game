@@ -1,7 +1,7 @@
 (function(root){
   'use strict';
   const {Game,PLANETS,SPECIES,BUILDINGS,RESOURCE_NAMES,WORLD_LIMIT,rand,dist,clamp}=root.OrbitCore;
-  const {creature,drawPlanet}=root.OrbitPortraits,TAU=Math.PI*2;
+  const {creature,drawPlanet}=root.OrbitPortraits,Motion=root.OrbitMotion,TAU=Math.PI*2;
   // Reuse the supplied transparent artwork for every iron deposit.
   const ironOreImage=typeof root.Image==='function'?new root.Image():null;
   if(ironOreImage){ironOreImage.decoding='async';ironOreImage.src=root.OrbitIronOreSource||'/assets/iron-ore-20261001-v22.png';}
@@ -12,10 +12,9 @@
   const ring=(c,x,y,r,color,width=2)=>{c.beginPath();c.arc(x,y,r,0,TAU);c.strokeStyle=color;c.lineWidth=width;c.stroke();};
   const glow=(c,x,y,r,color)=>{const g=c.createRadialGradient(x,y,0,x,y,Math.max(1,r));g.addColorStop(0,color);g.addColorStop(1,'transparent');c.fillStyle=g;c.beginPath();c.arc(x,y,Math.max(1,r),0,TAU);c.fill();};
   const gradient=(c,x1,y1,x2,y2,stops)=>{const g=c.createLinearGradient(x1,y1,x2,y2);for(const [at,color] of stops)g.addColorStop(at,color);return g;};
-  function heldTool(c,id,swing,angle){
+  function heldTool(c,id,pose){
     if(!id)return;
-    c.save();c.translate(Math.cos(angle)<0?-21:21,-12);if(Math.cos(angle)<0)c.scale(-1,1);
-    c.rotate(-.28+swing*(id==='sword'?2.5:1.9));
+    c.save();c.translate(21+pose.reach,-12-pose.reach*.65);c.rotate(pose.angle);
     line(c,0,6,0,-34,id==='sword'?'#485c72':'#92704e',5);line(c,-1,4,-1,-31,'#eac38b',1.4);
     if(id==='pickaxe'){path(c,[[-23,-26],[-14,-38],[0,-41],[15,-37],[25,-25],[10,-31],[0,-32],[-11,-31]],'#cde8ec','#426879');line(c,-13,-37,12,-36,'#f5ffed',1.4);}
     else if(id==='axe'){path(c,[[-5,-37],[15,-43],[23,-35],[23,-19],[10,-20],[-4,-26]],'#d3e6e3','#426577');line(c,21,-33,21,-22,'#f6ffef',2);box(c,-4,-34,8,12,2,'#e7b461');}
@@ -23,32 +22,31 @@
     oval(c,0,0,5,5,'#355362');c.restore();
   }
   function astronaut(c,time,moving,angle,action,equipped){
-    const walk=moving?Math.sin(time*12)*5:0,breath=Math.sin(time*2)*.8;
-    glow(c,0,5,34,'#07192340');c.save();c.translate(0,breath);
-    // Life-support pack and articulated shadow layer.
+    const walk=moving?Math.sin(time*12)*5:0,breath=Math.sin(time*2)*.8,id=action?.tool||equipped;
+    const pose=Motion.toolPose(id||'pickaxe',action?.motion||Motion.DEFAULTS[id||'pickaxe'],action?1-action.life/action.duration:0);
+    glow(c,0,5,34,'#07192340');c.save();
+    // Planted boots and legs stay separate from the moving upper body.
+    box(c,-12,-5+walk,10,16,4,'#263e50','#172f3d');box(c,3,-5-walk,10,16,4,'#263e50','#172f3d');
+    box(c,-13,9+walk,12,6,2,'#1c3443');box(c,2,9-walk,12,6,2,'#1c3443');line(c,-12,12+walk,-3,12+walk,'#d4e4d8',1);line(c,4,12-walk,13,12-walk,'#d4e4d8',1);
+    c.translate(0,breath+pose.crouch);c.scale(Math.cos(angle)<0?-1:1,1);c.rotate(pose.body);
     box(c,-25,-33,50,28,8,'#304b58','#193542');box(c,-20,-30,40,21,6,'#456d76');
     line(c,-17,-26,17,-26,'#81a9a2',2);line(c,-15,-19,15,-19,'#193845',2);
-    box(c,-12,-5+walk,10,16,4,'#263e50','#172f3d');box(c,3,-5-walk,10,16,4,'#263e50','#172f3d');
     box(c,-14,-35,28,34,9,gradient(c,-14,-35,14,0,[[0,'#ffffff'],[.42,'#e7f0df'],[1,'#b1c8b9']]),'#5c8987');
     box(c,-3,-31,6,24,2,'#f3ba65');line(c,-11,-5,10,-5,'#6d9990',1);line(c,-10,-1,9,-1,'#9db9ae',1);
-    // Shoulder armor, chest badge and utility belt add small readable forms.
     box(c,-22,-30,8,15,3,'#d6e4d8','#71938d');box(c,14,-30,8,15,3,'#d6e4d8','#71938d');
     box(c,-8,-21,16,7,2,'#5c8b8b','#294f5c');oval(c,0,-17,3,2,'#c7f79f');
     box(c,-16,-8,32,5,2,'#405a63');line(c,-8,-8,-8,-3,'#e8cf8e',1);line(c,8,-8,8,-3,'#e8cf8e',1);
-    const swing=action?Math.sin((1-action.life/action.duration)*Math.PI):0,reach=swing*9;
-    box(c,-23,-29-walk*.7,9,24,4,'#d2e0d6','#718c87');box(c,15,-29+walk*.7-reach,9,24,4,'#d2e0d6','#718c87');
-    box(c,-22,-20-walk*.7,7,8,2,'#7ca59b');box(c,16,-20+walk*.7-reach,7,8,2,'#7ca59b');
-    oval(c,0,-43,21,20,'#edf6df','#');
-    const visor=gradient(c,-15,-54,15,-33,[[0,'#6ed1d4'],[.45,'#2d6676'],[1,'#102e43']]);oval(c,Math.cos(angle)*2,-44+Math.sin(angle)*1.5,16,13,visor);
+    box(c,-23,-29-walk*.7,9,24,4,'#d2e0d6','#718c87');box(c,-22,-20-walk*.7,7,8,2,'#7ca59b');
+    const hx=21+pose.reach,hy=-12-pose.reach*.65,ex=27+pose.reach*.3,ey=-17+walk*.35;
+    c.lineCap='round';line(c,18,-26,ex,ey,'#6b9190',11);line(c,ex,ey,hx,hy,'#6b9190',10);line(c,18,-26,ex,ey,'#d2e0d6',8);line(c,ex,ey,hx,hy,'#d2e0d6',7);oval(c,ex,ey,4,4,'#7ca59b');
+    oval(c,0,-43,21,20,'#edf6df');
+    const visor=gradient(c,-15,-54,15,-33,[[0,'#6ed1d4'],[.45,'#2d6676'],[1,'#102e43']]);oval(c,2,-44+Math.sin(angle)*1.5,16,13,visor);
     oval(c,-5,-49,8,3,'#d9ffff55');line(c,-11,-55,6,-55,'#f6ffe7',2);line(c,12,-48,16,-42,'#ffffffaa',1.2);box(c,-6,-24,12,6,2,'#6bcbd0');
-    // Boots catch the planet light and make the walking cycle easier to read.
-    box(c,-13,9+walk,12,6,2,'#1c3443');box(c,2,9-walk,12,6,2,'#1c3443');line(c,-12,12+walk,-3,12+walk,'#d4e4d8',1);line(c,4,12-walk,13,12-walk,'#d4e4d8',1);
-    heldTool(c,action?.tool||equipped,swing,angle);
-    c.restore();
+    heldTool(c,id,pose);c.restore();
   }
-  function ship(c,time,flying,moving){
-    glow(c,0,25,105,'#081c2735');c.save();if(flying)c.scale(.8,.8);
-    if(moving){for(const x of[-38,38]){glow(c,x,56,25,'#68ddf855');path(c,[[x-10,40],[x,81+Math.sin(time*31)*10],[x+10,40]],'#73ddf8aa');path(c,[[x-5,40],[x,63],[x+5,40]],'#fff5bc');}}
+  function ship(c,time,flying,moving,compression=0){
+    glow(c,0,25,105,'#081c2735');c.save();c.translate(0,compression);if(flying)c.scale(.8,.8);
+    if(moving){for(const x of[-38,38]){glow(c,x,56,25,'#68ddf855');path(c,[[x-10,40],[x,40+(41+Math.sin(time*31)*10)*Number(moving)],[x+10,40]],'#73ddf8aa');path(c,[[x-5,40],[x,40+23*Number(moving)],[x+5,40]],'#fff5bc');}}
     path(c,[[-61,-19],[-82,29],[-50,26],[-32,-20]],'#759790','#294b54');path(c,[[61,-19],[82,29],[50,26],[32,-20]],'#759790','#294b54');
     line(c,-63,14,-49,7,'#b8d8c4',2);line(c,63,14,49,7,'#b8d8c4',2);
     for(const x of[-39,39]){box(c,x-15,-44,30,92,10,'#344e5d','#183844');box(c,x-12,-38,24,62,8,gradient(c,x-12,-38,x+12,24,[[0,'#f4f5e5'],[.6,'#d6ddca'],[1,'#9ab4aa']]),'#6e908b');box(c,x-13,8,26,10,2,'#edaf5f');oval(c,x,40,11,7,'#172e40');oval(c,x,41,7,4,moving?'#c6f9ff':'#75d6dc');line(c,x-8,-27,x+8,-27,'#ffffff77',1);}
@@ -57,20 +55,15 @@
     path(c,[[-22,-29],[-12,-55],[12,-55],[22,-29],[16,-16],[-16,-16]],gradient(c,-18,-54,18,-17,[[0,'#4a9aa1'],[.5,'#204e63'],[1,'#102b43']]),'#88c9c6');line(c,-8,-48,8,-48,'#d6fbf3',3);line(c,-16,-23,16,-23,'#9ee4df66',1);
     box(c,-19,-6,38,21,5,'#9aada5','#607d79');box(c,-10,-2,20,12,2,'#bdcebd');line(c,-6,2,6,2,'#e9f4d5',1);box(c,-4,20,8,9,2,'#eab465');
     line(c,18,-42,27,-77,'#739a98',3);oval(c,28,-78,4,4,'#e5f8b7');line(c,28,-78,28,-66,'#efffc3',1);
-    if(!flying)for(const x of[-47,47]){line(c,x,37,x*1.23,55,'#3b5760',6);box(c,x*1.23-12,52,24,7,3,'#c3d3be');oval(c,x*1.23,55,9,2,'#dcf6be77');}
+    if(!flying)for(const x of[-47,47]){line(c,x,37,x*1.23,55-compression,'#3b5760',6);box(c,x*1.23-12,52-compression,24,7,3,'#c3d3be');oval(c,x*1.23,55-compression,9,2,'#dcf6be77');}
     c.restore();
   }
   function animatedShip(c,flight,time){
-    const t=clamp(flight.age/flight.duration,0,1),launch=flight.kind==='launch';
-    const rise=launch?Math.pow(clamp((t-.16)/.84,0,1),1.65):Math.pow(1-clamp(t/.87,0,1),2);
-    const height=rise*340,scale=1-rise*.36,engine=launch||t<.92;
-    c.save();c.translate(0,-height+(launch?0:Math.sin(clamp((t-.87)/.13,0,1)*Math.PI)*4));c.scale(scale,scale);
-    c.globalAlpha=launch?1-clamp((t-.92)/.08,0,1):clamp(t/.1,0,1);
-    if(engine)for(const x of[-39,39]){glow(c,x,57,35,'#81dfff66');path(c,[[x-11,40],[x-6,68],[x,95+Math.sin(time*39)*9],[x+6,68],[x+11,40]],'#9eeeffb0');}
-    ship(c,time,false,engine);c.restore();
-    // Ground exhaust expands separately from the ship's height.
-    const exhaust=launch?Math.sin(clamp(t/.65,0,1)*Math.PI):Math.sin(clamp((t-.62)/.38,0,1)*Math.PI);
-    if(exhaust>0){c.save();c.globalAlpha=exhaust*.38;for(let i=0;i<10;i++){const a=i*TAU/10,r=54+exhaust*65;oval(c,Math.cos(a)*r,35+Math.sin(a)*r*.32,16+exhaust*11,5+exhaust*4,'#b2d4d1');}c.restore();}
+    const p=flight.motion||Motion.DEFAULTS[flight.kind],pose=Motion.flightPose(flight.kind,p,flight.age/flight.duration);
+    c.save();c.translate(pose.jitter,-pose.height);c.scale(pose.scale,pose.scale);c.globalAlpha=pose.alpha;
+    if(pose.thrust>.05)for(const x of[-39,39]){glow(c,x,57,35*pose.thrust,'#81dfff66');path(c,[[x-11,40],[x-6,68],[x,40+(55+Math.sin(time*39)*9)*pose.thrust],[x+6,68],[x+11,40]],'#9eeeffb0');}
+    ship(c,time,false,pose.thrust,pose.compression);c.restore();
+    if(pose.dust>0){c.save();c.globalAlpha=pose.dust*.38;for(let i=0;i<10;i++){const a=i*TAU/10,r=54+pose.dust*65;oval(c,Math.cos(a)*r,35+Math.sin(a)*r*.32,16+pose.dust*11,5+pose.dust*4,'#b2d4d1');}c.restore();}
   }
   function resource(c,n,time){
     const damaged=n.hp<n.maxHp;c.save();c.scale(n.size||1,n.size||1);oval(c,0,6,27,10,'#10292836');
@@ -244,7 +237,7 @@
         if(a.kind==='node'&&(a.type==='crystal'||a.type==='iron'))glow(c,0,-18,a.type==='crystal'?78:45,a.type==='crystal'?p.accent+'16':p.light+'0c');
         if(a.kind==='creature')glow(c,0,-20,48,p.light+'0a');
         if(nearest?.entity?.id===a.id&&a.id){ring(c,0,2,a.kind==='building'?66:35,p.accent+'bb',1.5);}
-        if(a.kind==='ship'){if(!g.flight)ship(c,this.time,false,false);else{const t=clamp(g.flight.age/g.flight.duration,0,1),h=g.flight.kind==='launch'?t:1-t;oval(c,0,28,72-h*30,22-h*9,'#05182455');}}
+        if(a.kind==='ship'){if(!g.flight)ship(c,this.time,false,false);else{const h=Motion.flightPose(g.flight.kind,g.flight.motion||Motion.DEFAULTS[g.flight.kind],g.flight.age/g.flight.duration).rise;oval(c,0,28,72-h*30,22-h*9,'#05182455');}}
         if(a.kind==='node')resource(c,a,this.time);
         if(a.kind==='building')building(c,a,this.time);
         if(a.kind==='creature')creature(c,a.species,this.time+a.phase,1,s.met.includes(a.species));
@@ -261,7 +254,7 @@
         if(a.kind==='relic'){oval(c,0,8,31,12,'#102b3740');path(c,[[-25,4],[-20,-45],[0,-64],[22,-46],[25,4]],p.dark,p.light+'55');line(c,-8,-32,0,-45,p.accent,3);line(c,0,-45,10,-31,p.accent,3);line(c,10,-31,0,-20,p.accent,3);if(!s.relics.includes(a.id))ring(c,0,-32,22+Math.sin(this.time*2)*2,p.accent+'50');}
         c.restore();}
       if(g.flight)animatedShip(c,g.flight,this.time);
-      if(g.beam){const b=g.beam,t=1-b.life/b.duration;c.save();c.globalAlpha=(1-t)*.7;c.translate(b.x,b.y-20);c.rotate(s.player.angle);c.beginPath();c.arc(-12,0,24+t*18,-1.15,1.15);c.strokeStyle=b.tool==='sword'?'#b7efff':b.tool==='axe'?'#d2fa92':'#ffe1a5';c.lineWidth=5*(1-t)+1;c.stroke();c.restore();}
+      if(g.beam&&g.beam.hit){const b=g.beam,t=clamp((1-b.life/b.duration-b.motion.impact)/(1-b.motion.impact),0,1);c.save();c.globalAlpha=(1-t)*.7;c.translate(b.x,b.y-20);c.rotate(s.player.angle);c.beginPath();c.arc(-12,0,24+t*18,-1.15,1.15);c.strokeStyle=b.tool==='sword'?'#b7efff':b.tool==='axe'?'#d2fa92':'#ffe1a5';c.lineWidth=5*(1-t)+1;c.stroke();c.restore();}
       if(g.scanRing){const t=g.scanRing.age;c.globalAlpha=Math.max(0,1-t/2);ring(c,g.scanRing.x,g.scanRing.y,t*330,p.accent,3);c.globalAlpha=1;}
       if(g.waypoint){const t=g.waypoint;ring(c,t.x,t.y,36+Math.sin(this.time*3)*4,p.accent,3);if(!(s.training&&g.trainingStep===0)){line(c,t.x,t.y-11,t.x,t.y-78,p.accent,2);path(c,[[t.x-8,t.y-76],[t.x+8,t.y-76],[t.x,t.y-66]],p.accent);c.fillStyle='#f2ffd7';c.font='bold 11px sans-serif';c.textAlign='center';c.fillText(t.label||'목표',t.x,t.y-87);}}
       if(g.selectedBuild){const target=this.mouse||{x:s.player.x+Math.cos(s.player.angle)*105,y:s.player.y+Math.sin(s.player.angle)*105},valid=g.canPlace(g.selectedBuild,target.x,target.y).ok;c.globalAlpha=.65;c.save();c.translate(target.x,target.y);building(c,{type:g.selectedBuild},this.time);ring(c,0,5,BUILDINGS[g.selectedBuild].radius+8,valid?'#d2ff99':'#ff9b8e',3);c.restore();c.globalAlpha=1;}
@@ -301,6 +294,6 @@
   }
   function drawPreview(canvas){const g=new Game();g.state.player={x:70,y:115,angle:0};g.world().buildings.push({type:'habitat',x:220,y:0,level:1},{type:'solar',x:270,y:120});const friend=g.world().creatures[0];friend.x=130;friend.y=150;g.state.met.push(friend.species);const r=new Renderer(canvas,null,g);r.zoom=.9;r.camera={x:80,y:60};r.time=1.2;r.draw(0);return r;}
   root.OrbitRenderer={Renderer,drawPlanet,creature,drawPreview};
-  root.Orbit2D={Renderer,ship,astronaut,building,resource,drawPreview};
+  root.Orbit2D={Renderer,ship,animatedShip,astronaut,building,resource,drawPreview};
   if(typeof module!=='undefined')module.exports=root.Orbit2D;
 })(typeof globalThis!=='undefined'?globalThis:this);
