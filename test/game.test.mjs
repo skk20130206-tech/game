@@ -111,7 +111,9 @@ test('Worker serves current game, all content pages, existing ads separation and
   const html=await (await worker.fetch(new Request('https://game.test/play'))).text();
   assert.ok(html.includes('orbit-share-button'));assert.ok(html.includes('orbit:start'));assert.ok(html.includes('Canvas 2D'));assert.equal(html.includes('Orbit3D'),false);assert.equal(html.includes("getContext('webgl')"),false);
   assert.equal(html.includes('pagead/js/adsbygoogle.js'),false);
-  assert.ok((await (await worker.fetch(new Request('https://game.test/'))).text()).includes('pagead/js/adsbygoogle.js'));
+  const home=await (await worker.fetch(new Request('https://game.test/'))).text();
+  assert.ok(home.includes('name="google-adsense-account"'));
+  assert.ok(!home.includes('pagead/js/adsbygoogle.js'));
   assert.equal((await worker.fetch(new Request('https://game.test/missing'))).status,404);
   for(const match of html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g))new vm.Script(match[1]);
 });
