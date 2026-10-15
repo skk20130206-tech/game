@@ -12,6 +12,8 @@
     {id:'ember',name:'엠버',code:'EMBER–04',kind:'붉은 화산 행성',temp:'67°C',gravity:1.3,seed:5183,x:250,y:1030,r:120,color:'#c47761',light:'#f7b290',dark:'#603f48',ground:['#53464c','#624b50','#73545a','#845c60','#926768'],water:'#ca674b',flora:'#b37b65',accent:'#ffa685',species:['emberling','cinderwisp'],resource:'철광석 · 수정',description:'붉은 균열 사이로 생명이 움틉니다. 불꽃이와 잿빛 정령이 용암빛 숨결로 어둠을 밀어냅니다.',oxygen:.26},
     {id:'prisma',name:'프리즈마',code:'PRISMA–05',kind:'보랏빛 수정 행성',temp:'12°C',gravity:.6,seed:2207,x:-1010,y:880,r:106,color:'#aa97d5',light:'#e0c6f1',dark:'#594879',ground:['#514963','#5b526f','#695d7d','#73668a','#807196'],water:'#393f64',flora:'#a994c3',accent:'#e7b6fd',species:['prismite','veilfox'],resource:'수정 풍부',description:'땅과 하늘이 함께 빛나는 수정의 정원. 수정 수호자와 환영 여우가 빛의 길을 만들며 노닙니다.',oxygen:.14}
   ];
+  // Game movement rule: Verdant is 1x; lighter gravity increases ground speed.
+  const surfaceSpeedMultiplier=p=>PLANETS[0].gravity/p.gravity;
   const SPECIES={
     mossling:{name:'모스링',kind:'숲의 작은 정원사',color:'#bbe490',dark:'#66936f',planet:'verdant',shape:'sprout',gift:{biomass:5},lore:'등에서 자라는 새싹으로 햇빛을 모아요. 낯선 탐험가에게도 나뭇잎을 나누어 줍니다.',line:'안녕, 별에서 온 친구!\n이 작은 새싹이 네 집에서도 자랐으면 좋겠어.'},
     lumi:{name:'루미',kind:'별빛을 모으는 친구',color:'#a3e4e9',dark:'#549daf',planet:'verdant',shape:'float',gift:{crystal:4},lore:'해가 지면 은은하게 빛나는 생명체. 반짝이는 것을 선물하는 건 루미의 인사예요.',line:'반짝이는 걸 좋아해? 나도!\n우리가 만난 기념으로 이 별 조각을 가져가.'},
@@ -159,7 +161,7 @@
       if(this.moveTarget&&!dx&&!dy){const d=dist(actor,this.moveTarget);if(d>7){dx=(this.moveTarget.x-actor.x)/d;dy=(this.moveTarget.y-actor.y)/d;}else{this.moveTarget=null;}}
       const len=Math.hypot(dx,dy),moving=len>.01;
       if(this.motionMode!==s.mode){this.motionMode=s.mode;this.velocity={x:0,y:0,z:0};this.pendingInteraction=null;this.waypoint=null;}
-      const speed=s.mode==='surface'?(input.run?218:144):(s.fuel>0?(input.run?540:250):95);
+      const speed=s.mode==='surface'?(input.run?218:144)*surfaceSpeedMultiplier(this.planet()):(s.fuel>0?(input.run?540:250):95);
       const response=1-Math.exp(-dt*(s.mode==='surface'?15:6));
       this.velocity.x+=((moving?dx/len*speed:0)-this.velocity.x)*response;
       this.velocity.y+=((moving?dy/len*speed:0)-this.velocity.y)*response;
@@ -391,7 +393,7 @@
     goals(){const s=this.state;return[{text:'철광석 12개, 바이오매스 8개 모으기',done:s.stats.collected.iron>=12&&s.stats.collected.biomass>=8},{text:'나만의 집 한 채 짓기',done:Object.values(s.worlds).some(w=>w.buildings.some(b=>b.type==='habitat'))},{text:'낯선 생명체와 친구 되기',done:s.met.length>0},{text:'우주선을 타고 두 번째 행성 탐험',done:s.visited.length>=2}];}
     nearbyState(){return{mode:this.state.mode,planet:this.planet().name,player:{...this.state.player},ship:{...this.state.ship},inventory:{...this.state.inventory},tools:[...this.state.tools],equippedTool:this.state.equippedTool,flight:this.flight?{...this.flight}:null,oxygen:Math.round(this.state.oxygen),fuel:Math.round(this.state.fuel),visited:[...this.state.visited],discovered:[...this.state.discovered],met:[...this.state.met],goals:this.goals(),nearby:this.state.mode==='surface'?{resources:this.world().nodes.filter(n=>n.hp>0&&dist(n,this.state.player)<350).map(n=>({id:n.id,type:n.type,x:n.x,y:n.y,hp:n.hp})),creatures:this.world().creatures.filter(c=>dist(c,this.state.player)<500).map(c=>({id:c.id,species:c.species,x:c.x,y:c.y})),buildings:this.world().buildings}:null};}
   }
-  const exports={Game,PLANETS,SPECIES,BUILDINGS,RESOURCE_NAMES,TOOLS,RESOURCE_TOOLS,FLIGHT_DURATION,SURFACE_MAP_SCALE,WORLD_LIMIT,TERRAIN_LIMIT,rand,clamp,dist};
+  const exports={Game,PLANETS,surfaceSpeedMultiplier,SPECIES,BUILDINGS,RESOURCE_NAMES,TOOLS,RESOURCE_TOOLS,FLIGHT_DURATION,SURFACE_MAP_SCALE,WORLD_LIMIT,TERRAIN_LIMIT,rand,clamp,dist};
   if(typeof module!=='undefined'&&module.exports)module.exports=exports;
   root.OrbitCore=exports;
 })(typeof globalThis!=='undefined'?globalThis:this);

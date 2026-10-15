@@ -5,7 +5,7 @@ import shareFeature from "./patch/share-feature.txt";
 import siteReady from "./patch/adsense-ready.txt";
 import {homePage,guidePage,resourcesPage,planetsPage,motionPage,savesPage,aboutPage,updatesPage,privacyPage,termsPage,contactPage,notFoundPage,robots,sitemap,CONTENT_PATHS,SITE_PATHS} from "./site.js";
 
-const BUILD="justgame-planet-environment-20261015-v28";
+const BUILD="justgame-gravity-movement-20261015-v29";
 const ADSENSE_CLIENT="ca-pub-6073295964667681";
 // Ownership verification does not require loading an advertising script.
 // Ad serving remains off until approval, placement and CMP configuration are reviewed.

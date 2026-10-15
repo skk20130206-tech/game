@@ -83,7 +83,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
 @media(max-width:660px){.motion-open-button{padding:7px;font-size:10px}#modal.motion-modal{width:calc(100vw - 16px);max-height:calc(100dvh - 16px);padding:18px 14px;border-radius:14px}.motion-modal .modal-heading h2{font-size:23px}.motion-intro{font-size:11px}.motion-workspace{grid-template-columns:1fr;gap:15px}.motion-library{gap:5px}.motion-library>button{min-width:76px;flex-direction:column;gap:6px;padding:9px 7px}.motion-library strong{font-size:10px}.motion-library .motion-item-icon{font-size:19px}.motion-stage canvas{height:270px}.motion-stage-bottom>small{font-size:8px}.motion-inspector{border-left:0;padding-left:0;border-top:1px solid #74948b2b;padding-top:20px}.motion-preview-tip{margin-top:10px}.motion-field{margin-bottom:20px}.motion-field label{font-size:12px}.motion-field p{font-size:10px}.motion-field input[type=range]{height:22px}.motion-field input[type=number]{font-size:13px;width:70px;padding:6px}.motion-field small{font-size:10px}.motion-presets button{padding:10px}.motion-footer{flex-direction:column;align-items:stretch;gap:12px}.motion-footer>div{justify-content:space-between}.motion-footer .motion-footer-actions{justify-content:flex-end}.motion-save-line{align-items:flex-start;flex-direction:column;gap:3px}.motion-exit{flex-wrap:wrap}.motion-exit span{width:100%}.motion-transport{padding-bottom:16px}.motion-transport button{min-height:38px}}
 
 /* Planet environment: keep HUD compact and comparison values aligned in the map. */
-.planet-environment{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:15px 0 0;padding:12px 14px;border:1px solid #87b7b32a;border-radius:10px;background:#0e242a80}
+.planet-environment{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:15px 0 0;padding:12px 14px;border:1px solid #87b7b32a;border-radius:10px;background:#0e242a80}
 .planet-environment>div{min-width:0}.planet-environment dt{font-size:10px;color:#a9c6be;letter-spacing:.06em;margin-bottom:5px}.planet-environment dd{margin:0;font-size:19px;font-weight:700;font-variant-numeric:tabular-nums;color:#d8f2cf}.planet-environment dd small{font-size:13px;color:#a9c6be}.environment-note{font-size:11px;line-height:1.7;color:#a7c5bc;margin:-8px 0 16px}.location #location-description{font-variant-numeric:tabular-nums}
 @media(max-width:600px){.planet-environment{padding:10px 12px;margin-top:12px}.planet-environment dd{font-size:17px}.environment-note{font-size:10px}.location #location-description{font-size:10px;letter-spacing:-.2px}}
 </style>
@@ -107,7 +107,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
         <section class="location glass">
           <span class="eyebrow" id="location-code">시그마 성계 / 01</span>
           <h1 id="location-name">베르단트<span class="planet-tag">탐험 중</span></h1>
-          <p id="location-description" title="탐험 지역 기온 / 표면 중력 · 1 g = 지구 중력">기온 21°C · 중력 1.00 g</p>
+          <p id="location-description" title="탐험 지역 기온 / 표면 중력 · 1 g = 지구 중력">기온 21°C · 중력 1.00 g · 이동 1.00배</p>
         </section>
         <section class="inventory glass" aria-label="보유 자원">
           <div class="resource" title="철광석: 암석을 채굴해 획득"><i class="resource-icon iron">◆</i><span><small>철광석</small><strong id="iron-count">0</strong></span></div>
@@ -230,6 +230,8 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     {id:'ember',name:'엠버',code:'EMBER–04',kind:'붉은 화산 행성',temp:'67°C',gravity:1.3,seed:5183,x:250,y:1030,r:120,color:'#c47761',light:'#f7b290',dark:'#603f48',ground:['#53464c','#624b50','#73545a','#845c60','#926768'],water:'#ca674b',flora:'#b37b65',accent:'#ffa685',species:['emberling','cinderwisp'],resource:'철광석 · 수정',description:'붉은 균열 사이로 생명이 움틉니다. 불꽃이와 잿빛 정령이 용암빛 숨결로 어둠을 밀어냅니다.',oxygen:.26},
     {id:'prisma',name:'프리즈마',code:'PRISMA–05',kind:'보랏빛 수정 행성',temp:'12°C',gravity:.6,seed:2207,x:-1010,y:880,r:106,color:'#aa97d5',light:'#e0c6f1',dark:'#594879',ground:['#514963','#5b526f','#695d7d','#73668a','#807196'],water:'#393f64',flora:'#a994c3',accent:'#e7b6fd',species:['prismite','veilfox'],resource:'수정 풍부',description:'땅과 하늘이 함께 빛나는 수정의 정원. 수정 수호자와 환영 여우가 빛의 길을 만들며 노닙니다.',oxygen:.14}
   ];
+  // Game movement rule: Verdant is 1x; lighter gravity increases ground speed.
+  const surfaceSpeedMultiplier=p=>PLANETS[0].gravity/p.gravity;
   const SPECIES={
     mossling:{name:'모스링',kind:'숲의 작은 정원사',color:'#bbe490',dark:'#66936f',planet:'verdant',shape:'sprout',gift:{biomass:5},lore:'등에서 자라는 새싹으로 햇빛을 모아요. 낯선 탐험가에게도 나뭇잎을 나누어 줍니다.',line:'안녕, 별에서 온 친구!\n이 작은 새싹이 네 집에서도 자랐으면 좋겠어.'},
     lumi:{name:'루미',kind:'별빛을 모으는 친구',color:'#a3e4e9',dark:'#549daf',planet:'verdant',shape:'float',gift:{crystal:4},lore:'해가 지면 은은하게 빛나는 생명체. 반짝이는 것을 선물하는 건 루미의 인사예요.',line:'반짝이는 걸 좋아해? 나도!\n우리가 만난 기념으로 이 별 조각을 가져가.'},
@@ -377,7 +379,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
       if(this.moveTarget&&!dx&&!dy){const d=dist(actor,this.moveTarget);if(d>7){dx=(this.moveTarget.x-actor.x)/d;dy=(this.moveTarget.y-actor.y)/d;}else{this.moveTarget=null;}}
       const len=Math.hypot(dx,dy),moving=len>.01;
       if(this.motionMode!==s.mode){this.motionMode=s.mode;this.velocity={x:0,y:0,z:0};this.pendingInteraction=null;this.waypoint=null;}
-      const speed=s.mode==='surface'?(input.run?218:144):(s.fuel>0?(input.run?540:250):95);
+      const speed=s.mode==='surface'?(input.run?218:144)*surfaceSpeedMultiplier(this.planet()):(s.fuel>0?(input.run?540:250):95);
       const response=1-Math.exp(-dt*(s.mode==='surface'?15:6));
       this.velocity.x+=((moving?dx/len*speed:0)-this.velocity.x)*response;
       this.velocity.y+=((moving?dy/len*speed:0)-this.velocity.y)*response;
@@ -609,7 +611,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     goals(){const s=this.state;return[{text:'철광석 12개, 바이오매스 8개 모으기',done:s.stats.collected.iron>=12&&s.stats.collected.biomass>=8},{text:'나만의 집 한 채 짓기',done:Object.values(s.worlds).some(w=>w.buildings.some(b=>b.type==='habitat'))},{text:'낯선 생명체와 친구 되기',done:s.met.length>0},{text:'우주선을 타고 두 번째 행성 탐험',done:s.visited.length>=2}];}
     nearbyState(){return{mode:this.state.mode,planet:this.planet().name,player:{...this.state.player},ship:{...this.state.ship},inventory:{...this.state.inventory},tools:[...this.state.tools],equippedTool:this.state.equippedTool,flight:this.flight?{...this.flight}:null,oxygen:Math.round(this.state.oxygen),fuel:Math.round(this.state.fuel),visited:[...this.state.visited],discovered:[...this.state.discovered],met:[...this.state.met],goals:this.goals(),nearby:this.state.mode==='surface'?{resources:this.world().nodes.filter(n=>n.hp>0&&dist(n,this.state.player)<350).map(n=>({id:n.id,type:n.type,x:n.x,y:n.y,hp:n.hp})),creatures:this.world().creatures.filter(c=>dist(c,this.state.player)<500).map(c=>({id:c.id,species:c.species,x:c.x,y:c.y})),buildings:this.world().buildings}:null};}
   }
-  const exports={Game,PLANETS,SPECIES,BUILDINGS,RESOURCE_NAMES,TOOLS,RESOURCE_TOOLS,FLIGHT_DURATION,SURFACE_MAP_SCALE,WORLD_LIMIT,TERRAIN_LIMIT,rand,clamp,dist};
+  const exports={Game,PLANETS,surfaceSpeedMultiplier,SPECIES,BUILDINGS,RESOURCE_NAMES,TOOLS,RESOURCE_TOOLS,FLIGHT_DURATION,SURFACE_MAP_SCALE,WORLD_LIMIT,TERRAIN_LIMIT,rand,clamp,dist};
   if(typeof module!=='undefined'&&module.exports)module.exports=exports;
   root.OrbitCore=exports;
 })(typeof globalThis!=='undefined'?globalThis:this);
@@ -1278,7 +1280,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
 <script>
 (function(){
   'use strict';
-  const {Game,PLANETS,SPECIES,BUILDINGS,RESOURCE_NAMES,TOOLS,RESOURCE_TOOLS,WORLD_LIMIT,dist,clamp}=window.OrbitCore;
+  const {Game,PLANETS,surfaceSpeedMultiplier,SPECIES,BUILDINGS,RESOURCE_NAMES,TOOLS,RESOURCE_TOOLS,WORLD_LIMIT,dist,clamp}=window.OrbitCore;
   const {Renderer,drawPlanet,creature}=window.OrbitRenderer;
   const Motion=window.OrbitMotion;
   let motionSettings=Motion.normalize();try{motionSettings=Motion.normalize(JSON.parse(localStorage.getItem(Motion.STORAGE_KEY)||'null'));}catch(e){}
@@ -1479,12 +1481,12 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
   $('modal-close').onclick=closeModal;
   function planetName(id){return PLANETS.find(p=>p.id===id)?.name||id;}
   // Surface environment values are worldbuilding data; g is relative to Earth.
-  function environmentText(p){return '기온 '+p.temp+' · 중력 '+p.gravity.toFixed(2)+' g';}
+  function environmentText(p){return '기온 '+p.temp+' · 중력 '+p.gravity.toFixed(2)+' g · 이동 '+surfaceSpeedMultiplier(p).toFixed(2)+'배';}
   function showMap(){
     const s=game.state,space=s.mode==='space';
     showModal('다음엔, 어떤 세계로 갈까요?','SIGMA SYSTEM / 성계 지도',
-      '<p class="modal-intro">'+(space?'행성을 선택해 궤도로 이동한 뒤 착륙하세요. 자유 비행은 방향키 또는 WASD로 할 수 있어요.':'지금은 '+planetName(s.planet)+'의 지표면에 있어요. 우주선 가까이에서 <kbd>F</kbd>로 이륙하면 다른 행성으로 떠날 수 있어요.')+'</p><p class="environment-note">행성별 탐험 지역 기온과 표면 중력 · 1 g = 지구 중력</p><div class="planet-list">'+
-      PLANETS.map((p,i)=>'<article class="planet-card'+(s.planet===p.id?' current':'')+'"><canvas class="planet-thumb" id="planet-thumb-'+p.id+'" width="132" height="132" aria-label="'+p.name+' 행성"></canvas><div><h3>'+p.name+'</h3><p>'+p.kind+'<br>'+p.resource+'</p></div><dl class="planet-environment"><div><dt>기온</dt><dd>'+p.temp+'</dd></div><div><dt>표면 중력</dt><dd>'+p.gravity.toFixed(2)+' <small>g</small></dd></div></dl><div class="planet-bottom"><span>'+(s.visited.includes(p.id)?'✓ 탐험 완료':'미탐사')+'</span><button class="small-button" data-warp="'+p.id+'" '+(!space||s.fuel<18||game.travel?'disabled':'')+'>'+(space?'궤도로 이동 · 연료 18':s.planet===p.id?'현재 행성':'이륙 후 이동')+'</button></div></article>').join('')+'</div><div class="map-note"><span>탐험한 행성 '+s.visited.length+' / '+PLANETS.length+'</span><span>남은 연료 '+Math.floor(s.fuel)+' / 100</span></div>'+(space&&s.fuel<18?'<button class="primary-button" id="map-refuel" style="margin-top:18px">연료 합성 / 비상 충전</button>':'')+(!space?'<button class="primary-button" id="map-return-ship" style="margin-top:18px">우주선으로 돌아가기</button>':''));
+      '<p class="modal-intro">'+(space?'행성을 선택해 궤도로 이동한 뒤 착륙하세요. 자유 비행은 방향키 또는 WASD로 할 수 있어요.':'지금은 '+planetName(s.planet)+'의 지표면에 있어요. 우주선 가까이에서 <kbd>F</kbd>로 이륙하면 다른 행성으로 떠날 수 있어요.')+'</p><p class="environment-note">1 g = 지구 중력 · 이동 속도 = 베르단트 중력 ÷ 현재 중력</p><div class="planet-list">'+
+      PLANETS.map((p,i)=>'<article class="planet-card'+(s.planet===p.id?' current':'')+'"><canvas class="planet-thumb" id="planet-thumb-'+p.id+'" width="132" height="132" aria-label="'+p.name+' 행성"></canvas><div><h3>'+p.name+'</h3><p>'+p.kind+'<br>'+p.resource+'</p></div><dl class="planet-environment"><div><dt>기온</dt><dd>'+p.temp+'</dd></div><div><dt>표면 중력</dt><dd>'+p.gravity.toFixed(2)+' <small>g</small></dd></div><div><dt>이동 속도</dt><dd>'+surfaceSpeedMultiplier(p).toFixed(2)+' <small>배</small></dd></div></dl><div class="planet-bottom"><span>'+(s.visited.includes(p.id)?'✓ 탐험 완료':'미탐사')+'</span><button class="small-button" data-warp="'+p.id+'" '+(!space||s.fuel<18||game.travel?'disabled':'')+'>'+(space?'궤도로 이동 · 연료 18':s.planet===p.id?'현재 행성':'이륙 후 이동')+'</button></div></article>').join('')+'</div><div class="map-note"><span>탐험한 행성 '+s.visited.length+' / '+PLANETS.length+'</span><span>남은 연료 '+Math.floor(s.fuel)+' / 100</span></div>'+(space&&s.fuel<18?'<button class="primary-button" id="map-refuel" style="margin-top:18px">연료 합성 / 비상 충전</button>':'')+(!space?'<button class="primary-button" id="map-return-ship" style="margin-top:18px">우주선으로 돌아가기</button>':''));
     $('explore-tab').classList.remove('active');$('map-tab').classList.add('active');
     for(const p of PLANETS){const c=$('planet-thumb-'+p.id).getContext('2d');drawPlanet(c,p,66,66,44);}
     modal.querySelectorAll('[data-warp]').forEach(b=>b.onclick=()=>{const id=b.dataset.warp;closeModal();game.warp(id);processEvents();});
@@ -1573,7 +1575,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     for(const r of ['iron','crystal','biomass'])setText(r+'-count',s.inventory[r]);
     setText('oxygen-text',Math.ceil(s.oxygen)+'%');$('oxygen-bar').style.width=s.oxygen+'%';$('oxygen-bar').style.background=s.oxygen<25?'#ffb196':'';setText('fuel-text',Math.floor(s.fuel)+'%');$('fuel-bar').style.width=s.fuel+'%';setText('journal-count',s.discovered.length);
     const loc=space?'space':p.id;if(locationSignature!==loc||force){locationSignature=loc;setText('location-code',space?'SIGMA SYSTEM / OPEN SPACE':'시그마 성계 / '+String(PLANETS.indexOf(p)+1).padStart(2,'0'));$('location-name').innerHTML=(space?'시그마 성계':p.name)+'<span class="planet-tag">'+(space?'비행 중':'탐험 중')+'</span>';$('location-description').textContent=space?'새로운 행성으로 향하는 중':environmentText(p);$('location-description').title=space?'':p.kind+' · 탐험 지역 기온 / 표면 중력 (1 g = 지구 중력)';setText('ship-label',space?'착륙':'우주선');$('scan-button').title=space?'주변 행성 스캔':'주변 자원과 생명체 스캔';}
-    if(s.training){setText('location-code','TRAINING SIMULATION / 전용 공간');$('location-name').innerHTML=(space?'비행 시뮬레이터':s.planet==='verdant'?'시그마 훈련 기지':'모의 착륙 구역')+'<span class="planet-tag">훈련 중</span>';$('location-description').textContent=space?'모의 항로 · 다른 행성에 착륙해 보세요':s.planet==='verdant'?'실내 22°C · 인공 중력 1.00 g':environmentText(p);$('location-description').title=space?'비행 시뮬레이터':s.planet==='verdant'?'시그마 훈련 기지의 실내 환경 · 1 g = 지구 중력':'모의 착륙 구역 · '+p.kind+' · 1 g = 지구 중력';}
+    if(s.training){setText('location-code','TRAINING SIMULATION / 전용 공간');$('location-name').innerHTML=(space?'비행 시뮬레이터':s.planet==='verdant'?'시그마 훈련 기지':'모의 착륙 구역')+'<span class="planet-tag">훈련 중</span>';$('location-description').textContent=space?'모의 항로 · 다른 행성에 착륙해 보세요':s.planet==='verdant'?'실내 22°C · 인공 중력 1.00 g · 이동 1.00배':environmentText(p);$('location-description').title=space?'비행 시뮬레이터':s.planet==='verdant'?'시그마 훈련 기지의 실내 환경 · 1 g = 지구 중력':'모의 착륙 구역 · '+p.kind+' · 1 g = 지구 중력';}
     updateTutorial();$('space-action').hidden=!space||!$('tutorial-card').hidden;$('mission-card').hidden=space||session.active||!$('tutorial-card').hidden;
     if(space){const target=nearest?.kind==='planet'?nearest.entity:null;setText('space-target-name',target?target.name+' 궤도':'다음 목적지를 찾아보세요');setText('space-target-help',target?environmentText(target)+' · 지표 환경':'방향키로 비행하거나 성계 지도에서 항로를 설정하세요.');$('land-button').disabled=!target||!!game.travel;setText('land-button',target?target.name+'에 착륙':'행성 가까이에서 착륙');setText('refuel-button',game.solarCharge>0?'태양광 비상 충전 · '+Math.ceil(game.solarCharge)+'초':s.inventory.biomass>=3?'연료 합성 · 바이오매스 3개':'비상 태양광 충전 · 6초');}
     let hint='자원 가까이에서 E를 누르세요',key='E';
