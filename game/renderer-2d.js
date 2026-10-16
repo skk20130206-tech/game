@@ -1,6 +1,6 @@
 (function(root){
   'use strict';
-  const {Game,PLANETS,SPECIES,BUILDINGS,RESOURCE_NAMES,WORLD_LIMIT,rand,dist,clamp}=root.OrbitCore;
+  const {Game,PROBE,probePose,PLANETS,SPECIES,BUILDINGS,RESOURCE_NAMES,WORLD_LIMIT,rand,dist,clamp}=root.OrbitCore;
   const {creature,drawPlanet}=root.OrbitPortraits,Motion=root.OrbitMotion,TAU=Math.PI*2;
   // Reuse the supplied transparent artwork for every iron deposit.
   const ironOreImage=typeof root.Image==='function'?new root.Image():null;
@@ -132,6 +132,29 @@
     }
     if(b.level===2){c.fillStyle='#e2edb0';c.font='bold 10px sans-serif';c.textAlign='center';c.fillText('II',0,39);}
   }
+  function drawProbe(c,quest,time,effects=true){
+    const pose=probePose(quest.stage,quest.age),repair=quest.stage==='repairing',active=pose.online;
+    const shake=effects&&pose.sparks?Math.sin(time*36)*2:0;
+    oval(c,0,16,65,22,'#0a202b55');ring(c,0,8,78,'#a6d7cf40',1);
+    for(const x of [-35,35]){line(c,x*.65,-6,x,24,'#314c55',9);box(c,x-13,20,26,8,3,'#abc0b6','#375965');}
+    c.save();c.translate(shake,0);c.rotate(pose.tilt*.12);
+    box(c,-44,-54,88,62,12,'#b8cec4','#426775');box(c,-36,-45,72,38,6,'#294754','#71929b');
+    box(c,-29,-38,39,23,4,active?'#5cbfb6':repair?'#599daf':'#263843');
+    c.fillStyle=active?'#d9ffe2':'#f2b581';c.font='bold 8px sans-serif';c.textAlign='center';c.fillText(active?'SIGMA 01':repair?'REPAIR':'OFFLINE',-9,-23);
+    for(let i=0;i<3;i++)box(c,18,-37+i*8,12,3,1,active?'#bde994':i===0?'#d69d6c':'#53606a');
+    line(c,-29,-3,28,-3,'#ecaa60',4);box(c,-12,1,24,10,3,'#3c5d66');
+    if(pose.damage>.25){line(c,-30,-50,-18,-40,'#1e3340',2);line(c,-18,-40,-24,-28,'#1e3340',2);line(c,28,-12,40,-20,'#1e3340',2);}
+    // The mast folds down and the detached solar vane falls to the ground.
+    c.save();c.translate(0,-53);c.rotate(pose.tilt);line(c,0,0,0,-46,'#809c9b',7);line(c,-3,0,-3,-46,'#d2e1d3',2);
+    c.save();c.translate(0,-48);c.rotate(effects&&active?Math.sin(time*.8)*.28:0);path(c,[[-28,-18],[-18,1],[0,12],[18,1],[28,-18]],'#c9ded0','#587983');line(c,-25,-17,24,-17,'#91c1bd',3);line(c,0,6,0,-29,'#496976',3);oval(c,0,-30,4,4,active?'#c8ffae':'#e4a16d');
+    if(active&&effects){c.globalAlpha=.2;for(let i=0;i<3;i++)ring(c,0,-34,14+((time*15+i*12)%36),'#c9ffc5',1);c.globalAlpha=1;}c.restore();c.restore();
+    c.save();c.translate(-45-pose.damage*19,-40+pose.damage*61);c.rotate(-.16-pose.damage*.9);box(c,-29,-10,34,34,3,'#284e6c','#8db4bd');for(let i=0;i<3;i++)line(c,-25,-5+i*9,0,-5+i*9,'#69a7b9',1);line(c,-14,-7,-14,20,'#77afbb',1);c.restore();
+    c.save();c.translate(44,-39);c.rotate(.17);box(c,-4,-10,34,34,3,'#2d536e','#8db4bd');for(let i=0;i<3;i++)line(c,0,-5+i*9,25,-5+i*9,'#69a7b9',1);c.restore();c.restore();
+    if(pose.sparks&&effects){for(let i=0;i<10;i++){const phase=(time*2+i*.17)%1,a=i*2.4;line(c,-20+Math.cos(a)*phase*12,-38+Math.sin(a)*phase*12,-20+Math.cos(a)*phase*45,-38+Math.sin(a)*phase*45,'#ffce7fcc',1.5);}}
+    if(pose.smoke&&effects)for(let i=0;i<6;i++){const f=(time*.22+i/6)%1;c.globalAlpha=(1-f)*pose.smoke*.55;oval(c,-22+Math.sin(i*2+f*4)*14,-35-f*105,8+f*17,9+f*14,'#29414b');}c.globalAlpha=1;
+    if(repair){const r=pose.progress;ring(c,0,-25,62,'#8aefe47a',2);for(const x of [-75,75]){line(c,x,18,x*.65,-22,'#9bbfbd',6);line(c,x*.65,-22,x*.35,-35-Math.sin(r*12)*8,'#d1dcca',5);oval(c,x*.35,-35-Math.sin(r*12)*8,5,5,'#b9fff0');}if(effects)glow(c,0,-28,60,'#80eedf22');}
+    c.textAlign='center';c.font='bold 10px sans-serif';c.fillStyle=quest.stage==='complete'?'#d9ffad':'#f4d4a2';c.fillText(quest.stage==='complete'?'탐사기 복구 완료':quest.stage==='collecting'?'고장 난 탐사기 · E 확인':'SIGMA / 신호 탐사기',0,53);
+  }
   class Renderer{
     constructor(canvas,radar,game){
       this.canvas=canvas;this.ctx=canvas.getContext('2d',{alpha:false});if(!this.ctx)throw Error('Canvas 2D 화면을 사용할 수 없어요. 최신 브라우저로 열어주세요.');
@@ -232,7 +255,7 @@
       if(g.moveTarget){ring(c,g.moveTarget.x,g.moveTarget.y,10+Math.sin(this.time*5)*2,'#edf7c7',1.5);}
       const nearest=g.nearest(),actors=[{kind:'ship',x:0,y:0},...w.nodes.filter(n=>n.hp>0).map(n=>({...n,kind:'node'})),...w.buildings.map(b=>({...b,kind:'building'})),...w.relics.map(r=>({...r,kind:'relic'})),...w.creatures.map(v=>({...v,kind:'creature'})),{...s.player,kind:'player'}];
       actors.sort((a,b)=>a.y-b.y);
-      const instructor=g.trainingNpc();if(instructor){actors.push({...instructor,kind:'npc'});actors.sort((a,b)=>a.y-b.y);}
+      const instructor=g.trainingNpc()||g.questNpc();const probe=g.probeEntity();if(probe)actors.push({...probe,kind:'probe'});if(instructor){actors.push({...instructor,kind:'npc'});actors.sort((a,b)=>a.y-b.y);}
       for(const a of actors){if(!this.project(a.x,a.y).visible)continue;c.save();c.translate(a.x,a.y);
         if(a.kind==='node'&&(a.type==='crystal'||a.type==='iron'))glow(c,0,-18,a.type==='crystal'?78:45,a.type==='crystal'?p.accent+'16':p.light+'0c');
         if(a.kind==='creature')glow(c,0,-20,48,p.light+'0a');
@@ -240,6 +263,7 @@
         if(a.kind==='ship'){if(!g.flight)ship(c,this.time,false,false);else{const h=Motion.flightPose(g.flight.kind,g.flight.motion||Motion.DEFAULTS[g.flight.kind],g.flight.age/g.flight.duration).rise;oval(c,0,28,72-h*30,22-h*9,'#05182455');}}
         if(a.kind==='node')resource(c,a,this.time);
         if(a.kind==='building')building(c,a,this.time);
+        if(a.kind==='probe'){if(g.probeCinematic)c.scale(1.65,1.65);drawProbe(c,s.probeQuest,this.time,this.immersive&&this.intensity>0);}
         if(a.kind==='creature')creature(c,a.species,this.time+a.phase,1,s.met.includes(a.species));
         if(a.kind==='player'&&!g.flight)astronaut(c,this.time,g.moving,s.player.angle,g.beam,s.equippedTool);
         if(a.kind==='npc'){
@@ -248,7 +272,7 @@
           box(c,-24,-62,48,33,10,'#d3eeed','#75b7c9');box(c,-19,-56,38,20,6,'#12364b');
           oval(c,-9,-47,4,4,'#92fff1');oval(c,9,-47,4,4,'#92fff1');line(c,0,-63,0,-72,'#a6e5e3',2);oval(c,0,-75,4,4,'#ffdb83');
           line(c,-18,-22,-29,-9,'#9ce6e5',6);line(c,18,-22,31,-36+Math.sin(this.time*3)*6,'#9ce6e5',6);box(c,-8,-20,16,10,3,'#f0d48c');
-          c.fillStyle='#dfffff';c.font='bold 12px sans-serif';c.textAlign='center';c.fillText('교관 루미 · E 대화',0,-92);
+          c.fillStyle='#dfffff';c.font='bold 12px sans-serif';c.textAlign='center';c.fillText(s.training?'교관 루미 · E 대화':'루미 · 탐사기 복구 임무',0,-92);
           if(g.trainingStep===0){box(c,-93,-148,186,32,12,'#b9f3ed');c.fillStyle='#123946';c.font='bold 12px sans-serif';c.fillText('여기로 와서 인사해 주세요!',0,-127);}
         }
         if(a.kind==='relic'){oval(c,0,8,31,12,'#102b3740');path(c,[[-25,4],[-20,-45],[0,-64],[22,-46],[25,4]],p.dark,p.light+'55');line(c,-8,-32,0,-45,p.accent,3);line(c,0,-45,10,-31,p.accent,3);line(c,10,-31,0,-20,p.accent,3);if(!s.relics.includes(a.id))ring(c,0,-32,22+Math.sin(this.time*2)*2,p.accent+'50');}
@@ -287,13 +311,13 @@
     drawRadar(){if(!this.rctx)return;const c=this.rctx,w=this.radar.width,h=this.radar.height,g=this.game,s=g.state,a=s.mode==='space'?s.ship:s.player,k=s.mode==='space'?.045:.095;c.clearRect(0,0,w,h);box(c,0,0,w,h,10,'#0e252f');c.save();c.beginPath();c.rect(0,0,w,h);c.clip();const point=(x,y,r,color)=>oval(c,w/2+(x-a.x)*k,h/2+(y-a.y)*k,r,r,color);if(s.mode==='space')for(const p of PLANETS)point(p.x,p.y,Math.max(3,p.r*k),p.color);else{point(0,0,4,'#fff4b3');for(const n of g.world().nodes)if(n.hp>0)point(n.x,n.y,1.5,n.type==='crystal'?'#b9d4f3':'#91ae99');for(const v of g.world().creatures)point(v.x,v.y,2.5,'#d5eea0');for(const b of g.world().buildings)point(b.x,b.y,3,'#84d5e1');if(g.waypoint)point(g.waypoint.x,g.waypoint.y,4,'#f5cc85');}point(a.x,a.y,3.5,'#efffda');c.restore();}
     draw(dt=.016){
       dt=clamp(Number(dt)||.016,0,.1);this.frameMs=this.frameMs*.94+dt*1000*.06;const s=this.game.state;if(this.mode!==s.mode)this.reset();if(!this.game.paused)this.time+=dt;
-      const actor=this.game.flight?{x:0,y:-75}:s.mode==='space'?s.ship:s.player;if(this.game.flight)this.pan={x:0,y:0};if(this.game.moving){this.pan.x*=Math.exp(-dt*3);this.pan.y*=Math.exp(-dt*3);}const response=1-Math.exp(-dt*10);this.camera.x+=(actor.x+this.pan.x-this.camera.x)*response;this.camera.y+=(actor.y+this.pan.y-this.camera.y)*response;
+      const actor=this.game.probeCinematic?{x:PROBE.x,y:PROBE.y+10}:this.game.flight?{x:0,y:-75}:s.mode==='space'?s.ship:s.player;if(this.game.flight||this.game.probeCinematic)this.pan={x:0,y:0};if(this.game.moving){this.pan.x*=Math.exp(-dt*3);this.pan.y*=Math.exp(-dt*3);}const response=1-Math.exp(-dt*10);this.camera.x+=(actor.x+this.pan.x-this.camera.x)*response;this.camera.y+=(actor.y+this.pan.y-this.camera.y)*response;
       const c=this.ctx;c.setTransform(this.dpr,0,0,this.dpr,0,0);c.save();if(this.immersive&&this.shake>0){c.translate(Math.sin(this.time*50)*this.shake*this.intensity,Math.cos(this.time*63)*this.shake*this.intensity);this.shake=Math.max(0,this.shake-dt*12);}
       if(s.mode==='surface')this.surface(c,dt);else this.space(c,dt);this.screenFx(c,s.mode);c.restore();this.radarTime+=dt;if(this.radarTime>.15){this.drawRadar();this.radarTime=0;}
     }
   }
   function drawPreview(canvas){const g=new Game();g.state.player={x:70,y:115,angle:0};g.world().buildings.push({type:'habitat',x:220,y:0,level:1},{type:'solar',x:270,y:120});const friend=g.world().creatures[0];friend.x=130;friend.y=150;g.state.met.push(friend.species);const r=new Renderer(canvas,null,g);r.zoom=.9;r.camera={x:80,y:60};r.time=1.2;r.draw(0);return r;}
   root.OrbitRenderer={Renderer,drawPlanet,creature,drawPreview};
-  root.Orbit2D={Renderer,ship,animatedShip,astronaut,building,resource,drawPreview};
+  root.Orbit2D={Renderer,drawProbe,ship,animatedShip,astronaut,building,resource,drawPreview};
   if(typeof module!=='undefined')module.exports=root.Orbit2D;
 })(typeof globalThis!=='undefined'?globalThis:this);
