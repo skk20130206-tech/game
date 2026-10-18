@@ -2,9 +2,9 @@
   'use strict';
   const STEPS=[
     {short:'루미',zone:'01 · 도착 / 접수대',title:'루미에게 첫인사를 건네요',text:'빛나는 안내 로봇을 클릭해 다가가세요. 가까이에서는 E로 대화할 수 있어요.',note:'WASD·방향키로 이동 · 빈 땅 클릭으로 이동',line:'어서 와요! 저는 교관 루미예요. 제 쪽으로 걸어와 인사해 주세요. 함께 첫 탐험을 준비해요.',controls:['touch-pad','interact-button']},
-    {short:'채굴',zone:'02 · 자원 실습실',title:'곡괭이로 철광석을 채굴해요',text:'1번 곡괭이를 장착하고, 표시된 철광석 가까이에서 E 또는 ‘채굴 / 교류’를 꾹 누르세요.',note:'철광석 → 곡괭이 · 바이오매스 → 도끼 · 수정 → 칼',line:'탐사 도구 3개를 지급했어요! 철광석은 곡괭이, 바이오매스는 도끼, 수정은 칼로만 부술 수 있어요. 먼저 곡괭이를 사용해 볼까요?',controls:['interact-button']},
+    {short:'채굴',zone:'02 · 자원 실습실',title:'곡괭이로 철광석을 채굴해요',text:'1번 곡괭이를 장착하고, 표시된 철광석 가까이에서 E 또는 ‘채굴 / 교류’를 꾹 누르세요.',note:'철광석 → 곡괭이 · 풀 → 도끼 · 수정 → 칼',line:'탐사 도구 3개를 지급했어요! 철광석은 곡괭이, 풀은 도끼, 수정은 칼로만 부술 수 있어요. 먼저 곡괭이를 사용해 볼까요?',controls:['interact-button']},
     {short:'스캔',zone:'02 · 자원 실습실',title:'스캐너를 작동시켜요',text:'Q 또는 아래 ‘스캔’을 누르세요. 주변 자원과 생명체를 감지해요.',note:'스캔을 마치면 집 짓기에 필요한 재료를 지급해요.',line:'첫 자원을 얻었네요! 이번에는 스캐너로 주변을 살펴봐요. 다음 실습에 쓸 건설 재료도 준비해 둘게요.',controls:['scan-button']},
-    {short:'건설',zone:'03 · 건설 실습실',title:'나만의 첫 집을 지어요',text:'금색 건설장으로 이동해 B → ‘탐험가의 집’을 선택하고, 테두리 안의 빈 땅을 클릭하세요.',note:'철광석 12개 + 바이오매스 8개 · 건설 재료 지급 완료',line:'건설 재료를 받았죠? 금색 실습장에 집을 지어 보세요. 실제 탐험에서는 집 근처에서 산소를 채울 수 있어요.',controls:['build-button']},
+    {short:'건설',zone:'03 · 건설 실습실',title:'나만의 첫 집을 지어요',text:'금색 건설장으로 이동해 B → ‘탐험가의 집’을 선택하고, 테두리 안의 빈 땅을 클릭하세요.',note:'철광석 12개 + 풀 8개 · 건설 재료 지급 완료',line:'건설 재료를 받았죠? 금색 실습장에 집을 지어 보세요. 실제 탐험에서는 집 근처에서 산소를 채울 수 있어요.',controls:['build-button']},
     {short:'교류',zone:'04 · 생태 실습실',title:'모스링과 친구가 돼요',text:'초록빛 생태실의 생명체를 클릭하거나 가까이에서 E를 눌러 인사하세요.',note:'스캔은 발견, 대화는 교류예요. 직접 인사를 건네 보세요.',line:'멋진 집이에요! 이제 왼쪽 생태실로 가 볼까요? 모스링에게 인사하면 작은 선물을 받을 수 있어요.',controls:['interact-button']},
     {short:'이륙',zone:'05 · 비행 격납고',title:'우주선을 타고 출발해요',text:'중앙 격납고의 우주선으로 돌아가 F 또는 ‘우주선’을 누르세요.',note:'우주선에 다가간 뒤 한 번 더 눌러 이륙해요.',line:'지상 훈련을 모두 마쳤어요! 중앙 격납고에서 비행 연습을 시작해요. 제가 무전으로 계속 안내할게요.',controls:['ship-button']},
     {short:'착륙',zone:'06 · 비행 시뮬레이터',title:'다른 행성에 착륙해요',text:'M → 다른 행성의 항로를 선택하세요. 도착한 뒤 E 또는 ‘착륙’을 누르면 훈련 완료!',note:'현재 행성이 아닌 다른 행성을 선택하세요.',line:'마지막 실습이에요! 성계 지도에서 새로운 목적지를 고르고 착륙해 보세요. 여기까지 마치면 정식 탐험가가 됩니다.',controls:['map-tab','ship-button']}
@@ -35,7 +35,7 @@
       if(allowed(1)&&e.type==='effect'&&e.kind==='break')this.done[1]=true;
       if(allowed(2)&&e.type==='effect'&&e.kind==='scan'&&e.scanAction&&game.state.mode==='surface'){
         this.done[2]=true;
-        if(training){for(const [r,n]of Object.entries({iron:12,biomass:8}))if(game.state.inventory[r]<n)game.addResource(r,n-game.state.inventory[r]);game.emit('message',{text:'루미: 건설 재료 도착! 철광석 12개와 바이오매스 8개가 준비됐어요.'});game.emit('save');}
+        if(training){for(const [r,n]of Object.entries({iron:12,biomass:8}))if(game.state.inventory[r]<n)game.addResource(r,n-game.state.inventory[r]);game.emit('message',{text:'루미: 건설 재료 도착! 철광석 12개와 풀 8개가 준비됐어요.'});game.emit('save');}
       }
       if(allowed(3)&&e.type==='effect'&&e.kind==='build'&&e.buildingType==='habitat')this.done[3]=true;
       if(allowed(4)&&e.type==='dialogue')this.done[4]=true;
@@ -62,7 +62,7 @@
       if(this.step===0){target=game.trainingNpc();if(!target)info.note=Math.floor(this.walked)+' / 60m · '+info.note;}
       if(this.step===1)target=nearest(w.nodes.filter(n=>n.hp>0&&n.type==='iron'));
       if(this.step===3){
-        info.note='철광석 '+s.inventory.iron+' / 12 · 바이오매스 '+s.inventory.biomass+' / 8';
+        info.note='철광석 '+s.inventory.iron+' / 12 · 풀 '+s.inventory.biomass+' / 8';
         const type=s.inventory.iron<12?'iron':s.inventory.biomass<8?'biomass':null;
         if(type){target=nearest(w.nodes.filter(n=>n.hp>0&&n.type===type));info.controls=['interact-button'];}
         else if(s.training&&Math.hypot(s.player.x-450,s.player.y-480)>210){target={x:450,y:370};info.label='건설장으로 이동';}

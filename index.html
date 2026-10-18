@@ -118,7 +118,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
         <section class="inventory glass" aria-label="보유 자원">
           <div class="resource" title="철광석: 암석을 채굴해 획득"><i class="resource-icon iron">◆</i><span><small>철광석</small><strong id="iron-count">0</strong></span></div>
           <div class="resource" title="수정: 빛나는 결정을 채굴해 획득"><i class="resource-icon crystal">♦</i><span><small>수정</small><strong id="crystal-count">0</strong></span></div>
-          <div class="resource" title="바이오매스: 외계 식물을 채집해 획득"><i class="resource-icon biomass">❋</i><span><small>바이오매스</small><strong id="biomass-count">0</strong></span></div>
+          <div class="resource" title="풀: 베르단트에서 도끼로 채집해 획득"><i class="resource-icon biomass">❋</i><span><small>풀</small><strong id="biomass-count">0</strong></span></div>
         </section>
         <section class="vitals glass" aria-label="탐험가 상태">
           <div><span>O₂ <small>산소</small></span><strong id="oxygen-text">100%</strong></div><div class="meter"><i id="oxygen-bar"></i></div>
@@ -140,11 +140,11 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
       <div class="discovery-banner" id="discovery-banner" hidden><span>새로운 발견</span><strong id="discovery-title"></strong><p id="discovery-detail"></p></div>
       <div class="bottom-hud">
         <div class="expedition-state"><span class="compass">N ↑</span><span id="coordinate-label">X 0000 / Y 0000</span><span id="day-label">탐험 1일째</span></div>
-        <div class="center-controls"><div id="tool-rack" class="tool-rack"><button id="starter-tools" class="starter-tools">탐사 도구 받기 · 우주선 / 루미</button><div class="tool-belt glass" role="group" aria-label="보유 도구 및 장착"><button class="equipment-slot" data-tool="pickaxe" aria-pressed="false"><svg viewBox="0 0 26 26" aria-hidden="true"><path d="M12 8v14M3 10l4-6 5-1 6 2 4 5-8-3-4 1z"/></svg><span><strong>곡괭이</strong><small>철광석</small></span><kbd>1</kbd></button><button class="equipment-slot" data-tool="axe" aria-pressed="false"><svg viewBox="0 0 26 26" aria-hidden="true"><path d="M8 3v20M9 5l9-3 4 5v8l-8-1-5-4"/></svg><span><strong>도끼</strong><small>바이오매스</small></span><kbd>2</kbd></button><button class="equipment-slot" data-tool="sword" aria-pressed="false"><svg viewBox="0 0 26 26" aria-hidden="true"><path d="M12 22v-8M7 15h10M10 14V5l2-3 2 3v9"/></svg><span><strong>칼</strong><small>수정</small></span><kbd>3</kbd></button></div></div><div class="interaction-hint glass" id="interaction-hint"><kbd>E</kbd><span>가까운 자원을 채굴하세요</span></div><div class="toolbar glass" role="group" aria-label="탐험 도구"><button id="interact-button" class="tool-button selected"><span class="tool-icon">⛏</span><span id="interact-label">채굴 / 교류</span><kbd>E</kbd></button><button id="scan-button" class="tool-button"><span class="tool-icon">⌾</span><span>스캔</span><kbd>Q</kbd></button><button id="build-button" class="tool-button"><span class="tool-icon">⌂</span><span>건설</span><kbd>B</kbd></button><button id="ship-button" class="tool-button"><span class="tool-icon">↑</span><span id="ship-label">우주선</span><kbd>F</kbd></button></div><p class="keyboard-hint"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 이동 <span>·</span> <kbd>Shift</kbd> 가속 <span>·</span> 드래그 지도 <span>·</span> <kbd>V</kbd> 확대</p></div>
+        <div class="center-controls"><div id="tool-rack" class="tool-rack"><button id="starter-tools" class="starter-tools">탐사 도구 받기 · 우주선 / 루미</button><div class="tool-belt glass" role="group" aria-label="보유 도구 및 장착"><button class="equipment-slot" data-tool="pickaxe" aria-pressed="false"><svg viewBox="0 0 26 26" aria-hidden="true"><path d="M12 8v14M3 10l4-6 5-1 6 2 4 5-8-3-4 1z"/></svg><span><strong>곡괭이</strong><small>철광석</small></span><kbd>1</kbd></button><button class="equipment-slot" data-tool="axe" aria-pressed="false"><svg viewBox="0 0 26 26" aria-hidden="true"><path d="M8 3v20M9 5l9-3 4 5v8l-8-1-5-4"/></svg><span><strong>도끼</strong><small>풀</small></span><kbd>2</kbd></button><button class="equipment-slot" data-tool="sword" aria-pressed="false"><svg viewBox="0 0 26 26" aria-hidden="true"><path d="M12 22v-8M7 15h10M10 14V5l2-3 2 3v9"/></svg><span><strong>칼</strong><small>수정</small></span><kbd>3</kbd></button></div></div><div class="interaction-hint glass" id="interaction-hint"><kbd>E</kbd><span>가까운 자원을 채굴하세요</span></div><div class="toolbar glass" role="group" aria-label="탐험 도구"><button id="interact-button" class="tool-button selected"><span class="tool-icon">⛏</span><span id="interact-label">채굴 / 교류</span><kbd>E</kbd></button><button id="scan-button" class="tool-button"><span class="tool-icon">⌾</span><span>스캔</span><kbd>Q</kbd></button><button id="build-button" class="tool-button"><span class="tool-icon">⌂</span><span>건설</span><kbd>B</kbd></button><button id="ship-button" class="tool-button"><span class="tool-icon">↑</span><span id="ship-label">우주선</span><kbd>F</kbd></button></div><p class="keyboard-hint"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 이동 <span>·</span> <kbd>Shift</kbd> 가속 <span>·</span> 드래그 지도 <span>·</span> <kbd>V</kbd> 확대</p></div>
         <button class="radar-panel glass" id="radar-button" aria-label="성계 지도 열기"><span class="radar-title">주변 탐색 <span>↗</span></span><canvas id="radar" width="160" height="126" aria-hidden="true"></canvas><span class="radar-caption">시그마 성계 · 개척 가능</span></button>
       </div>
       <div class="touch-pad" id="touch-pad" aria-label="터치 이동"><button data-move="up" aria-label="위로 이동">↑</button><button data-move="left" aria-label="왼쪽으로 이동">←</button><span></span><button data-move="right" aria-label="오른쪽으로 이동">→</button><button data-move="down" aria-label="아래로 이동">↓</button></div>
-      <div class="space-action glass" id="space-action" hidden><strong id="space-target-name">다음 목적지를 찾아보세요</strong><p id="space-target-help">방향키로 비행하거나 성계 지도에서 항로를 설정하세요.</p><button id="land-button" class="primary-button" disabled>행성 가까이에서 착륙</button><button id="refuel-button" class="subtle-button">연료 합성 · 바이오매스 3개</button></div>
+      <div class="space-action glass" id="space-action" hidden><strong id="space-target-name">다음 목적지를 찾아보세요</strong><p id="space-target-help">방향키로 비행하거나 성계 지도에서 항로를 설정하세요.</p><button id="land-button" class="primary-button" disabled>행성 가까이에서 착륙</button><button id="refuel-button" class="subtle-button">연료 합성 · 풀 3개</button></div>
     </main>
     <footer class="statusbar"><span><span class="status-light"></span> <span id="status-label">탐사 장비 정상</span></span><span id="phase-status">튜토리얼 · 완료 후 본게임</span><button id="settings-button">저장 관리</button></footer>
   </div>
@@ -166,7 +166,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     launch:{duration:2.8,mark:.18,height:340,ease:1.65,recoil:2,thrust:1},
     land:{duration:2.8,mark:.87,height:340,ease:2,recoil:4,thrust:1}
   };
-  const GROUPS={pickaxe:{name:'곡괭이',detail:'철광석 · 내려찍기',icon:'⛏'},axe:{name:'도끼',detail:'바이오매스 · 대각선 찍기',icon:'◩'},sword:{name:'칼',detail:'수정 · 가로 베기',icon:'⚔'},launch:{name:'이륙',detail:'점화 · 상승 · 궤도 진입',icon:'↗'},land:{name:'착륙',detail:'접근 · 감속 · 착지',icon:'↘'}};
+  const GROUPS={pickaxe:{name:'곡괭이',detail:'철광석 · 내려찍기',icon:'⛏'},axe:{name:'도끼',detail:'풀 · 대각선 찍기',icon:'◩'},sword:{name:'칼',detail:'수정 · 가로 베기',icon:'⚔'},launch:{name:'이륙',detail:'점화 · 상승 · 궤도 진입',icon:'↗'},land:{name:'착륙',detail:'접근 · 감속 · 착지',icon:'↘'}};
   const TOOL_FIELDS=[
     {key:'duration',label:'전체 동작 시간',min:.35,max:1.4,step:.01,unit:'초',hint:'준비부터 원래 자세로 돌아올 때까지'},
     {key:'impact',label:'타격 시점',min:.25,max:.7,step:.01,unit:'%',percent:true,hint:'이 순간에 피해·파편·효과음이 발생해요'},
@@ -231,7 +231,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
   const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
   function rand(seed){let s=seed>>>0;return()=>{s+=0x6D2B79F5;let t=s;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}
   const PLANETS=[
-    {id:'verdant',name:'베르단트',code:'VERDANT–01',kind:'온화한 숲 행성',temp:'21°C',gravity:1.0,seed:4201,x:-480,y:70,r:130,color:'#73bc91',light:'#b2ddb3',dark:'#245c57',ground:['#315f53','#356658','#3d7060','#497d63','#558668'],water:'#1e5055',flora:'#73b18c',accent:'#c3f379',species:['mossling','lumi','mistmoth'],resource:'바이오매스 풍부',description:'별빛을 머금은 숲, 느릿하게 걷는 작은 생명들과 안개 날개 요정이 머무는 곳. 당신의 첫 보금자리로 완벽한 행성입니다.',oxygen:.11},
+    {id:'verdant',name:'베르단트',code:'VERDANT–01',kind:'온화한 숲 행성',temp:'21°C',gravity:1.0,seed:4201,x:-480,y:70,r:130,color:'#73bc91',light:'#b2ddb3',dark:'#245c57',ground:['#315f53','#356658','#3d7060','#497d63','#558668'],water:'#1e5055',flora:'#73b18c',accent:'#c3f379',species:['mossling','lumi','mistmoth'],resource:'풀 · 베르단트 전용',description:'별빛을 머금은 숲, 느릿하게 걷는 작은 생명들과 안개 날개 요정이 머무는 곳. 당신의 첫 보금자리로 완벽한 행성입니다.',oxygen:.11},
     {id:'solara',name:'솔라라',code:'SOLARA–02',kind:'황금빛 사막 행성',temp:'38°C',gravity:.8,seed:7129,x:470,y:-480,r:107,color:'#dbab6d',light:'#ffe1a2',dark:'#966344',ground:['#92724f','#a58257','#af8f60','#b69767','#bfa16e'],water:'#526968',flora:'#af9270',accent:'#fbd681',species:['dunecrab','sunwhorl'],resource:'철광석 풍부',description:'오래된 바람이 모래 언덕을 가로지르는 곳. 모래게와 황금빛 소용돌이 정령이 유적 주위를 맴돕니다.',oxygen:.19},
     {id:'nix',name:'닉스',code:'NIX–03',kind:'푸른 빙하 행성',temp:'−42°C',gravity:.7,seed:9703,x:920,y:330,r:101,color:'#a2cfe2',light:'#e1f2ec',dark:'#497e98',ground:['#637f96','#7897aa','#8da9b9','#97b6c5','#a1bfcd'],water:'#315b7b',flora:'#becedb',accent:'#abedff',species:['snowpuff','aurorayne'],resource:'수정 풍부',description:'얼음 아래로 푸른 수정맥이 흐릅니다. 보송이와 오로라 뿔을 가진 신비한 존재가 차가운 밤을 밝힙니다.',oxygen:.2},
     {id:'ember',name:'엠버',code:'EMBER–04',kind:'붉은 화산 행성',temp:'67°C',gravity:1.3,seed:5183,x:250,y:1030,r:120,color:'#c47761',light:'#f7b290',dark:'#603f48',ground:['#53464c','#624b50','#73545a','#845c60','#926768'],water:'#ca674b',flora:'#b37b65',accent:'#ffa685',species:['emberling','cinderwisp'],resource:'철광석 · 수정',description:'붉은 균열 사이로 생명이 움틉니다. 불꽃이와 잿빛 정령이 용암빛 숨결로 어둠을 밀어냅니다.',oxygen:.26},
@@ -246,18 +246,18 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     dunecrab:{name:'듄크랩',kind:'사막의 길잡이',color:'#f0be80',dark:'#aa7455',planet:'solara',shape:'crab',gift:{iron:8},lore:'여섯 개의 발로 뜨거운 모래를 성큼성큼 걸어요. 모래 속 금속을 모으는 취미가 있어요.',line:'사각사각! 모래 아래에는 보물이 많지.\n이 단단한 돌로 멋진 집을 지어봐!'},
     sunwhorl:{name:'선월',kind:'사막의 황금 소용돌이 정령',color:'#ffd98a',dark:'#d39a57',planet:'solara',shape:'sunwhorl',gift:{iron:5,crystal:3},lore:'유적 위를 맴도는 모래 정령. 몸을 둘러싼 고리가 바람의 방향과 비밀스러운 유적의 길을 알려 줍니다.',line:'바람은 늘 같은 길을 그리는 법이야.\n이 반짝임을 따라가면 너도 길을 찾을 수 있어.'},
     snowpuff:{name:'보송이',kind:'빙하의 솜뭉치',color:'#e4f0fa',dark:'#93b6d0',planet:'nix',shape:'fluff',gift:{crystal:6},lore:'폭신한 털에 공기를 가둬 추위를 견뎌요. 친구를 발견하면 귀를 쫑긋 세운답니다.',line:'후우, 오늘도 조금 쌀쌀하네!\n따뜻한 집을 짓는다면 나도 놀러 가도 될까?'},
-    aurorayne:{name:'오로레인',kind:'오로라 뿔의 설원 정령',color:'#d8f8ff',dark:'#79a8c8',planet:'nix',shape:'aurorayne',gift:{crystal:8,biomass:2},lore:'머리 위의 유리 같은 뿔이 오로라를 머금으면 눈밭에 잔잔한 색빛이 번져요. 고요한 밤일수록 더 가까이 다가옵니다.',line:'차가운 별빛은 아프지 않아. 아주 조용할 뿐이야.\n이 작은 얼음결정이 너의 주머니에서도 노래할 거야.'},
+    aurorayne:{name:'오로레인',kind:'오로라 뿔의 설원 정령',color:'#d8f8ff',dark:'#79a8c8',planet:'nix',shape:'aurorayne',gift:{crystal:10},lore:'머리 위의 유리 같은 뿔이 오로라를 머금으면 눈밭에 잔잔한 색빛이 번져요. 고요한 밤일수록 더 가까이 다가옵니다.',line:'차가운 별빛은 아프지 않아. 아주 조용할 뿐이야.\n이 작은 얼음결정이 너의 주머니에서도 노래할 거야.'},
     emberling:{name:'불꽃이',kind:'화산의 온기',color:'#ffa479',dark:'#be6460',planet:'ember',shape:'flame',gift:{iron:10},lore:'등의 작은 불꽃은 기분에 따라 달라져요. 반가운 친구를 만나면 불꽃이 춤을 춥니다.',line:'우와, 손님이다! 뜨거우니까 조심해.\n이 철은 용암이 나한테 준 선물이야.'},
     cinderwisp:{name:'신더위습',kind:'재와 불씨의 유영자',color:'#ffc48c',dark:'#b86057',planet:'ember',shape:'cinderwisp',gift:{iron:4,crystal:5},lore:'몸체보다 후광과 불씨가 먼저 보이는 작은 정령. 화산 틈의 속삭임을 따라 유영하며 잿빛 밤을 물들입니다.',line:'너의 심장도 작은 별처럼 타오르고 있구나.\n받아, 이 불씨는 길이 어두울 때 가장 환하게 빛나.'},
     prismite:{name:'프리즘',kind:'수정 정원의 수호자',color:'#d4b6f5',dark:'#8a70ac',planet:'prisma',shape:'prism',gift:{crystal:10},lore:'수정과 함께 자라는 신비한 생명체. 빛을 굴절시켜 무지개로 마음을 전합니다.',line:'멀리서 온 너의 빛이 느껴져.\n네가 머무는 곳도 이 수정처럼 빛나기를.'},
-    veilfox:{name:'베일폭스',kind:'환영 꼬리의 수정 여우',color:'#efe2ff',dark:'#9077c2',planet:'prisma',shape:'veilfox',gift:{crystal:7,biomass:3},lore:'반투명한 꼬리가 여러 갈래로 번지며 공중에 빛의 흔적을 남겨요. 모습을 드러냈다가도 금세 유리 안개처럼 사라집니다.',line:'내 꼬리에 남은 잔광을 따라와 봐.\n너의 집에도 꿈처럼 빛나는 길이 이어질 거야.'}
+    veilfox:{name:'베일폭스',kind:'환영 꼬리의 수정 여우',color:'#efe2ff',dark:'#9077c2',planet:'prisma',shape:'veilfox',gift:{crystal:10},lore:'반투명한 꼬리가 여러 갈래로 번지며 공중에 빛의 흔적을 남겨요. 모습을 드러냈다가도 금세 유리 안개처럼 사라집니다.',line:'내 꼬리에 남은 잔광을 따라와 봐.\n너의 집에도 꿈처럼 빛나는 길이 이어질 거야.'}
   };
   const BUILDINGS={
     habitat:{name:'탐험가의 집',icon:'⌂',cost:{iron:12,biomass:8},description:'머무르면 산소를 충전해요.',radius:67},
     solar:{name:'태양광 충전기',icon:'▦',cost:{iron:8,crystal:6},description:'근처에서 우주선 연료를 충전해요.',radius:52},
     beacon:{name:'탐사 비콘',icon:'⌁',cost:{iron:6,crystal:4},description:'주변 자원과 생명체를 표시해요.',radius:32}
   };
-  const RESOURCE_NAMES={iron:'철광석',crystal:'수정',biomass:'바이오매스'};
+  const RESOURCE_NAMES={iron:'철광석',crystal:'수정',biomass:'풀'};
   const TOOLS={pickaxe:{name:'곡괭이',resource:'iron',key:'1'},axe:{name:'도끼',resource:'biomass',key:'2'},sword:{name:'칼',resource:'crystal',key:'3'}};
   const RESOURCE_TOOLS={iron:'pickaxe',biomass:'axe',crystal:'sword'},FLIGHT_DURATION=2.8;
   const PROBE={id:'lumi-probe',x:320,y:-175,name:'루미의 탐사기',cost:{iron:18,biomass:10,crystal:4},failureDuration:7,repairDuration:4.5};
@@ -360,7 +360,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
       const random=rand(p.seed),nodes=[],creatures=[];
       if(training){
         const samples=[['iron',330,15],['iron',535,45],['crystal',645,135],['biomass',335,195],['biomass',505,215]];
-        return{nodes:samples.map(([type,x,y],i)=>({id:'training-v2-'+p.id+'-node-'+i,type,x,y,hp:type==='iron'?4:type==='crystal'?3:2,maxHp:type==='iron'?4:type==='crystal'?3:2,respawnAt:0,size:1,rotation:random()*TAU,seed:Math.floor(random()*10000)})),creatures:[{id:'training-v2-'+p.id+'-friend',species:p.species[0],x:-465,y:515,homeX:-465,homeY:515,phase:0,angle:0}],buildings:[],relics:[]};
+        return{nodes:samples.map(([type,x,y],i)=>({id:'training-v2-'+p.id+'-node-'+i,type,x,y,hp:type==='iron'?4:type==='crystal'?3:2,maxHp:type==='iron'?4:type==='crystal'?3:2,respawnAt:0,size:1,rotation:random()*TAU,seed:Math.floor(random()*10000)})).filter(n=>p.id==='verdant'||n.type!=='biomass'),creatures:[{id:'training-v2-'+p.id+'-friend',species:p.species[0],x:-465,y:515,homeX:-465,homeY:515,phase:0,angle:0}],buildings:[],relics:[]};
       }
       const resourceRadius=970*SURFACE_MAP_SCALE, creatureSpread=1900*SURFACE_MAP_SCALE;
       const fixed=[{x:190,y:115,type:'iron'},{x:285,y:65,type:'iron'},{x:185,y:230,type:'biomass'},{x:65,y:265,type:'biomass'},{x:-155,y:90,type:'crystal'},{x:-260,y:-70,type:'crystal'}];
@@ -369,6 +369,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
         const special=p.id==='solara'?'iron':(p.id==='nix'||p.id==='prisma')?'crystal':p.id==='verdant'?'biomass':'iron';
         fixed.push({x:Math.cos(a)*d,y:Math.sin(a)*d,type:random()<.36?special:['iron','crystal','biomass'][Math.floor(random()*3)]});
       }
+      // Keep deterministic IDs and positions, then omit grass outside Verdant so old saves migrate safely.
       fixed.forEach((n,i)=>{const maxHp=n.type==='iron'?4:n.type==='crystal'?3:2;nodes.push({...n,id:p.id+'-node-'+i,hp:maxHp,maxHp,respawnAt:0,size:.8+random()*.5,rotation:random()*TAU,seed:Math.floor(random()*10000)});});
       p.species.forEach((species,i)=>{
         for(let j=0;j<3;j++){
@@ -378,7 +379,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
         }
       });
       const relics=[[-245,405],[720,-490],[-810,-710]].map(([x,y],i)=>({id:p.id+'-relic-'+i,x:x*SURFACE_MAP_SCALE,y:y*SURFACE_MAP_SCALE,name:['별빛 기록석','잊힌 항로 표식','공명 수정 유적'][i]}));
-      return{nodes:p.id==='verdant'?nodes.filter(n=>dist(n,PROBE)>95&&dist(n,{x:170,y:-150})>55):nodes,creatures:training?creatures.slice(0,1):creatures,buildings:[],relics:training?[]:relics};
+      return{nodes:p.id==='verdant'?nodes.filter(n=>dist(n,PROBE)>95&&dist(n,{x:170,y:-150})>55):nodes.filter(n=>n.type!=='biomass'),creatures:training?creatures.slice(0,1):creatures,buildings:[],relics:training?[]:relics};
     }
     ensureWorld(id){if(!this.state.worlds[id])this.state.worlds[id]=this.makeWorld(PLANETS.find(p=>p.id===id));return this.state.worlds[id];}
     world(){return this.ensureWorld(this.state.planet);}
@@ -536,7 +537,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
       }else if(action==='pet'||action==='feed'){
         if(action==='pet'&&s.creatureCare[c.species]!==undefined&&s.time-s.creatureCare[c.species]<10)return{ok:false,reason:'조금 뒤 다시 쓰다듬어 주세요 · '+Math.ceil(10-(s.time-s.creatureCare[c.species]))+'초'};
         if(bond>=3)return{ok:false,reason:'이미 가장 친한 친구예요. 함께 탐험해 보세요!'};
-        if(action==='feed'&&s.inventory.biomass<2)return{ok:false,reason:'먹이를 나누려면 바이오매스 2개가 필요해요.'};
+        if(action==='feed'&&s.inventory.biomass<2)return{ok:false,reason:'먹이를 나누려면 풀 2개가 필요해요.'};
         if(action==='feed')s.inventory.biomass-=2;
         s.friendship[c.species]=Math.min(3,bond+1);if(action==='pet')s.creatureCare[c.species]=s.time;
         this.emit('effect',{kind:'friend',x:c.x,y:c.y,color:sp.color});
@@ -659,9 +660,9 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
       if(this.state.fuel>=99){this.emit('message',{text:'연료가 충분해요!'});return{ok:false,reason:'연료 가득'};}
       if(this.solarCharge>0)return{ok:false,reason:'비상 충전 중'};
       if(this.state.inventory.biomass>=3){this.state.inventory.biomass-=3;this.state.fuel=clamp(this.state.fuel+40,0,100);this.emit('message',{text:'바이오 연료 합성 완료 · 연료 +40'});this.emit('save');return{ok:true,amount:40};}
-      this.solarCharge=6;this.emit('message',{text:'바이오매스가 부족해요. 6초 동안 비상 태양광 충전을 진행합니다.'});return{ok:true,emergency:true};
+      this.solarCharge=6;this.emit('message',{text:'풀이 부족해요. 6초 동안 비상 태양광 충전을 진행합니다.'});return{ok:true,emergency:true};
     }
-    goals(){const s=this.state;return[{text:'철광석 12개, 바이오매스 8개 모으기',done:s.stats.collected.iron>=12&&s.stats.collected.biomass>=8},{text:'나만의 집 한 채 짓기',done:Object.values(s.worlds).some(w=>w.buildings.some(b=>b.type==='habitat'))},{text:'낯선 생명체와 친구 되기',done:s.met.length>0},{text:'우주선을 타고 두 번째 행성 탐험',done:s.visited.length>=2}];}
+    goals(){const s=this.state;return[{text:'철광석 12개, 풀 8개 모으기',done:s.stats.collected.iron>=12&&s.stats.collected.biomass>=8},{text:'나만의 집 한 채 짓기',done:Object.values(s.worlds).some(w=>w.buildings.some(b=>b.type==='habitat'))},{text:'낯선 생명체와 친구 되기',done:s.met.length>0},{text:'우주선을 타고 두 번째 행성 탐험',done:s.visited.length>=2}];}
     nearbyState(){return{mode:this.state.mode,planet:this.planet().name,player:{...this.state.player},ship:{...this.state.ship},inventory:{...this.state.inventory},tools:[...this.state.tools],equippedTool:this.state.equippedTool,flight:this.flight?{...this.flight}:null,oxygen:Math.round(this.state.oxygen),fuel:Math.round(this.state.fuel),visited:[...this.state.visited],discovered:[...this.state.discovered],met:[...this.state.met],goals:this.goals(),nearby:this.state.mode==='surface'?{resources:this.world().nodes.filter(n=>n.hp>0&&dist(n,this.state.player)<350).map(n=>({id:n.id,type:n.type,x:n.x,y:n.y,hp:n.hp})),creatures:this.world().creatures.filter(c=>dist(c,this.state.player)<500).map(c=>({id:c.id,species:c.species,x:c.x,y:c.y})),buildings:this.world().buildings}:null};}
   }
   const exports={Game,PROBE,probePose,PLANETS,surfaceSpeedMultiplier,SPECIES,BUILDINGS,RESOURCE_NAMES,TOOLS,RESOURCE_TOOLS,FLIGHT_DURATION,SURFACE_MAP_SCALE,WORLD_LIMIT,TERRAIN_LIMIT,rand,clamp,dist};
@@ -1133,9 +1134,9 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
   'use strict';
   const STEPS=[
     {short:'루미',zone:'01 · 도착 / 접수대',title:'루미에게 첫인사를 건네요',text:'빛나는 안내 로봇을 클릭해 다가가세요. 가까이에서는 E로 대화할 수 있어요.',note:'WASD·방향키로 이동 · 빈 땅 클릭으로 이동',line:'어서 와요! 저는 교관 루미예요. 제 쪽으로 걸어와 인사해 주세요. 함께 첫 탐험을 준비해요.',controls:['touch-pad','interact-button']},
-    {short:'채굴',zone:'02 · 자원 실습실',title:'곡괭이로 철광석을 채굴해요',text:'1번 곡괭이를 장착하고, 표시된 철광석 가까이에서 E 또는 ‘채굴 / 교류’를 꾹 누르세요.',note:'철광석 → 곡괭이 · 바이오매스 → 도끼 · 수정 → 칼',line:'탐사 도구 3개를 지급했어요! 철광석은 곡괭이, 바이오매스는 도끼, 수정은 칼로만 부술 수 있어요. 먼저 곡괭이를 사용해 볼까요?',controls:['interact-button']},
+    {short:'채굴',zone:'02 · 자원 실습실',title:'곡괭이로 철광석을 채굴해요',text:'1번 곡괭이를 장착하고, 표시된 철광석 가까이에서 E 또는 ‘채굴 / 교류’를 꾹 누르세요.',note:'철광석 → 곡괭이 · 풀 → 도끼 · 수정 → 칼',line:'탐사 도구 3개를 지급했어요! 철광석은 곡괭이, 풀은 도끼, 수정은 칼로만 부술 수 있어요. 먼저 곡괭이를 사용해 볼까요?',controls:['interact-button']},
     {short:'스캔',zone:'02 · 자원 실습실',title:'스캐너를 작동시켜요',text:'Q 또는 아래 ‘스캔’을 누르세요. 주변 자원과 생명체를 감지해요.',note:'스캔을 마치면 집 짓기에 필요한 재료를 지급해요.',line:'첫 자원을 얻었네요! 이번에는 스캐너로 주변을 살펴봐요. 다음 실습에 쓸 건설 재료도 준비해 둘게요.',controls:['scan-button']},
-    {short:'건설',zone:'03 · 건설 실습실',title:'나만의 첫 집을 지어요',text:'금색 건설장으로 이동해 B → ‘탐험가의 집’을 선택하고, 테두리 안의 빈 땅을 클릭하세요.',note:'철광석 12개 + 바이오매스 8개 · 건설 재료 지급 완료',line:'건설 재료를 받았죠? 금색 실습장에 집을 지어 보세요. 실제 탐험에서는 집 근처에서 산소를 채울 수 있어요.',controls:['build-button']},
+    {short:'건설',zone:'03 · 건설 실습실',title:'나만의 첫 집을 지어요',text:'금색 건설장으로 이동해 B → ‘탐험가의 집’을 선택하고, 테두리 안의 빈 땅을 클릭하세요.',note:'철광석 12개 + 풀 8개 · 건설 재료 지급 완료',line:'건설 재료를 받았죠? 금색 실습장에 집을 지어 보세요. 실제 탐험에서는 집 근처에서 산소를 채울 수 있어요.',controls:['build-button']},
     {short:'교류',zone:'04 · 생태 실습실',title:'모스링과 친구가 돼요',text:'초록빛 생태실의 생명체를 클릭하거나 가까이에서 E를 눌러 인사하세요.',note:'스캔은 발견, 대화는 교류예요. 직접 인사를 건네 보세요.',line:'멋진 집이에요! 이제 왼쪽 생태실로 가 볼까요? 모스링에게 인사하면 작은 선물을 받을 수 있어요.',controls:['interact-button']},
     {short:'이륙',zone:'05 · 비행 격납고',title:'우주선을 타고 출발해요',text:'중앙 격납고의 우주선으로 돌아가 F 또는 ‘우주선’을 누르세요.',note:'우주선에 다가간 뒤 한 번 더 눌러 이륙해요.',line:'지상 훈련을 모두 마쳤어요! 중앙 격납고에서 비행 연습을 시작해요. 제가 무전으로 계속 안내할게요.',controls:['ship-button']},
     {short:'착륙',zone:'06 · 비행 시뮬레이터',title:'다른 행성에 착륙해요',text:'M → 다른 행성의 항로를 선택하세요. 도착한 뒤 E 또는 ‘착륙’을 누르면 훈련 완료!',note:'현재 행성이 아닌 다른 행성을 선택하세요.',line:'마지막 실습이에요! 성계 지도에서 새로운 목적지를 고르고 착륙해 보세요. 여기까지 마치면 정식 탐험가가 됩니다.',controls:['map-tab','ship-button']}
@@ -1166,7 +1167,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
       if(allowed(1)&&e.type==='effect'&&e.kind==='break')this.done[1]=true;
       if(allowed(2)&&e.type==='effect'&&e.kind==='scan'&&e.scanAction&&game.state.mode==='surface'){
         this.done[2]=true;
-        if(training){for(const [r,n]of Object.entries({iron:12,biomass:8}))if(game.state.inventory[r]<n)game.addResource(r,n-game.state.inventory[r]);game.emit('message',{text:'루미: 건설 재료 도착! 철광석 12개와 바이오매스 8개가 준비됐어요.'});game.emit('save');}
+        if(training){for(const [r,n]of Object.entries({iron:12,biomass:8}))if(game.state.inventory[r]<n)game.addResource(r,n-game.state.inventory[r]);game.emit('message',{text:'루미: 건설 재료 도착! 철광석 12개와 풀 8개가 준비됐어요.'});game.emit('save');}
       }
       if(allowed(3)&&e.type==='effect'&&e.kind==='build'&&e.buildingType==='habitat')this.done[3]=true;
       if(allowed(4)&&e.type==='dialogue')this.done[4]=true;
@@ -1193,7 +1194,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
       if(this.step===0){target=game.trainingNpc();if(!target)info.note=Math.floor(this.walked)+' / 60m · '+info.note;}
       if(this.step===1)target=nearest(w.nodes.filter(n=>n.hp>0&&n.type==='iron'));
       if(this.step===3){
-        info.note='철광석 '+s.inventory.iron+' / 12 · 바이오매스 '+s.inventory.biomass+' / 8';
+        info.note='철광석 '+s.inventory.iron+' / 12 · 풀 '+s.inventory.biomass+' / 8';
         const type=s.inventory.iron<12?'iron':s.inventory.biomass<8?'biomass':null;
         if(type){target=nearest(w.nodes.filter(n=>n.hp>0&&n.type===type));info.controls=['interact-button'];}
         else if(s.training&&Math.hypot(s.player.x-450,s.player.y-480)>210){target={x:450,y:370};info.label='건설장으로 이동';}
@@ -1434,7 +1435,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
   function showTrainingComplete(){
     completionShown=true;save();showModal('탐험가 훈련 수료!','ALL CLEAR / 7개 실습 완료',
       '<div class="academy-graduate"><span>✦</span><h3>이제, 당신만의 탐험을 시작하세요.</h3><p>루미: 첫 만남부터 우주 비행까지 모두 해냈어요.<br>새로운 행성에서도 오늘 배운 걸 기억해 주세요!</p></div>'+
-      '<div class="reward">'+(session.main?'보관한 본게임의 원래 위치로 돌아갑니다.':'수료 선물 · 철광석 12 · 바이오매스 8 · 수정 4')+'</div><button id="training-finish" class="primary-button">본게임으로 출발 →</button>');$('training-finish').onclick=enterMainGame;
+      '<div class="reward">'+(session.main?'보관한 본게임의 원래 위치로 돌아갑니다.':'수료 선물 · 철광석 12 · 풀 8 · 수정 4')+'</div><button id="training-finish" class="primary-button">본게임으로 출발 →</button>');$('training-finish').onclick=enterMainGame;
   }
   function updateTutorial(){
     tutorial.sync(game);$('game-area').classList.toggle('training-active',session.active);
@@ -1464,7 +1465,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     $('tutorial-action').hidden=!info.action&&!tutorial.complete;setText('tutorial-action',tutorial.complete?'본게임 시작':info.label||'목표 위치 표시');
     const refuel=tutorial.active&&game.state.mode==='space'&&game.state.fuel<18;
     $('tutorial-refuel').hidden=!refuel;$('tutorial-refuel').disabled=game.solarCharge>0||!!game.travel;
-    setText('tutorial-refuel',game.solarCharge>0?'비상 충전 중 · '+Math.ceil(game.solarCharge)+'초':game.state.inventory.biomass>=3?'연료 합성 · 바이오매스 3개':'비상 태양광 충전 · 6초');
+    setText('tutorial-refuel',game.solarCharge>0?'비상 충전 중 · '+Math.ceil(game.solarCharge)+'초':game.state.inventory.biomass>=3?'연료 합성 · 풀 3개':'비상 태양광 충전 · 6초');
     $('tutorial-progress').setAttribute('aria-valuenow',String(count));$('tutorial-progress-bar').style.width=(count/7*100)+'%';
     if(tutorial.active)for(const id of info.controls)$(id).classList.add('tutorial-focus');
   }
@@ -1564,11 +1565,11 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     if(session.active||game.probeCinematic)return;
     const s=game.state,q=s.probeQuest,home=s.mode==='surface'&&s.planet==='verdant',ready=Object.entries(PROBE.cost).every(([r,n])=>s.inventory[r]>=n),near=home&&dist(s.player,PROBE)<160;
     const complete=q.stage==='complete',available=q.stage==='available';
-    const line=available?'새 탐사기로 솔라라의 미확인 신호를 찾아보려고 해요. 같이 첫 가동을 지켜봐 주실래요?':complete?'해냈어요! 신호의 출처는 솔라라의 별빛 기록석이에요. 좌표를 보내드릴게요. 다음 발견은 탐험가님의 몫이에요!':'신호를 잡는 순간 회로가 타 버렸어요. 철광석으로 외장을 고치고, 바이오매스로 배선을 절연하고, 수정으로 전력을 공급하면 다시 켤 수 있어요.';
+    const line=available?'새 탐사기로 솔라라의 미확인 신호를 찾아보려고 해요. 같이 첫 가동을 지켜봐 주실래요?':complete?'해냈어요! 신호의 출처는 솔라라의 별빛 기록석이에요. 좌표를 보내드릴게요. 다음 발견은 탐험가님의 몫이에요!':'신호를 잡는 순간 회로가 타 버렸어요. 철광석으로 외장을 고치고, 풀로 배선을 절연하고, 수정으로 전력을 공급하면 다시 켤 수 있어요.';
     const materials=Object.entries(PROBE.cost).map(([r,n])=>'<li class="'+(s.inventory[r]>=n?'ready':'')+'"><span>'+RESOURCE_NAMES[r]+'</span><strong>'+s.inventory[r]+' / '+n+'</strong><small>'+TOOLS[RESOURCE_TOOLS[r]].name+'로 수집</small></li>').join('');
     showModal(complete?'다시 연결된 별빛':'루미의 탐사기 복구','LUMI / 첫 번째 탐험 임무',
       '<div class="instructor-chat"><div class="lumi-face" aria-label="루미"><i></i><i></i></div><blockquote>'+line+'</blockquote></div>'+
-      '<div class="probe-task-intro"><span class="academy-tag">'+(complete?'MISSION COMPLETE':available?'01 / 탐사기 첫 가동':'02 / 재료 수집 · 탐사기 수리')+'</span><h3>'+(complete?'솔라라의 신호 좌표를 발견했어요':available?'꺼진 별빛을 다시 연결해 주세요':'베르단트의 탐사기를 수리해 주세요')+'</h3><p>'+(complete?'성계 지도에서 솔라라를 선택해 이동하세요. 착륙 후 목표를 표시하면 기록석까지 안내합니다.':available?'가동 장면이 끝나면 복구 임무가 시작됩니다. 필요한 재료와 목표는 탐험 일지에서 언제든 확인할 수 있어요.':'수리를 시작할 때 아래 재료를 한 번 사용합니다. 우주선이나 루미에게 탐사 도구를 받을 수 있어요.')+'</p></div>'+
+      '<div class="probe-task-intro"><span class="academy-tag">'+(complete?'MISSION COMPLETE':available?'01 / 탐사기 첫 가동':'02 / 재료 수집 · 탐사기 수리')+'</span><h3>'+(complete?'솔라라의 신호 좌표를 발견했어요':available?'꺼진 별빛을 다시 연결해 주세요':'베르단트의 탐사기를 수리해 주세요')+'</h3><p>'+(complete?'성계 지도에서 솔라라를 선택해 이동하세요. 착륙 후 목표를 표시하면 기록석까지 안내합니다.':available?'가동 장면이 끝나면 복구 임무가 시작됩니다. 필요한 재료와 목표는 탐험 일지에서 언제든 확인할 수 있어요.':'풀은 베르단트에서만 채집할 수 있어요. 수리를 시작할 때 아래 재료를 한 번 사용합니다. 우주선이나 루미에게 탐사 도구를 받을 수 있어요.')+'</p></div>'+
       (!complete?'<ul class="probe-materials">'+materials+'</ul><div class="reward">복구 보상 · 솔라라 미확인 신호 위치 해금</div>':'<div class="reward">솔라라 · 별빛 기록석 좌표 해금</div>')+
       '<div class="probe-actions">'+(complete?'<button id="probe-signal" class="primary-button">신호 위치 안내받기 →</button>':available?'<button id="probe-accept" class="primary-button">'+(home?'루미와 탐사기 가동하기':'베르단트로 돌아가기')+'</button>':'<button id="probe-repair" class="primary-button" '+(near&&!ready?'disabled':'')+'>'+(near?ready?'재료를 사용해 수리하기':'재료를 더 모아 주세요':'탐사기 위치로 이동')+'</button>')+'<button id="probe-close" class="subtle-button">탐험 계속하기</button></div>'+
       (complete?'<details class="probe-free-goals"><summary>나의 자유 탐험 목표</summary><ul>'+game.goals().map(v=>'<li>'+(v.done?'✓ ':'○ ')+v.text+'</li>').join('')+'</ul></details>':''));
@@ -1584,7 +1585,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     if(session.active)return;
     const complete=q.stage==='complete',available=q.stage==='available',signal=game.probeSignal();
     const rows=available?[{text:'루미와 탐사기 첫 가동 지켜보기',done:false}]:complete?[{text:'탐사기 수리 완료',done:true},{text:'솔라라 신호 좌표 해금',done:true},{text:'솔라라의 별빛 기록석 조사',done:game.state.relics.includes(signal.id)}]:Object.entries(PROBE.cost).map(([r,n])=>({text:RESOURCE_NAMES[r]+' '+Math.min(n,game.state.inventory[r])+' / '+n,done:game.state.inventory[r]>=n}));
-    const signature=q.stage+rows.map(v=>v.text+v.done).join('|');if(signature!==missionSignature){missionSignature=signature;setText('mission-title',complete?'다시 연결된 별빛':'루미의 탐사기 복구');setText('mission-description',complete?'솔라라에서 신호의 출처를 찾아보세요.':available?'루미가 탐사기의 첫 가동을 기다리고 있어요.':'철광석·바이오매스·수정으로 탐사기를 수리하세요.');$('mission-list').innerHTML=rows.map(v=>'<li class="'+(v.done?'done':'')+'">'+v.text+'</li>').join('');$('mission-progress-bar').style.width=(available?0:complete?100:15+rows.filter(v=>v.done).length/3*65)+'%';setText('mission-note',complete?'복구 완료 · 신호 좌표 등록됨':'보상 · 솔라라의 미확인 신호 위치');setText('probe-mission-open',available?'루미의 임무 받기 →':complete?'신호 위치 확인 →':'복구 임무 확인 →');}
+    const signature=q.stage+rows.map(v=>v.text+v.done).join('|');if(signature!==missionSignature){missionSignature=signature;setText('mission-title',complete?'다시 연결된 별빛':'루미의 탐사기 복구');setText('mission-description',complete?'솔라라에서 신호의 출처를 찾아보세요.':available?'루미가 탐사기의 첫 가동을 기다리고 있어요.':'철광석·풀·수정으로 탐사기를 수리하세요.');$('mission-list').innerHTML=rows.map(v=>'<li class="'+(v.done?'done':'')+'">'+v.text+'</li>').join('');$('mission-progress-bar').style.width=(available?0:complete?100:15+rows.filter(v=>v.done).length/3*65)+'%';setText('mission-note',complete?'복구 완료 · 신호 좌표 등록됨':'보상 · 솔라라의 미확인 신호 위치');setText('probe-mission-open',available?'루미의 임무 받기 →':complete?'신호 위치 확인 →':'복구 임무 확인 →');}
   }
   $('probe-mission-open').onclick=showProbeQuest;
   $('probe-scene-skip').onclick=()=>{game.finishProbeScene();processEvents();hud(true);};
@@ -1609,7 +1610,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     for(const[id,sp]of Object.entries(SPECIES)){const c=$('species-'+id).getContext('2d');c.translate(70,123);c.scale(1.7,1.7);if(s.discovered.includes(id))creature(c,id,0,1,s.met.includes(id));else{c.fillStyle='#9eb2aa';c.font='28px system-ui';c.textAlign='center';c.fillText('?',0,-12);}}
   }
   function showHelp(){
-    showModal('탐험가를 위한 작은 안내서','FLIGHT MANUAL / 조작 방법','<p class="modal-intro">서두르지 않아도 괜찮아요. 자원을 모으고 작은 집을 지으며 나만의 속도로 우주를 탐험하세요.</p><div class="help-grid"><div class="help-item"><strong>걷기 · 달리기</strong><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 또는 방향키<br><kbd>Shift</kbd>를 누르면 더 빠르게 이동해요.<br>빈 땅 클릭으로 이동, 드래그로 지도 둘러보기<br>휠로 확대·축소, V로 확대 보기 전환</div><div class="help-item"><strong>채굴 · 생명체와 교류</strong>가까이 다가가 <kbd>E</kbd>를 누르세요.<br>철광석은 <kbd>1</kbd> 곡괭이, 바이오매스는 <kbd>2</kbd> 도끼, 수정은 <kbd>3</kbd> 칼을 장착해야 해요.<br>도구는 루미나 우주선에서 받아요.<br>계속 누르면 연속 채굴해요. 터치 화면에서는 ‘채굴 / 교류’를 누르세요.</div><div class="help-item"><strong>나만의 집 짓기</strong><kbd>B</kbd> → 건물 선택 → 빈 땅 클릭<br>또는 이동 후 ‘여기에 건설’을 누르세요.<br>집: 철광석 12개 + 바이오매스 8개</div><div class="help-item"><strong>새로운 행성으로 떠나기</strong>우주선 근처에서 <kbd>F</kbd>로 이륙<br><kbd>M</kbd> → 행성 선택 → <kbd>E</kbd> 착륙<br>방향키로 비행, Shift로 가속<br>행성 가까이에서 E 또는 F로 착륙하세요.</div><div class="help-item"><strong>스캔 · 도감</strong><kbd>Q</kbd>로 주변 자원과 생명체 탐지<br>발견한 생명체는 도감에 기록됩니다.<br>교류하면 첫 만남 선물을 받아요.</div><div class="help-item"><strong>산소 · 연료</strong>우주선과 집 근처에서는 산소 충전<br><kbd>R</kbd>로 바이오 연료 합성<br>재료가 없으면 6초 비상 충전이 가능해요.</div></div><p class="help-tips">진행 상황은 이 기기의 브라우저에 자동 저장돼요. 다른 기기로 옮기려면 ‘저장 관리’에서 저장 파일을 내보내세요. 산소가 떨어지면 자원을 보존한 채 우주선으로 돌아옵니다. 채굴한 자원은 150초 후 다시 자랍니다.</p><button class="primary-button" id="help-resume" style="margin-top:22px">탐험으로 돌아가기</button>');$('help-resume').onclick=closeModal;const replay=document.createElement('button');replay.id='tutorial-replay';replay.className='subtle-button';replay.textContent='튜토리얼 다시 시작';replay.onclick=restartTutorial;$('modal-content').append(replay);
+    showModal('탐험가를 위한 작은 안내서','FLIGHT MANUAL / 조작 방법','<p class="modal-intro">서두르지 않아도 괜찮아요. 자원을 모으고 작은 집을 지으며 나만의 속도로 우주를 탐험하세요.</p><div class="help-grid"><div class="help-item"><strong>걷기 · 달리기</strong><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 또는 방향키<br><kbd>Shift</kbd>를 누르면 더 빠르게 이동해요.<br>빈 땅 클릭으로 이동, 드래그로 지도 둘러보기<br>휠로 확대·축소, V로 확대 보기 전환</div><div class="help-item"><strong>채굴 · 생명체와 교류</strong>가까이 다가가 <kbd>E</kbd>를 누르세요.<br>철광석은 <kbd>1</kbd> 곡괭이, 풀은 <kbd>2</kbd> 도끼, 수정은 <kbd>3</kbd> 칼을 장착해야 해요.<br>도구는 루미나 우주선에서 받아요.<br>계속 누르면 연속 채굴해요. 터치 화면에서는 ‘채굴 / 교류’를 누르세요.</div><div class="help-item"><strong>나만의 집 짓기</strong><kbd>B</kbd> → 건물 선택 → 빈 땅 클릭<br>또는 이동 후 ‘여기에 건설’을 누르세요.<br>집: 철광석 12개 + 풀 8개</div><div class="help-item"><strong>새로운 행성으로 떠나기</strong>우주선 근처에서 <kbd>F</kbd>로 이륙<br><kbd>M</kbd> → 행성 선택 → <kbd>E</kbd> 착륙<br>방향키로 비행, Shift로 가속<br>행성 가까이에서 E 또는 F로 착륙하세요.</div><div class="help-item"><strong>스캔 · 도감</strong><kbd>Q</kbd>로 주변 자원과 생명체 탐지<br>발견한 생명체는 도감에 기록됩니다.<br>교류하면 첫 만남 선물을 받아요.</div><div class="help-item"><strong>산소 · 연료</strong>우주선과 집 근처에서는 산소 충전<br><kbd>R</kbd>로 바이오 연료 합성<br>재료가 없으면 6초 비상 충전이 가능해요.</div></div><p class="help-tips">진행 상황은 이 기기의 브라우저에 자동 저장돼요. 다른 기기로 옮기려면 ‘저장 관리’에서 저장 파일을 내보내세요. 산소가 떨어지면 자원을 보존한 채 우주선으로 돌아옵니다. 채굴한 자원은 150초 후 다시 자랍니다.</p><button class="primary-button" id="help-resume" style="margin-top:22px">탐험으로 돌아가기</button>');$('help-resume').onclick=closeModal;const replay=document.createElement('button');replay.id='tutorial-replay';replay.className='subtle-button';replay.textContent='튜토리얼 다시 시작';replay.onclick=restartTutorial;$('modal-content').append(replay);
   }
   function toggleBuild(force){
     if(game.flight&&force!==false)return;
@@ -1647,7 +1648,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
   function replaceGame(next){clearTutorialWaypoint();tutorialStep=tutorial.step;tutorialCollapsed=false;game=next;game.setMotion(motionSettings);tutorial.sync(game);renderer.game=next;renderer.reset();buildOpen=false;$('build-panel').hidden=true;$('build-button').classList.remove('selected');$('interact-button').classList.add('selected');missionSignature='';locationSignature='';clearInput();hud(true);}
   function showDialogue(e){
     const sp=SPECIES[e.species],bond=game.state.friendship[e.species]||0;
-    showModal(sp.name+'와의 만남','FIRST CONTACT / '+sp.kind,'<div class="dialogue"><p class="speaker">'+sp.name+' <span class="bond">'+('♥'.repeat(bond)+'♡'.repeat(3-bond))+'</span></p><blockquote>'+sp.line.replace(/\n/g,'<br>')+'</blockquote>'+(e.first?'<div class="reward">첫 만남 선물 · '+Object.entries(sp.gift).map(([r,n])=>RESOURCE_NAMES[r]+' +'+n).join(' · ')+'</div>':'<p class="modal-intro">친밀도 '+bond+' / 3 · 친밀도 2부터 동행과 길 안내가 열려요.</p>')+'<div class="interaction-grid"><button data-care="pet">♡ 쓰다듬기<small>친밀도 +1 · 10초 간격</small></button><button data-care="feed">❋ 먹이 나누기<small>바이오매스 2 · 친밀도 +1</small></button><button data-care="follow" '+(bond<2?'disabled':'')+'>'+(game.state.companion===e.id?'동행 마치기':'함께 탐험하기')+'<small>내 뒤를 따라오는 친구</small></button><button data-care="guide" '+(bond<2?'disabled':'')+'>유적 길 물어보기<small>미탐사 유적의 위치 표시</small></button></div><button class="primary-button" id="dialogue-close">탐험으로 돌아가기</button></div>');
+    showModal(sp.name+'와의 만남','FIRST CONTACT / '+sp.kind,'<div class="dialogue"><p class="speaker">'+sp.name+' <span class="bond">'+('♥'.repeat(bond)+'♡'.repeat(3-bond))+'</span></p><blockquote>'+sp.line.replace(/\n/g,'<br>')+'</blockquote>'+(e.first?'<div class="reward">첫 만남 선물 · '+Object.entries(sp.gift).map(([r,n])=>RESOURCE_NAMES[r]+' +'+n).join(' · ')+'</div>':'<p class="modal-intro">친밀도 '+bond+' / 3 · 친밀도 2부터 동행과 길 안내가 열려요.</p>')+'<div class="interaction-grid"><button data-care="pet">♡ 쓰다듬기<small>친밀도 +1 · 10초 간격</small></button><button data-care="feed">❋ 먹이 나누기<small>풀 2 · 친밀도 +1</small></button><button data-care="follow" '+(bond<2?'disabled':'')+'>'+(game.state.companion===e.id?'동행 마치기':'함께 탐험하기')+'<small>내 뒤를 따라오는 친구</small></button><button data-care="guide" '+(bond<2?'disabled':'')+'>유적 길 물어보기<small>미탐사 유적의 위치 표시</small></button></div><button class="primary-button" id="dialogue-close">탐험으로 돌아가기</button></div>');
     $('dialogue-close').onclick=closeModal;
     modal.querySelectorAll('[data-care]').forEach(button=>button.onclick=()=>{const action=button.dataset.care;closeModal();const result=game.careForCreature(e.id,action);if(!result.ok)toast(result.reason,true);processEvents();hud(true);});sound('discovery');
   }
@@ -1689,7 +1690,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     const loc=space?'space':p.id;if(locationSignature!==loc||force){locationSignature=loc;setText('location-code',space?'SIGMA SYSTEM / OPEN SPACE':'시그마 성계 / '+String(PLANETS.indexOf(p)+1).padStart(2,'0'));$('location-name').innerHTML=(space?'시그마 성계':p.name)+'<span class="planet-tag">'+(space?'비행 중':'탐험 중')+'</span>';$('location-description').textContent=space?'새로운 행성으로 향하는 중':environmentText(p);$('location-description').title=space?'':p.kind+' · 탐험 지역 기온 / 표면 중력 (1 g = 지구 중력)';setText('ship-label',space?'착륙':'우주선');$('scan-button').title=space?'주변 행성 스캔':'주변 자원과 생명체 스캔';}
     if(s.training){setText('location-code','TRAINING SIMULATION / 전용 공간');$('location-name').innerHTML=(space?'비행 시뮬레이터':s.planet==='verdant'?'시그마 훈련 기지':'모의 착륙 구역')+'<span class="planet-tag">훈련 중</span>';$('location-description').textContent=space?'모의 항로 · 다른 행성에 착륙해 보세요':s.planet==='verdant'?'실내 22°C · 인공 중력 1.00 g · 이동 1.00배':environmentText(p);$('location-description').title=space?'비행 시뮬레이터':s.planet==='verdant'?'시그마 훈련 기지의 실내 환경 · 1 g = 지구 중력':'모의 착륙 구역 · '+p.kind+' · 1 g = 지구 중력';}
     updateTutorial();$('space-action').hidden=!space||!$('tutorial-card').hidden;$('mission-card').hidden=space||session.active||!$('tutorial-card').hidden;
-    if(space){const target=nearest?.kind==='planet'?nearest.entity:null;setText('space-target-name',target?target.name+' 궤도':'다음 목적지를 찾아보세요');setText('space-target-help',target?environmentText(target)+' · 지표 환경':'방향키로 비행하거나 성계 지도에서 항로를 설정하세요.');$('land-button').disabled=!target||!!game.travel;setText('land-button',target?target.name+'에 착륙':'행성 가까이에서 착륙');setText('refuel-button',game.solarCharge>0?'태양광 비상 충전 · '+Math.ceil(game.solarCharge)+'초':s.inventory.biomass>=3?'연료 합성 · 바이오매스 3개':'비상 태양광 충전 · 6초');}
+    if(space){const target=nearest?.kind==='planet'?nearest.entity:null;setText('space-target-name',target?target.name+' 궤도':'다음 목적지를 찾아보세요');setText('space-target-help',target?environmentText(target)+' · 지표 환경':'방향키로 비행하거나 성계 지도에서 항로를 설정하세요.');$('land-button').disabled=!target||!!game.travel;setText('land-button',target?target.name+'에 착륙':'행성 가까이에서 착륙');setText('refuel-button',game.solarCharge>0?'태양광 비상 충전 · '+Math.ceil(game.solarCharge)+'초':s.inventory.biomass>=3?'연료 합성 · 풀 3개':'비상 태양광 충전 · 6초');}
     let hint='자원 가까이에서 E를 누르세요',key='E';
     if(game.selectedBuild){hint='빈 땅 클릭 또는 E · 건설 배치';key='B';}
     else if(space){hint=game.travel?'워프 항로를 따라 이동하고 있어요':nearest?'E 또는 F · '+nearest.entity.name+'에 착륙':'WASD 비행 · M 성계 지도';key=nearest?'E':'M';}
