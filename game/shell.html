@@ -20,8 +20,13 @@
       </nav>
       <div class="header-actions"><span id="save-indicator" class="save-indicator">이 기기에 자동 저장</span><button id="motion-button" class="motion-open-button" title="P: 모션 편집">모션 편집</button><button id="sound-button" class="icon-button" aria-label="소리 켜기" aria-pressed="false" title="소리 켜기">♪</button><button id="help-button" class="icon-button" aria-label="조작 방법" title="조작 방법">?</button><button id="pause-button" class="icon-button pause-icon" aria-label="일시 정지" title="일시 정지">Ⅱ</button></div>
     </header>
+    <section class="player-bar" aria-label="탐험가 성장과 장비">
+      <div class="player-level"><strong id="player-level">Lv.1</strong><span id="player-xp">0 / 100 XP</span><div id="player-xp-meter" class="xp-meter" role="progressbar" aria-label="다음 레벨 경험치" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="player-xp-fill"></i></div></div>
+      <p id="next-unlock">Lv.3 · MK II 강화 해금</p>
+      <div class="player-actions"><button id="inventory-button" aria-label="인벤토리 I">인벤토리 <kbd>I</kbd></button><button id="upgrade-button" aria-label="우주선 강화 U">우주선 강화 <kbd>U</kbd></button></div>
+    </section>
     <main id="game-area" class="game-area">
-      <canvas id="world" tabindex="0" aria-label="2D 행성 탐험 게임. 빈 땅 클릭으로 이동하고 드래그로 지도를 둘러보세요. WASD 또는 방향키로 이동하고 E로 채굴·교류하세요. M은 지도, B는 건설입니다."></canvas>
+      <canvas id="world" tabindex="0" aria-label="2D 행성 탐험 게임. 빈 땅 클릭으로 이동하고 드래그로 지도를 둘러보세요. WASD 또는 방향키로 이동하고 E로 채굴·교류하세요. M은 지도, B는 건설, I는 인벤토리, U는 우주선 강화입니다."></canvas>
       <div class="field-status glass" id="field-status"></div><div class="camera-controls"><button id="view-button" title="V: 확대 / 전체 보기">확대 보기 <kbd>V</kbd></button><button id="immersion-button" aria-label="화면 효과 설정">화면 효과</button><button id="fullscreen-button" aria-label="전체 화면">⛶</button></div>
       <div class="vignette" aria-hidden="true"></div>
       <div class="top-hud">

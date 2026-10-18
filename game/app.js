@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-  const {Game,PROBE,probePose,PLANETS,surfaceSpeedMultiplier,SPECIES,BUILDINGS,RESOURCE_NAMES,TOOLS,RESOURCE_TOOLS,WORLD_LIMIT,dist,clamp}=window.OrbitCore;
+  const {Game,MAX_LEVEL,XP_REWARDS,SHIP_TIERS,PROBE,probePose,PLANETS,surfaceSpeedMultiplier,SPECIES,BUILDINGS,RESOURCE_NAMES,TOOLS,RESOURCE_TOOLS,WORLD_LIMIT,dist,clamp}=window.OrbitCore;
   const {Renderer,drawPlanet,creature}=window.OrbitRenderer;
   const Motion=window.OrbitMotion;
   let motionSettings=Motion.normalize();try{motionSettings=Motion.normalize(JSON.parse(localStorage.getItem(Motion.STORAGE_KEY)||'null'));}catch(e){}
@@ -181,11 +181,46 @@
     try{localStorage.setItem(session.active?TRAINING_KEY:SAVE_KEY,JSON.stringify(session.active?session.snapshot(game):game.snapshot()));storageAvailable=true;setText('save-indicator',session.active?'튜토리얼 저장됨':'자동 저장됨');if(!silent)toast('이 브라우저에 탐험 기록을 저장했어요.');return true;}catch(e){storageAvailable=false;setText('save-indicator','저장 불가 · 파일로 백업');if(!silent)toast('브라우저 저장 공간을 사용할 수 없어요. 저장 파일을 내보내 주세요.',true);return false;}
   }
   function showModal(title,eyebrow,html){
-    if(motionEditor){motionEditor.destroy();motionEditor=null;}modal.classList.remove('motion-modal');
+    if(motionEditor){motionEditor.destroy();motionEditor=null;}modal.classList.remove('motion-modal','progression-modal');modal.dataset.panel='';
     clearInput();game.paused=true;renderer.stopHaptics();updateEngineAudio();game.moveTarget=null;$('modal-title').textContent=title;$('modal-eyebrow').textContent=eyebrow;$('modal-content').innerHTML=html;if(!modal.open)modal.showModal();updateTutorial();
   }
   function closeModal(force=false){if(motionEditor?.dirty&&force!==true){motionEditor.requestClose();return;}if(modal.open)modal.close();game.paused=startOpen||document.hidden;clearInput();$('map-tab').classList.remove('active');$('journal-tab').classList.remove('active');$('explore-tab').classList.add('active');if(!startOpen)$('world').focus({preventScroll:true});}
   modal.addEventListener('close',()=>{if(motionEditor){motionEditor.destroy();motionEditor=null;}modal.classList.remove('motion-modal');game.paused=startOpen||document.hidden;clearInput();$('map-tab').classList.remove('active');$('journal-tab').classList.remove('active');$('explore-tab').classList.add('active');});
+  const resourceSymbols={iron:'◆',crystal:'♦',biomass:'❋'};
+  const resourceDetails={iron:'곡괭이로 채굴 · 건축과 우주선 강화',crystal:'칼로 채굴 · 설비와 항법 장치',biomass:'베르단트 전용 · 도끼로 채집'};
+  function progressionHero(){
+    const info=game.levelInfo();
+    return '<div class="growth-summary"><div><span class="eyebrow">EXPLORER LEVEL</span><h3>Lv.'+info.level+' <small>탐험가</small></h3></div><div class="growth-progress"><strong>'+(game.state.training?'훈련 중 · 본게임에서 경험치를 얻어요':info.needed?info.current+' / '+info.needed+' XP':'최고 레벨 달성')+'</strong><div class="xp-meter"><i style="width:'+info.percent+'%"></i></div><p>'+(info.needed?'다음 레벨까지 '+info.remaining+' XP':'나만의 기지를 더 넓혀 보세요.')+'</p></div></div>';
+  }
+  function showInventory(){
+    if(startOpen||game.flight||game.travel||game.probeCinematic)return;
+    if(buildOpen)toggleBuild(false);
+    const s=game.state,owned=s.tools.length;
+    showModal('나의 인벤토리','EXPLORER / INVENTORY',progressionHero()+
+      '<div class="inventory-section-title"><h3>보유 재료</h3><span>채집한 재료는 자동으로 보관됩니다</span></div><div class="bag-grid">'+Object.entries(RESOURCE_NAMES).map(([id,name])=>'<article class="bag-item"><span class="bag-symbol '+id+'">'+resourceSymbols[id]+'</span><div><h4>'+name+'</h4><strong>'+s.inventory[id]+'<small> 개</small></strong></div><p>'+resourceDetails[id]+'</p></article>').join('')+'</div>'+
+      '<div class="inventory-section-title"><h3>탐사 장비</h3><span>'+owned+' / 3 보유 · 장비를 선택해 장착</span></div><div class="bag-grid">'+Object.entries(TOOLS).map(([id,tool])=>{const has=s.tools.includes(id),active=s.equippedTool===id;return '<article class="bag-tool '+(active?'equipped':'')+'"><span class="tool-emblem">'+({pickaxe:'⛏',axe:'◩',sword:'⚔'}[id])+'</span><h4>'+tool.name+'</h4><p>'+RESOURCE_NAMES[tool.resource]+' 전용 · 기본 장비</p><button class="small-button" data-bag-equip="'+id+'" '+(!has||active?'disabled':'')+'>'+(active?'✓ 장착 중':has?'장착하기':'미보유')+'</button></article>';}).join('')+'</div>'+
+      (owned<3?'<button id="bag-get-tools" class="subtle-button">'+(s.training?'루미에게 도구 받으러 가기':'우주선에서 기본 도구 받기')+'</button>':'')+
+      '<details class="growth-details"><summary>경험치 획득 방법과 다음 목표</summary><p>채집 완료 +12 · 새 생명체 발견 +25 · 첫 교류 +15 · 건축 +35 · 유적 조사 +60 · 새 행성 착륙 +80 · 탐사기 복구 +120 XP</p><p>반복 스캔·대화·재방문에는 경험치가 추가되지 않아요. 훈련 경험치는 본게임과 분리됩니다.</p><div class="unlock-list">'+SHIP_TIERS.slice(1).map(t=>'<span>Lv.'+t.level+' · '+t.name+' · '+planetName(t.planet)+'</span>').join('')+'</div></details><button id="bag-ship" class="subtle-button">우주선 강화 확인 →</button>');
+    modal.classList.add('progression-modal');modal.dataset.panel='inventory';
+    modal.querySelectorAll('[data-bag-equip]').forEach(b=>b.onclick=()=>{closeModal();const result=game.equipTool(b.dataset.bagEquip);processEvents();if(!result.ok)toast(result.reason,true);hud(true);showInventory();});
+    if($('bag-get-tools'))$('bag-get-tools').onclick=()=>{closeModal();if(s.training){const npc=game.trainingNpc();game.moveTarget={x:npc.x+50,y:npc.y};game.pendingInteraction=npc.id;}else game.collectStarterTools();processEvents();hud(true);};
+    $('bag-ship').onclick=()=>showShipUpgrade();
+  }
+  function showShipUpgrade(notice=''){
+    if(startOpen||game.flight||game.travel||game.probeCinematic)return;
+    if(buildOpen)toggleBuild(false);
+    const s=game.state,current=game.shipInfo(),status=game.shipUpgradeStatus(),next=status.next,level=game.levelInfo().level;
+    showModal('우주선 강화','SHIPYARD / UPGRADE',
+      '<div class="ship-overview"><div class="ship-blueprint"><canvas id="upgrade-ship-preview" width="320" height="230" aria-label="현재 우주선 '+current.name+'"></canvas><span>'+current.name+' / '+current.title+'</span></div><div class="ship-overview-copy"><span class="eyebrow">YOUR NEXT FRONTIER</span><h3>'+current.name+' <small>'+current.title+'</small></h3><p>자원을 모으고 우주선을 강화해 더 먼 행성으로 떠나세요.</p><dl><div><dt>탐험가</dt><dd>Lv.'+level+'</dd></div><div><dt>비행 속도</dt><dd>'+current.speed.toFixed(2)+'배</dd></div><div><dt>워프 연료</dt><dd>'+current.warpCost+'</dd></div></dl></div></div>'+
+      (notice?'<p class="upgrade-notice" role="status">'+notice+'</p>':'')+
+      (next?'<section class="next-upgrade"><div class="inventory-section-title"><h3>다음 강화 · '+next.name+'</h3><span>필요 레벨 '+next.level+'</span></div><div class="upgrade-benefits"><div><span>비행 속도</span><strong>'+current.speed.toFixed(2)+' → '+next.speed.toFixed(2)+'배</strong></div><div><span>워프 연료</span><strong>'+current.warpCost+' → '+next.warpCost+'</strong></div><div><span>새 항로</span><strong>'+planetName(next.planet)+'</strong></div></div><div class="upgrade-costs">'+Object.entries(next.cost).map(([id,n])=>'<div class="'+(s.inventory[id]>=n?'ready':'missing')+'"><span>'+resourceSymbols[id]+' '+RESOURCE_NAMES[id]+'</span><strong>'+s.inventory[id]+' / '+n+'</strong></div>').join('')+'</div><p class="upgrade-rule">'+(status.ok?'강화를 실행하면 표시된 재료를 사용합니다.':status.reason)+'</p><button id="ship-upgrade-confirm" class="primary-button" '+(!status.ok?'disabled':'')+'>'+next.name+'로 강화하기</button>'+(status.needsShip?'<button id="upgrade-go-ship" class="subtle-button">우주선으로 이동 →</button>':'')+'</section>':'<p class="upgrade-notice">최고 단계 강화 완료 · 모든 행성 항로가 열렸어요.</p>')+
+      '<div class="ship-route-list" aria-label="우주선 강화 단계">'+SHIP_TIERS.map((t,i)=>'<div class="'+(i===s.progression.shipTier?'current':i<s.progression.shipTier?'complete':'')+'"><span>'+t.name+'</span><strong>'+planetName(t.planet)+'</strong><small>'+(i===0?'기본 항로':'Lv.'+t.level)+'</small></div>').join('')+'</div><p class="shipyard-note">강화는 행성에 착륙한 뒤 우주선 가까이에서 진행해요. 기존에 방문한 행성은 계속 갈 수 있어요.</p><button id="ship-bag" class="subtle-button">인벤토리로 돌아가기 →</button>');
+    modal.classList.add('progression-modal');modal.dataset.panel='upgrade';
+    const context=$('upgrade-ship-preview').getContext('2d');context.translate(160,119);context.scale(1.22,1.22);window.Orbit2D.ship(context,0,false,false);
+    if($('ship-upgrade-confirm'))$('ship-upgrade-confirm').onclick=()=>{closeModal();const result=game.upgradeShip(status.tier);processEvents();hud(true);showShipUpgrade(result.ok?SHIP_TIERS[result.tier].name+' 강화 완료 · '+planetName(SHIP_TIERS[result.tier].planet)+' 항로 해금':result.reason);};
+    if($('upgrade-go-ship'))$('upgrade-go-ship').onclick=()=>{closeModal();game.moveTarget={x:80,y:60};game.waypoint={x:0,y:0,label:'우주선 정비 지점'};renderer.pan={x:0,y:0};};
+    $('ship-bag').onclick=showInventory;
+  }
   function showMotionEditor(){
     showModal('모션 스튜디오','JUSTGAME / MOTION LAB','');modal.classList.add('motion-modal');
     motionEditor=new window.OrbitMotionEditor.MotionEditor($('modal-content'),motionSettings,{
@@ -236,10 +271,10 @@
   // Surface environment values are worldbuilding data; g is relative to Earth.
   function environmentText(p){return '기온 '+p.temp+' · 중력 '+p.gravity.toFixed(2)+' g · 이동 '+surfaceSpeedMultiplier(p).toFixed(2)+'배';}
   function showMap(){
-    const s=game.state,space=s.mode==='space';
+    const s=game.state,space=s.mode==='space',warpCost=game.shipInfo().warpCost;
     showModal('다음엔, 어떤 세계로 갈까요?','SIGMA SYSTEM / 성계 지도',
       '<p class="modal-intro">'+(space?'행성을 선택해 궤도로 이동한 뒤 착륙하세요. 자유 비행은 방향키 또는 WASD로 할 수 있어요.':'지금은 '+planetName(s.planet)+'의 지표면에 있어요. 우주선 가까이에서 <kbd>F</kbd>로 이륙하면 다른 행성으로 떠날 수 있어요.')+'</p><p class="environment-note">1 g = 지구 중력 · 이동 속도 = 베르단트 중력 ÷ 현재 중력</p><div class="planet-list">'+
-      PLANETS.map((p,i)=>'<article class="planet-card'+(s.planet===p.id?' current':'')+'"><canvas class="planet-thumb" id="planet-thumb-'+p.id+'" width="132" height="132" aria-label="'+p.name+' 행성"></canvas><div><h3>'+p.name+'</h3><p>'+p.kind+'<br>'+p.resource+(p.id==='solara'&&s.probeQuest.stage==='complete'?'<br><strong class="probe-signal-badge">⌁ 미확인 신호 좌표 확보</strong>':'')+'</p></div><dl class="planet-environment"><div><dt>기온</dt><dd>'+p.temp+'</dd></div><div><dt>표면 중력</dt><dd>'+p.gravity.toFixed(2)+' <small>g</small></dd></div><div><dt>이동 속도</dt><dd>'+surfaceSpeedMultiplier(p).toFixed(2)+' <small>배</small></dd></div></dl><div class="planet-bottom"><span>'+(s.visited.includes(p.id)?'✓ 탐험 완료':'미탐사')+'</span><button class="small-button" data-warp="'+p.id+'" '+(!space||s.fuel<18||game.travel?'disabled':'')+'>'+(space?'궤도로 이동 · 연료 18':s.planet===p.id?'현재 행성':'이륙 후 이동')+'</button></div></article>').join('')+'</div><div class="map-note"><span>탐험한 행성 '+s.visited.length+' / '+PLANETS.length+'</span><span>남은 연료 '+Math.floor(s.fuel)+' / 100</span></div>'+(space&&s.fuel<18?'<button class="primary-button" id="map-refuel" style="margin-top:18px">연료 합성 / 비상 충전</button>':'')+(!space?'<button class="primary-button" id="map-return-ship" style="margin-top:18px">우주선으로 돌아가기</button>':''));
+      PLANETS.map((p,i)=>'<article class="planet-card'+(s.planet===p.id?' current':'')+'"><canvas class="planet-thumb" id="planet-thumb-'+p.id+'" width="132" height="132" aria-label="'+p.name+' 행성"></canvas><div><h3>'+p.name+'</h3><p>'+p.kind+'<br>'+p.resource+(p.id==='solara'&&s.probeQuest.stage==='complete'?'<br><strong class="probe-signal-badge">⌁ 미확인 신호 좌표 확보</strong>':'')+'</p></div><dl class="planet-environment"><div><dt>기온</dt><dd>'+p.temp+'</dd></div><div><dt>표면 중력</dt><dd>'+p.gravity.toFixed(2)+' <small>g</small></dd></div><div><dt>이동 속도</dt><dd>'+surfaceSpeedMultiplier(p).toFixed(2)+' <small>배</small></dd></div></dl><div class="planet-bottom"><span>'+(s.visited.includes(p.id)?'✓ 탐험 완료':game.planetAccess(p.id).ok?'미탐사':game.planetAccess(p.id).reason)+'</span><button class="small-button" data-warp="'+p.id+'" '+(!space||s.fuel<warpCost||game.travel||!game.planetAccess(p.id).ok?'disabled':'')+'>'+(!game.planetAccess(p.id).ok?'강화 후 이동':space?'궤도로 이동 · 연료 '+warpCost:s.planet===p.id?'현재 행성':'이륙 후 이동')+'</button></div></article>').join('')+'</div><div class="map-note"><span>탐험한 행성 '+s.visited.length+' / '+PLANETS.length+'</span><span>남은 연료 '+Math.floor(s.fuel)+' / 100</span></div>'+(space&&s.fuel<warpCost?'<button class="primary-button" id="map-refuel" style="margin-top:18px">연료 합성 / 비상 충전</button>':'')+(!space?'<button class="primary-button" id="map-return-ship" style="margin-top:18px">우주선으로 돌아가기</button>':''));
     $('explore-tab').classList.remove('active');$('map-tab').classList.add('active');
     for(const p of PLANETS){const c=$('planet-thumb-'+p.id).getContext('2d');drawPlanet(c,p,66,66,44);}
     modal.querySelectorAll('[data-warp]').forEach(b=>b.onclick=()=>{const id=b.dataset.warp;closeModal();game.warp(id);processEvents();});
@@ -252,7 +287,7 @@
     for(const[id,sp]of Object.entries(SPECIES)){const c=$('species-'+id).getContext('2d');c.translate(70,123);c.scale(1.7,1.7);if(s.discovered.includes(id))creature(c,id,0,1,s.met.includes(id));else{c.fillStyle='#9eb2aa';c.font='28px system-ui';c.textAlign='center';c.fillText('?',0,-12);}}
   }
   function showHelp(){
-    showModal('탐험가를 위한 작은 안내서','FLIGHT MANUAL / 조작 방법','<p class="modal-intro">서두르지 않아도 괜찮아요. 자원을 모으고 작은 집을 지으며 나만의 속도로 우주를 탐험하세요.</p><div class="help-grid"><div class="help-item"><strong>걷기 · 달리기</strong><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 또는 방향키<br><kbd>Shift</kbd>를 누르면 더 빠르게 이동해요.<br>빈 땅 클릭으로 이동, 드래그로 지도 둘러보기<br>휠로 확대·축소, V로 확대 보기 전환</div><div class="help-item"><strong>채굴 · 생명체와 교류</strong>가까이 다가가 <kbd>E</kbd>를 누르세요.<br>철광석은 <kbd>1</kbd> 곡괭이, 식물은 <kbd>2</kbd> 도끼, 수정은 <kbd>3</kbd> 칼을 장착해야 해요.<br>도구는 루미나 우주선에서 받아요.<br>계속 누르면 연속 채굴해요. 터치 화면에서는 ‘채굴 / 교류’를 누르세요.</div><div class="help-item"><strong>나만의 집 짓기</strong><kbd>B</kbd> → 건물 선택 → 빈 땅 클릭<br>또는 이동 후 ‘여기에 건설’을 누르세요.<br>집: 철광석 12개 + 식물 8개</div><div class="help-item"><strong>새로운 행성으로 떠나기</strong>우주선 근처에서 <kbd>F</kbd>로 이륙<br><kbd>M</kbd> → 행성 선택 → <kbd>E</kbd> 착륙<br>방향키로 비행, Shift로 가속<br>행성 가까이에서 E 또는 F로 착륙하세요.</div><div class="help-item"><strong>스캔 · 도감</strong><kbd>Q</kbd>로 주변 자원과 생명체 탐지<br>발견한 생명체는 도감에 기록됩니다.<br>교류하면 첫 만남 선물을 받아요.</div><div class="help-item"><strong>산소 · 연료</strong>우주선과 집 근처에서는 산소 충전<br><kbd>R</kbd>로 바이오 연료 합성<br>재료가 없으면 6초 비상 충전이 가능해요.</div></div><p class="help-tips">진행 상황은 이 기기의 브라우저에 자동 저장돼요. 다른 기기로 옮기려면 ‘저장 관리’에서 저장 파일을 내보내세요. 산소가 떨어지면 자원을 보존한 채 우주선으로 돌아옵니다. 채굴한 자원은 150초 후 다시 자랍니다.</p><button class="primary-button" id="help-resume" style="margin-top:22px">탐험으로 돌아가기</button>');$('help-resume').onclick=closeModal;const replay=document.createElement('button');replay.id='tutorial-replay';replay.className='subtle-button';replay.textContent='튜토리얼 다시 시작';replay.onclick=restartTutorial;$('modal-content').append(replay);
+    showModal('탐험가를 위한 작은 안내서','FLIGHT MANUAL / 조작 방법','<p class="modal-intro"><kbd>I</kbd> 인벤토리 · <kbd>U</kbd> 우주선 강화<br>채집·발견·건축으로 레벨을 올려 새 항로를 여세요. 서두르지 않아도 괜찮아요. 자원을 모으고 작은 집을 지으며 나만의 속도로 우주를 탐험하세요.</p><div class="help-grid"><div class="help-item"><strong>걷기 · 달리기</strong><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 또는 방향키<br><kbd>Shift</kbd>를 누르면 더 빠르게 이동해요.<br>빈 땅 클릭으로 이동, 드래그로 지도 둘러보기<br>휠로 확대·축소, V로 확대 보기 전환</div><div class="help-item"><strong>채굴 · 생명체와 교류</strong>가까이 다가가 <kbd>E</kbd>를 누르세요.<br>철광석은 <kbd>1</kbd> 곡괭이, 식물은 <kbd>2</kbd> 도끼, 수정은 <kbd>3</kbd> 칼을 장착해야 해요.<br>도구는 루미나 우주선에서 받아요.<br>계속 누르면 연속 채굴해요. 터치 화면에서는 ‘채굴 / 교류’를 누르세요.</div><div class="help-item"><strong>나만의 집 짓기</strong><kbd>B</kbd> → 건물 선택 → 빈 땅 클릭<br>또는 이동 후 ‘여기에 건설’을 누르세요.<br>집: 철광석 12개 + 식물 8개</div><div class="help-item"><strong>새로운 행성으로 떠나기</strong>우주선 근처에서 <kbd>F</kbd>로 이륙<br><kbd>M</kbd> → 행성 선택 → <kbd>E</kbd> 착륙<br>방향키로 비행, Shift로 가속<br>행성 가까이에서 E 또는 F로 착륙하세요.</div><div class="help-item"><strong>스캔 · 도감</strong><kbd>Q</kbd>로 주변 자원과 생명체 탐지<br>발견한 생명체는 도감에 기록됩니다.<br>교류하면 첫 만남 선물을 받아요.</div><div class="help-item"><strong>산소 · 연료</strong>우주선과 집 근처에서는 산소 충전<br><kbd>R</kbd>로 바이오 연료 합성<br>재료가 없으면 6초 비상 충전이 가능해요.</div></div><p class="help-tips">진행 상황은 이 기기의 브라우저에 자동 저장돼요. 다른 기기로 옮기려면 ‘저장 관리’에서 저장 파일을 내보내세요. 산소가 떨어지면 자원을 보존한 채 우주선으로 돌아옵니다. 채굴한 자원은 150초 후 다시 자랍니다.</p><button class="primary-button" id="help-resume" style="margin-top:22px">탐험으로 돌아가기</button>');$('help-resume').onclick=closeModal;const replay=document.createElement('button');replay.id='tutorial-replay';replay.className='subtle-button';replay.textContent='튜토리얼 다시 시작';replay.onclick=restartTutorial;$('modal-content').append(replay);
   }
   function toggleBuild(force){
     if(game.flight&&force!==false)return;
@@ -305,6 +340,8 @@
   function processEvents(){
     while(game.events.length){const e=game.events.shift();if(e.type==='launch'||e.type==='land')clearTutorialWaypoint();tutorial.event(e,game);
       if(e.type==='message')toast(e.text,e.error);
+      else if(e.type==='xp'){toast('+'+e.amount+' XP · '+e.reason);}
+      else if(e.type==='level-up'){toast('레벨 업! 탐험가 Lv.'+e.level+' · U 키로 강화 확인');sound('discovery');}
       else if(e.type==='effect'){renderer.effect(e);sound(e.kind,e);}
       else if(e.type==='save'){save();if(buildOpen)renderBuildOptions();}
       else if(e.type==='dialogue')showDialogue(e);
@@ -321,6 +358,11 @@
   }
   function hud(force=false){
     const s=game.state,p=game.planet(),space=s.mode==='space',nearest=game.nearest(),flight=game.flight;
+    const growth=game.levelInfo(),nextShip=SHIP_TIERS[s.progression.shipTier+1];
+    setText('player-level','Lv.'+growth.level);setText('player-xp',s.training?'훈련 중':growth.needed?growth.current+' / '+growth.needed+' XP':'MAX LEVEL');
+    $('player-xp-fill').style.width=growth.percent+'%';$('player-xp-meter').setAttribute('aria-valuenow',String(Math.floor(growth.percent)));
+    setText('next-unlock',s.training?'훈련 수료 후 성장 시작':nextShip?'다음 강화 · Lv.'+nextShip.level+' / '+nextShip.name:'최고 단계 우주선 · 모든 항로 해금');
+    for(const id of ['inventory-button','upgrade-button'])$(id).disabled=startOpen||!!flight||!!game.travel||game.probeCinematic;
     $('tool-rack').hidden=space||!!flight;
     $('starter-tools').hidden=s.tools.length===Object.keys(TOOLS).length;
     document.querySelectorAll('[data-tool]').forEach(button=>{const id=button.dataset.tool,owned=s.tools.includes(id),selected=s.equippedTool===id;button.disabled=!owned||!!flight;button.setAttribute('aria-pressed',String(selected));button.setAttribute('aria-label',TOOLS[id].name+' · '+(owned?selected?'장착 중':'장착하기':'미보유')+' · '+RESOURCE_NAMES[TOOLS[id].resource]+' 전용');button.querySelector('small').textContent=owned?(selected?'장착 중 · ':'')+RESOURCE_NAMES[TOOLS[id].resource]:'미보유';});
@@ -332,7 +374,7 @@
     const loc=space?'space':p.id;if(locationSignature!==loc||force){locationSignature=loc;setText('location-code',space?'SIGMA SYSTEM / OPEN SPACE':'시그마 성계 / '+String(PLANETS.indexOf(p)+1).padStart(2,'0'));$('location-name').innerHTML=(space?'시그마 성계':p.name)+'<span class="planet-tag">'+(space?'비행 중':'탐험 중')+'</span>';$('location-description').textContent=space?'새로운 행성으로 향하는 중':environmentText(p);$('location-description').title=space?'':p.kind+' · 탐험 지역 기온 / 표면 중력 (1 g = 지구 중력)';setText('ship-label',space?'착륙':'우주선');$('scan-button').title=space?'주변 행성 스캔':'주변 자원과 생명체 스캔';}
     if(s.training){setText('location-code','TRAINING SIMULATION / 전용 공간');$('location-name').innerHTML=(space?'비행 시뮬레이터':s.planet==='verdant'?'시그마 훈련 기지':'모의 착륙 구역')+'<span class="planet-tag">훈련 중</span>';$('location-description').textContent=space?'모의 항로 · 다른 행성에 착륙해 보세요':s.planet==='verdant'?'실내 22°C · 인공 중력 1.00 g · 이동 1.00배':environmentText(p);$('location-description').title=space?'비행 시뮬레이터':s.planet==='verdant'?'시그마 훈련 기지의 실내 환경 · 1 g = 지구 중력':'모의 착륙 구역 · '+p.kind+' · 1 g = 지구 중력';}
     updateTutorial();$('space-action').hidden=!space||!$('tutorial-card').hidden;$('mission-card').hidden=space||session.active||!$('tutorial-card').hidden;
-    if(space){const target=nearest?.kind==='planet'?nearest.entity:null;setText('space-target-name',target?target.name+' 궤도':'다음 목적지를 찾아보세요');setText('space-target-help',target?environmentText(target)+' · 지표 환경':'방향키로 비행하거나 성계 지도에서 항로를 설정하세요.');$('land-button').disabled=!target||!!game.travel;setText('land-button',target?target.name+'에 착륙':'행성 가까이에서 착륙');setText('refuel-button',game.solarCharge>0?'태양광 비상 충전 · '+Math.ceil(game.solarCharge)+'초':s.inventory.biomass>=3?'연료 합성 · 식물 3개':'비상 태양광 충전 · 6초');}
+    if(space){const target=nearest?.kind==='planet'?nearest.entity:null;setText('space-target-name',target?target.name+' 궤도':'다음 목적지를 찾아보세요');setText('space-target-help',target?environmentText(target)+' · 지표 환경':'방향키로 비행하거나 성계 지도에서 항로를 설정하세요.');$('land-button').disabled=!target||!!game.travel||(target&&!game.planetAccess(target.id).ok);setText('land-button',target?(game.planetAccess(target.id).ok?target.name+'에 착륙':game.planetAccess(target.id).reason):'행성 가까이에서 착륙');setText('refuel-button',game.solarCharge>0?'태양광 비상 충전 · '+Math.ceil(game.solarCharge)+'초':s.inventory.biomass>=3?'연료 합성 · 식물 3개':'비상 태양광 충전 · 6초');}
     let hint='자원 가까이에서 E를 누르세요',key='E';
     if(game.selectedBuild){hint='빈 땅 클릭 또는 E · 건설 배치';key='B';}
     else if(space){hint=game.travel?'워프 항로를 따라 이동하고 있어요':nearest?'E 또는 F · '+nearest.entity.name+'에 착륙':'WASD 비행 · M 성계 지도';key=nearest?'E':'M';}
@@ -349,9 +391,10 @@
     }else $('world-label').hidden=true;
   }
   function interact(){sound('click');const wasBuilding=!!game.selectedBuild;const result=game.interact();if(wasBuilding&&result.ok)toggleBuild(false);processEvents();}
+  $('inventory-button').onclick=showInventory;$('upgrade-button').onclick=()=>showShipUpgrade();
   $('explore-tab').onclick=()=>{if(modal.open)closeModal();};$('map-tab').onclick=showMap;$('radar-button').onclick=showMap;$('journal-tab').onclick=showJournal;$('help-button').onclick=showHelp;$('motion-button').onclick=showMotionEditor;$('settings-button').onclick=showSettings;
   $('view-button').onclick=toggleCamera;$('immersion-button').onclick=showImmersion;
-  $('fullscreen-button').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else if($('game-area').requestFullscreen)await $('game-area').requestFullscreen();else toast('이 브라우저에서는 전체 화면 버튼을 사용할 수 없어요.');}catch(e){toast('전체 화면을 열지 못했어요. 브라우저 설정을 확인해주세요.');}};
+  $('fullscreen-button').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else if(document.querySelector('.app-shell').requestFullscreen)await document.querySelector('.app-shell').requestFullscreen();else toast('이 브라우저에서는 전체 화면 버튼을 사용할 수 없어요.');}catch(e){toast('전체 화면을 열지 못했어요. 브라우저 설정을 확인해주세요.');}};
   $('pause-button').onclick=()=>{showModal('잠시, 별을 바라보세요','EXPEDITION PAUSED','<div class="pause-content"><p>탐험을 잠시 멈췄어요.<br>준비가 되면 언제든 다시 떠나세요.</p><button id="resume-button" class="primary-button">이어서 탐험하기</button></div>');$('resume-button').onclick=closeModal;save();};
   $('sound-button').onclick=()=>{soundEnabled=!soundEnabled;try{localStorage.setItem(SOUND_KEY,soundEnabled?'on':'off');}catch(e){}updateSoundButton();sound('click');updateEngineAudio();};
   $('scan-button').onclick=()=>{game.scan();processEvents();};$('build-button').onclick=()=>toggleBuild();$('build-close').onclick=()=>toggleBuild(false);$('place-building').onclick=placeBuilding;
@@ -366,7 +409,8 @@
   const moveMap={KeyW:'up',ArrowUp:'up',KeyS:'down',ArrowDown:'down',KeyA:'left',ArrowLeft:'left',KeyD:'right',ArrowRight:'right',ShiftLeft:'run',ShiftRight:'run',KeyE:'interact'};
   window.addEventListener('keydown',e=>{
     if(e.target instanceof HTMLInputElement||e.target instanceof HTMLTextAreaElement)return;
-    if(modal.open||game.probeCinematic)return;
+    if((e.code==='KeyI'||e.code==='KeyU')&&!e.repeat&&!startOpen&&!game.probeCinematic&&!game.flight&&!game.travel){e.preventDefault();const panel=e.code==='KeyI'?'inventory':'upgrade';if(modal.open&&modal.dataset.panel===panel)closeModal();else if(!modal.open||['inventory','upgrade'].includes(modal.dataset.panel)){if(panel==='inventory')showInventory();else showShipUpgrade();}return;}
+    if(modal.open||game.probeCinematic||startOpen)return;
     ensureAudio();
     if(moveMap[e.code]){e.preventDefault();keys[moveMap[e.code]]=true;}
     if(e.repeat)return;

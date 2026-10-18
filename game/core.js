@@ -36,6 +36,22 @@
   const TOOLS={pickaxe:{name:'곡괭이',resource:'iron',key:'1'},axe:{name:'도끼',resource:'biomass',key:'2'},sword:{name:'칼',resource:'crystal',key:'3'}};
   const RESOURCE_TOOLS={iron:'pickaxe',biomass:'axe',crystal:'sword'},FLIGHT_DURATION=2.8;
   const PROBE={id:'lumi-probe',x:320,y:-175,name:'루미의 탐사기',cost:{iron:18,biomass:10,crystal:4},failureDuration:7,repairDuration:4.5};
+  const MAX_LEVEL=20;
+  const XP_REWARDS={mine:12,discover:25,befriend:15,build:35,relic:60,planet:80,probe:120};
+  const SHIP_TIERS=[
+    {name:'MK I',title:'개척선',level:1,cost:{},speed:1,warpCost:18,planet:'solara'},
+    {name:'MK II',title:'장거리 탐사선',level:3,cost:{iron:24,crystal:8,biomass:10},speed:1.15,warpCost:16,planet:'nix'},
+    {name:'MK III',title:'극한 환경 탐사선',level:6,cost:{iron:48,crystal:16,biomass:16},speed:1.3,warpCost:14,planet:'ember'},
+    {name:'MK IV',title:'심우주 탐사선',level:10,cost:{iron:84,crystal:32,biomass:24},speed:1.5,warpCost:12,planet:'prisma'}
+  ];
+  const PLANET_TIERS={verdant:0,solara:0,nix:1,ember:2,prisma:3};
+  const xpForLevel=level=>{const n=clamp(Math.floor(level),1,MAX_LEVEL)-1;return 100*n+25*n*(n-1);};
+  function levelProgress(xp){
+    xp=clamp(Number.isFinite(xp)?Math.floor(xp):0,0,xpForLevel(MAX_LEVEL));
+    let level=1;while(level<MAX_LEVEL&&xp>=xpForLevel(level+1))level++;
+    const current=xp-xpForLevel(level),needed=level===MAX_LEVEL?0:xpForLevel(level+1)-xpForLevel(level);
+    return{level,xp,current,needed,remaining:needed-current,percent:needed?current/needed*100:100};
+  }
   function probePose(stage,age=0){
     const t=stage==='malfunction'?clamp(age/PROBE.failureDuration,0,1):stage==='repairing'?clamp(age/PROBE.repairDuration,0,1):0;
     const broken=stage==='collecting'||stage==='repairing';
@@ -53,7 +69,7 @@
       this.state.ship.altitude=clamp(Number.isFinite(this.state.ship.altitude)?this.state.ship.altitude:0,0,650);this.ensureWorld(this.state.planet);this.lastSave=0;this.boosting=false;
       this.velocity={x:0,y:0,z:0};this.motionMode=this.state.mode;this.pendingInteraction=null;this.waypoint=null;
     }
-    fresh(){return{version:VERSION,mode:'surface',planet:'verdant',player:{x:90,y:100,angle:0},ship:{x:-480,y:245,angle:-Math.PI/2},oxygen:100,fuel:100,inventory:{iron:0,crystal:0,biomass:0},tools:[],equippedTool:null,flight:null,worlds:{},visited:['verdant'],discovered:[],met:[],friendship:{},creatureCare:{},companion:null,relics:[],time:0,stats:{mined:0,buildings:0,travel:0,collected:{iron:0,crystal:0,biomass:0}},rewarded:false,probeQuest:{stage:'available',age:0}};}
+    fresh(){return{version:VERSION,mode:'surface',planet:'verdant',player:{x:90,y:100,angle:0},ship:{x:-480,y:245,angle:-Math.PI/2},oxygen:100,fuel:100,inventory:{iron:0,crystal:0,biomass:0},tools:[],equippedTool:null,flight:null,worlds:{},visited:['verdant'],discovered:[],met:[],friendship:{},creatureCare:{},companion:null,relics:[],time:0,stats:{mined:0,buildings:0,travel:0,collected:{iron:0,crystal:0,biomass:0}},rewarded:false,progression:{xp:0,shipTier:0},probeQuest:{stage:'available',age:0}};}
     validate(input){
       if(!input||input.version!==VERSION||!['surface','space'].includes(input.mode)||!PLANETS.some(p=>p.id===input.planet))throw Error('Invalid save');
       const s=this.fresh();s.training=input.training===true;if(s.training)s.trainingLayout=2;
@@ -93,11 +109,54 @@
         if(Array.isArray(old.buildings))w.buildings=old.buildings.slice(0,80).filter(b=>BUILDINGS[b.type]&&Number.isFinite(b.x)&&Number.isFinite(b.y)&&Math.abs(b.x)<WORLD_LIMIT&&Math.abs(b.y)<WORLD_LIMIT).map((b,i)=>({id:'building-'+i,type:b.type,x:b.x,y:b.y,level:b.level===2?2:1,lit:b.lit!==false}));
         s.worlds[p.id]=w;s.stats.buildings+=w.buildings.length;
       }
+      const legacyXp=s.stats.mined*XP_REWARDS.mine+s.stats.buildings*XP_REWARDS.build+s.discovered.length*XP_REWARDS.discover+s.met.length*XP_REWARDS.befriend+s.relics.length*XP_REWARDS.relic+Math.max(0,s.visited.length-1)*XP_REWARDS.planet+(s.probeQuest.stage==='complete'?XP_REWARDS.probe:0);
+      const legacyTier=Math.max(0,...s.visited.map(id=>PLANET_TIERS[id]),s.flight?.kind==='land'?PLANET_TIERS[s.planet]:0);
+      s.progression=s.training?{xp:0,shipTier:0}:{xp:levelProgress(input.progression===undefined?legacyXp:input.progression?.xp).xp,shipTier:clamp(Math.floor(Number.isFinite(input.progression?.shipTier)?input.progression.shipTier:0),0,SHIP_TIERS.length-1)};
+      if(!s.training&&input.progression===undefined)s.progression.shipTier=legacyTier;
       return s;
     }
     emit(type,data={}){this.events.push({type,...data});}
     setMotion(config){this.motion=Motion.normalize(config);}
     planet(){return PLANETS.find(p=>p.id===this.state.planet);}
+    levelInfo(){return levelProgress(this.state.progression.xp);}
+    shipInfo(){return SHIP_TIERS[this.state.training?0:this.state.progression.shipTier];}
+    awardXp(amount,reason){
+      if(this.state.training||!Number.isFinite(amount)||amount<=0)return;
+      const before=this.levelInfo();this.state.progression.xp=levelProgress(before.xp+amount).xp;
+      const after=this.levelInfo(),earned=after.xp-before.xp;
+      if(earned)this.emit('xp',{amount:earned,reason});
+      if(after.level>before.level)this.emit('level-up',{level:after.level});
+      if(earned)this.emit('save');
+    }
+    planetAccess(id){
+      if(!Object.hasOwn(PLANET_TIERS,id))return{ok:false,reason:'알 수 없는 행성이에요.'};
+      const required=PLANET_TIERS[id];
+      if(this.state.training||this.state.visited.includes(id)||this.state.progression.shipTier>=required)return{ok:true};
+      return{ok:false,reason:SHIP_TIERS[required].name+' 강화 필요 · Lv.'+SHIP_TIERS[required].level,required};
+    }
+    shipUpgradeStatus(){
+      const s=this.state,next=SHIP_TIERS[s.progression.shipTier+1];
+      if(!next)return{ok:false,reason:'최고 단계의 우주선이에요.',max:true};
+      const missing=Object.entries(next.cost).filter(([r,n])=>s.inventory[r]<n).map(([r,n])=>RESOURCE_NAMES[r]+' '+(n-s.inventory[r])+'개');
+      const base={next,tier:s.progression.shipTier+1,missing};
+      if(s.training)return{...base,ok:false,reason:'훈련을 마친 뒤 본게임에서 강화할 수 있어요.'};
+      if(this.flight||this.travel||this.probeCinematic)return{...base,ok:false,reason:'이동이나 이야기 장면을 마친 뒤 강화하세요.'};
+      if(s.mode!=='surface')return{...base,ok:false,reason:'행성에 착륙한 뒤 우주선 가까이에서 강화하세요.'};
+      if(dist(s.player,{x:0,y:0})>190)return{...base,ok:false,reason:'우주선 가까이로 이동하세요.',needsShip:true};
+      if(this.levelInfo().level<next.level)return{...base,ok:false,reason:'탐험가 Lv.'+next.level+'에 강화가 열려요.'};
+      if(missing.length)return{...base,ok:false,reason:'부족한 재료 · '+missing.join(' · ')};
+      return{...base,ok:true};
+    }
+    upgradeShip(expectedTier){
+      if(this.paused)return{ok:false,reason:'강화 화면에서 강화를 실행하세요.'};
+      const status=this.shipUpgradeStatus();if(!status.ok)return status;
+      if(expectedTier!==status.tier)return{ok:false,reason:'강화 단계가 바뀌었어요. 다시 확인해 주세요.'};
+      for(const [r,n]of Object.entries(status.next.cost))this.state.inventory[r]-=n;
+      this.state.progression.shipTier=status.tier;
+      this.emit('effect',{kind:'build',x:0,y:0,color:'#a3e4e9'});
+      this.emit('message',{text:status.next.name+' 강화 완료! '+PLANETS.find(p=>p.id===status.next.planet).name+' 항로가 열렸어요.'});this.emit('save');
+      return{ok:true,tier:status.tier};
+    }
     trainingNpc(){return this.state.training&&this.state.mode==='surface'?{id:'training-instructor',x:-350,y:140,name:'교관 루미'}:null;}
     questNpc(){return !this.state.training&&this.state.mode==='surface'&&this.state.planet==='verdant'?{id:'lumi-field',x:170,y:-150,name:'탐사 담당 루미'}:null;}
     probeEntity(){return this.questNpc()?{...PROBE}:null;}
@@ -115,6 +174,7 @@
       if(!this.probeCinematic)return{ok:false};
       const repaired=this.state.probeQuest.stage==='repairing';this.state.probeQuest={stage:repaired?'complete':'collecting',age:0};
       this.emit('probe-update',{complete:repaired});this.emit('save');
+      if(repaired)this.awardXp(XP_REWARDS.probe,'탐사기 복구');
       if(repaired)this.emit('message',{text:'탐사기 복구 완료! 솔라라의 미확인 신호 좌표가 성계 지도에 등록됐어요.'});
       return{ok:true};
     }
@@ -205,7 +265,7 @@
       if(this.moveTarget&&!dx&&!dy){const d=dist(actor,this.moveTarget);if(d>7){dx=(this.moveTarget.x-actor.x)/d;dy=(this.moveTarget.y-actor.y)/d;}else{this.moveTarget=null;}}
       const len=Math.hypot(dx,dy),moving=len>.01;
       if(this.motionMode!==s.mode){this.motionMode=s.mode;this.velocity={x:0,y:0,z:0};this.pendingInteraction=null;this.waypoint=null;}
-      const speed=s.mode==='surface'?(input.run?218:144)*surfaceSpeedMultiplier(this.planet()):(s.fuel>0?(input.run?540:250):95);
+      const speed=s.mode==='surface'?(input.run?218:144)*surfaceSpeedMultiplier(this.planet()):(s.fuel>0?(input.run?540:250)*this.shipInfo().speed:95);
       const response=1-Math.exp(-dt*(s.mode==='surface'?15:6));
       this.velocity.x+=((moving?dx/len*speed:0)-this.velocity.x)*response;
       this.velocity.y+=((moving?dy/len*speed:0)-this.velocity.y)*response;
@@ -217,7 +277,7 @@
       this.moving=Math.hypot(this.velocity.x,this.velocity.y)>2;this.boosting=this.moving&&!!input.run;
       if(s.mode==='space'){
         s.ship.altitude=0;this.velocity.z=0;
-        if(this.moving)s.fuel=clamp(s.fuel-dt*(input.run?.8:.28),0,100);
+        if(this.moving)s.fuel=clamp(s.fuel-dt*(input.run?.8:.28)*(this.shipInfo().warpCost/18),0,100);
       }
       if(s.mode==='surface'){
         const w=this.world(),p=s.player;
@@ -283,12 +343,12 @@
         node.hp--;
         const nodeColor=node.type==='crystal'?'#bccfff':node.type==='biomass'?'#c3f379':'#cad9df',broken=node.hp<=0;
         this.emit('effect',{kind:'mine',x:node.x,y:node.y,color:nodeColor,nodeType:node.type,remaining:node.hp,maxHp:node.maxHp,broken});
-        if(broken){const amount=node.type==='iron'?6:node.type==='biomass'?5:4;this.addResource(node.type,amount);this.state.stats.mined++;node.respawnAt=this.state.time+150;this.emit('message',{text:RESOURCE_NAMES[node.type]+' +'+amount});this.emit('effect',{kind:'break',x:node.x,y:node.y,color:nodeColor,nodeType:node.type,maxHp:node.maxHp});this.emit('effect',{kind:'collect',x:node.x,y:node.y,color:this.planet().accent,label:'+'+amount+' '+RESOURCE_NAMES[node.type]});this.emit('save');}
+        if(broken){const amount=node.type==='iron'?6:node.type==='biomass'?5:4;this.addResource(node.type,amount);this.state.stats.mined++;this.awardXp(XP_REWARDS.mine,'자원 채집');node.respawnAt=this.state.time+150;this.emit('message',{text:RESOURCE_NAMES[node.type]+' +'+amount});this.emit('effect',{kind:'break',x:node.x,y:node.y,color:nodeColor,nodeType:node.type,maxHp:node.maxHp});this.emit('effect',{kind:'collect',x:node.x,y:node.y,color:this.planet().accent,label:'+'+amount+' '+RESOURCE_NAMES[node.type]});this.emit('save');}
     }
-    discover(id,announce=true){if(this.state.discovered.includes(id))return false;this.state.discovered.push(id);if(announce)this.emit('discovery',{species:id});this.emit('save');return true;}
+    discover(id,announce=true){if(this.state.discovered.includes(id))return false;this.state.discovered.push(id);this.awardXp(XP_REWARDS.discover,'새 생명체 발견');if(announce)this.emit('discovery',{species:id});this.emit('save');return true;}
     befriend(c){
       const first=!this.state.met.includes(c.species),sp=SPECIES[c.species];this.discover(c.species,false);
-      if(first){this.state.met.push(c.species);for(const [r,v]of Object.entries(sp.gift))this.addResource(r,v);}
+      if(first){this.state.met.push(c.species);this.awardXp(XP_REWARDS.befriend,'첫 교류');for(const [r,v]of Object.entries(sp.gift))this.addResource(r,v);}
       this.cooldown=.8;this.emit('dialogue',{species:c.species,id:c.id,first});this.emit('save');return{ok:true,type:'friend',species:c.species,first};
     }
     careForCreature(id,action){
@@ -353,7 +413,7 @@
       const r=this.world().relics.find(v=>v.id===id),s=this.state;
       if(!r||dist(r,s.player)>160)return{ok:false,reason:'유적 가까이로 이동하세요.'};
       if(s.relics.includes(id)){this.emit('message',{text:'이미 조사한 '+r.name+'입니다. 다음 별빛 기록을 찾아보세요.'});return{ok:false,reason:'조사 완료'};}
-      s.relics.push(id);this.addResource('crystal',5);this.addResource('iron',4);this.cooldown=.8;
+      s.relics.push(id);this.awardXp(XP_REWARDS.relic,'유적 조사');this.addResource('crystal',5);this.addResource('iron',4);this.cooldown=.8;
       if(this.waypoint&&dist(this.waypoint,r)<2)this.waypoint=null;
       this.emit('effect',{kind:'relic',x:r.x,y:r.y,color:this.planet().accent});
       this.emit('message',{text:r.name+' 조사 완료 · 수정 +5 · 철광석 +4'});
@@ -394,7 +454,7 @@
       if(this.paused||this.travel||this.flight||this.probeCinematic)return{ok:false,reason:'탐험 중에 건설할 수 있어요.'};
       const result=this.canPlace(type,x,y);if(!result.ok){this.emit('message',{text:result.reason,error:true});return result;}
       for(const[r,n]of Object.entries(BUILDINGS[type].cost))this.state.inventory[r]-=n;
-      this.world().buildings.push({id:'building-'+Math.round(this.state.time*1000)+'-'+this.world().buildings.length,type,x,y});this.state.stats.buildings++;
+      this.world().buildings.push({id:'building-'+Math.round(this.state.time*1000)+'-'+this.world().buildings.length,type,x,y});this.state.stats.buildings++;this.awardXp(XP_REWARDS.build,'기지 건설');
       this.emit('effect',{kind:'build',x,y,color:'#c3f379',buildingType:type});this.emit('message',{text:BUILDINGS[type].name+' 완성! 이곳이 당신의 새로운 보금자리예요.'});this.selectedBuild=null;this.emit('save');return{ok:true,type};
     }
     launch(){
@@ -409,6 +469,7 @@
       if(this.state.mode!=='space')return{ok:false,reason:'이미 행성에 착륙해 있어요.'};
       const target=id?PLANETS.find(p=>p.id===id):this.nearest()?.entity;
       if(!target||Math.hypot(target.x-this.state.ship.x,target.y-this.state.ship.y)>target.r+105){this.emit('message',{text:'행성에 더 가까이 다가가거나 M으로 항로를 설정하세요.'});return{ok:false,reason:'착륙 범위 밖입니다.'};}
+      const access=this.planetAccess(target.id);if(!access.ok){this.emit('message',{text:access.reason,error:true});return access;}
       this.state.planet=target.id;this.state.mode='surface';this.state.player={x:90,y:100,angle:0};this.state.oxygen=100;this.ensureWorld(target.id);this.moveTarget=null;
       this.startFlight('land');return{ok:true,phase:'landing',planet:target.id};
     }
@@ -419,15 +480,17 @@
     finishFlight(){
       if(!this.flight)return;const {kind}=this.flight,p=this.planet();this.state.flight=null;this.state.oxygen=100;
       if(kind==='launch'){this.state.mode='space';this.state.ship={x:p.x,y:p.y+p.r+155,angle:-Math.PI/2,altitude:0};this.emit('message',{text:'이륙 완료! 방향키로 비행하거나 M 키로 성계 지도를 열어보세요.'});}
-      else{if(!this.state.visited.includes(p.id)){this.state.visited.push(p.id);this.emit('planet-discovery',{planet:p.id});}this.emit('message',{text:p.name+'에 착륙했어요. 새로운 탐험을 시작하세요!'});}
+      else{if(!this.state.visited.includes(p.id)){this.state.visited.push(p.id);this.awardXp(XP_REWARDS.planet,'새 행성 착륙');this.emit('planet-discovery',{planet:p.id});}this.emit('message',{text:p.name+'에 착륙했어요. 새로운 탐험을 시작하세요!'});}
       this.emit(kind);this.emit('save');
     }
     warp(id){
       if(this.paused||this.travel||this.flight||this.probeCinematic)return{ok:false,reason:'잠시 기다려주세요.'};
       const target=PLANETS.find(p=>p.id===id);if(!target)return{ok:false,reason:'알 수 없는 행성이에요.'};
       if(this.state.mode!=='space')return{ok:false,reason:'우주선에서 이륙한 뒤 항로를 설정하세요.'};
-      if(this.state.fuel<18){this.emit('message',{text:'연료가 18 필요해요. 연료 합성 또는 비상 충전을 이용하세요.',error:true});return{ok:false,reason:'연료 부족'};}
-      this.state.fuel-=18;this.state.stats.travel++;this.travel={planet:id,age:0};this.moveTarget=null;this.emit('effect',{kind:'warp'});this.emit('message',{text:target.name+' 궤도로 이동 중…'});return{ok:true,planet:id,cost:18};
+      const access=this.planetAccess(id);if(!access.ok){this.emit('message',{text:access.reason,error:true});return access;}
+      const cost=this.shipInfo().warpCost;
+      if(this.state.fuel<cost){this.emit('message',{text:'연료가 '+cost+' 필요해요. 연료 합성 또는 비상 충전을 이용하세요.',error:true});return{ok:false,reason:'연료 부족'};}
+      this.state.fuel-=cost;this.state.stats.travel++;this.travel={planet:id,age:0};this.moveTarget=null;this.emit('effect',{kind:'warp'});this.emit('message',{text:target.name+' 궤도로 이동 중…'});return{ok:true,planet:id,cost};
     }
     finishTravel(){const target=PLANETS.find(p=>p.id===this.travel.planet);this.state.ship={x:target.x,y:target.y+target.r+65,angle:-Math.PI/2,altitude:0};this.travel=null;this.emit('message',{text:target.name+' 궤도 도착. E 또는 착륙 버튼을 눌러주세요.'});this.emit('save');}
     refuel(){
@@ -438,9 +501,9 @@
       this.solarCharge=6;this.emit('message',{text:'식물이 부족해요. 6초 동안 비상 태양광 충전을 진행합니다.'});return{ok:true,emergency:true};
     }
     goals(){const s=this.state;return[{text:'철광석 12개, 식물 8개 모으기',done:s.stats.collected.iron>=12&&s.stats.collected.biomass>=8},{text:'나만의 집 한 채 짓기',done:Object.values(s.worlds).some(w=>w.buildings.some(b=>b.type==='habitat'))},{text:'낯선 생명체와 친구 되기',done:s.met.length>0},{text:'우주선을 타고 두 번째 행성 탐험',done:s.visited.length>=2}];}
-    nearbyState(){return{mode:this.state.mode,planet:this.planet().name,player:{...this.state.player},ship:{...this.state.ship},inventory:{...this.state.inventory},tools:[...this.state.tools],equippedTool:this.state.equippedTool,flight:this.flight?{...this.flight}:null,oxygen:Math.round(this.state.oxygen),fuel:Math.round(this.state.fuel),visited:[...this.state.visited],discovered:[...this.state.discovered],met:[...this.state.met],goals:this.goals(),nearby:this.state.mode==='surface'?{resources:this.world().nodes.filter(n=>n.hp>0&&dist(n,this.state.player)<350).map(n=>({id:n.id,type:n.type,x:n.x,y:n.y,hp:n.hp})),creatures:this.world().creatures.filter(c=>dist(c,this.state.player)<500).map(c=>({id:c.id,species:c.species,x:c.x,y:c.y})),buildings:this.world().buildings}:null};}
+    nearbyState(){return{level:this.levelInfo(),shipTier:this.state.progression.shipTier,shipUpgrade:this.shipUpgradeStatus(),mode:this.state.mode,planet:this.planet().name,player:{...this.state.player},ship:{...this.state.ship},inventory:{...this.state.inventory},tools:[...this.state.tools],equippedTool:this.state.equippedTool,flight:this.flight?{...this.flight}:null,oxygen:Math.round(this.state.oxygen),fuel:Math.round(this.state.fuel),visited:[...this.state.visited],discovered:[...this.state.discovered],met:[...this.state.met],goals:this.goals(),nearby:this.state.mode==='surface'?{resources:this.world().nodes.filter(n=>n.hp>0&&dist(n,this.state.player)<350).map(n=>({id:n.id,type:n.type,x:n.x,y:n.y,hp:n.hp})),creatures:this.world().creatures.filter(c=>dist(c,this.state.player)<500).map(c=>({id:c.id,species:c.species,x:c.x,y:c.y})),buildings:this.world().buildings}:null};}
   }
-  const exports={Game,PROBE,probePose,PLANETS,surfaceSpeedMultiplier,SPECIES,BUILDINGS,RESOURCE_NAMES,TOOLS,RESOURCE_TOOLS,FLIGHT_DURATION,SURFACE_MAP_SCALE,WORLD_LIMIT,TERRAIN_LIMIT,rand,clamp,dist};
+  const exports={Game,MAX_LEVEL,XP_REWARDS,SHIP_TIERS,PLANET_TIERS,xpForLevel,levelProgress,PROBE,probePose,PLANETS,surfaceSpeedMultiplier,SPECIES,BUILDINGS,RESOURCE_NAMES,TOOLS,RESOURCE_TOOLS,FLIGHT_DURATION,SURFACE_MAP_SCALE,WORLD_LIMIT,TERRAIN_LIMIT,rand,clamp,dist};
   if(typeof module!=='undefined'&&module.exports)module.exports=exports;
   root.OrbitCore=exports;
 })(typeof globalThis!=='undefined'?globalThis:this);
