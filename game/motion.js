@@ -10,7 +10,7 @@
     launch:{duration:2.8,mark:.18,height:340,ease:1.65,recoil:2,thrust:1},
     land:{duration:2.8,mark:.87,height:340,ease:2,recoil:4,thrust:1}
   };
-  const GROUPS={pickaxe:{name:'곡괭이',detail:'철광석 · 내려찍기',icon:'⛏'},axe:{name:'도끼',detail:'풀 · 대각선 찍기',icon:'◩'},sword:{name:'칼',detail:'수정 · 가로 베기',icon:'⚔'},launch:{name:'이륙',detail:'점화 · 상승 · 궤도 진입',icon:'↗'},land:{name:'착륙',detail:'접근 · 감속 · 착지',icon:'↘'}};
+  const GROUPS={pickaxe:{name:'곡괭이',detail:'철광석 · 내려찍기',icon:'⛏'},axe:{name:'도끼',detail:'식물 · 대각선 찍기',icon:'◩'},sword:{name:'칼',detail:'수정 · 가로 베기',icon:'⚔'},launch:{name:'이륙',detail:'점화 · 상승 · 궤도 진입',icon:'↗'},land:{name:'착륙',detail:'접근 · 감속 · 착지',icon:'↘'}};
   const TOOL_FIELDS=[
     {key:'duration',label:'전체 동작 시간',min:.35,max:1.4,step:.01,unit:'초',hint:'준비부터 원래 자세로 돌아올 때까지'},
     {key:'impact',label:'타격 시점',min:.25,max:.7,step:.01,unit:'%',percent:true,hint:'이 순간에 피해·파편·효과음이 발생해요'},

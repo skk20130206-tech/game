@@ -6,7 +6,7 @@
   const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
   function rand(seed){let s=seed>>>0;return()=>{s+=0x6D2B79F5;let t=s;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}
   const PLANETS=[
-    {id:'verdant',name:'베르단트',code:'VERDANT–01',kind:'온화한 숲 행성',temp:'21°C',gravity:1.0,seed:4201,x:-480,y:70,r:130,color:'#73bc91',light:'#b2ddb3',dark:'#245c57',ground:['#315f53','#356658','#3d7060','#497d63','#558668'],water:'#1e5055',flora:'#73b18c',accent:'#c3f379',species:['mossling','lumi','mistmoth'],resource:'풀 · 베르단트 전용',description:'별빛을 머금은 숲, 느릿하게 걷는 작은 생명들과 안개 날개 요정이 머무는 곳. 당신의 첫 보금자리로 완벽한 행성입니다.',oxygen:.11},
+    {id:'verdant',name:'베르단트',code:'VERDANT–01',kind:'온화한 숲 행성',temp:'21°C',gravity:1.0,seed:4201,x:-480,y:70,r:130,color:'#73bc91',light:'#b2ddb3',dark:'#245c57',ground:['#315f53','#356658','#3d7060','#497d63','#558668'],water:'#1e5055',flora:'#73b18c',accent:'#c3f379',species:['mossling','lumi','mistmoth'],resource:'식물 · 베르단트 전용',description:'별빛을 머금은 숲, 느릿하게 걷는 작은 생명들과 안개 날개 요정이 머무는 곳. 당신의 첫 보금자리로 완벽한 행성입니다.',oxygen:.11},
     {id:'solara',name:'솔라라',code:'SOLARA–02',kind:'황금빛 사막 행성',temp:'38°C',gravity:.8,seed:7129,x:470,y:-480,r:107,color:'#dbab6d',light:'#ffe1a2',dark:'#966344',ground:['#92724f','#a58257','#af8f60','#b69767','#bfa16e'],water:'#526968',flora:'#af9270',accent:'#fbd681',species:['dunecrab','sunwhorl'],resource:'철광석 풍부',description:'오래된 바람이 모래 언덕을 가로지르는 곳. 모래게와 황금빛 소용돌이 정령이 유적 주위를 맴돕니다.',oxygen:.19},
     {id:'nix',name:'닉스',code:'NIX–03',kind:'푸른 빙하 행성',temp:'−42°C',gravity:.7,seed:9703,x:920,y:330,r:101,color:'#a2cfe2',light:'#e1f2ec',dark:'#497e98',ground:['#637f96','#7897aa','#8da9b9','#97b6c5','#a1bfcd'],water:'#315b7b',flora:'#becedb',accent:'#abedff',species:['snowpuff','aurorayne'],resource:'수정 풍부',description:'얼음 아래로 푸른 수정맥이 흐릅니다. 보송이와 오로라 뿔을 가진 신비한 존재가 차가운 밤을 밝힙니다.',oxygen:.2},
     {id:'ember',name:'엠버',code:'EMBER–04',kind:'붉은 화산 행성',temp:'67°C',gravity:1.3,seed:5183,x:250,y:1030,r:120,color:'#c47761',light:'#f7b290',dark:'#603f48',ground:['#53464c','#624b50','#73545a','#845c60','#926768'],water:'#ca674b',flora:'#b37b65',accent:'#ffa685',species:['emberling','cinderwisp'],resource:'철광석 · 수정',description:'붉은 균열 사이로 생명이 움틉니다. 불꽃이와 잿빛 정령이 용암빛 숨결로 어둠을 밀어냅니다.',oxygen:.26},
@@ -32,7 +32,7 @@
     solar:{name:'태양광 충전기',icon:'▦',cost:{iron:8,crystal:6},description:'근처에서 우주선 연료를 충전해요.',radius:52},
     beacon:{name:'탐사 비콘',icon:'⌁',cost:{iron:6,crystal:4},description:'주변 자원과 생명체를 표시해요.',radius:32}
   };
-  const RESOURCE_NAMES={iron:'철광석',crystal:'수정',biomass:'풀'};
+  const RESOURCE_NAMES={iron:'철광석',crystal:'수정',biomass:'식물'};
   const TOOLS={pickaxe:{name:'곡괭이',resource:'iron',key:'1'},axe:{name:'도끼',resource:'biomass',key:'2'},sword:{name:'칼',resource:'crystal',key:'3'}};
   const RESOURCE_TOOLS={iron:'pickaxe',biomass:'axe',crystal:'sword'},FLIGHT_DURATION=2.8;
   const PROBE={id:'lumi-probe',x:320,y:-175,name:'루미의 탐사기',cost:{iron:18,biomass:10,crystal:4},failureDuration:7,repairDuration:4.5};
@@ -312,7 +312,7 @@
       }else if(action==='pet'||action==='feed'){
         if(action==='pet'&&s.creatureCare[c.species]!==undefined&&s.time-s.creatureCare[c.species]<10)return{ok:false,reason:'조금 뒤 다시 쓰다듬어 주세요 · '+Math.ceil(10-(s.time-s.creatureCare[c.species]))+'초'};
         if(bond>=3)return{ok:false,reason:'이미 가장 친한 친구예요. 함께 탐험해 보세요!'};
-        if(action==='feed'&&s.inventory.biomass<2)return{ok:false,reason:'먹이를 나누려면 풀 2개가 필요해요.'};
+        if(action==='feed'&&s.inventory.biomass<2)return{ok:false,reason:'먹이를 나누려면 식물 2개가 필요해요.'};
         if(action==='feed')s.inventory.biomass-=2;
         s.friendship[c.species]=Math.min(3,bond+1);if(action==='pet')s.creatureCare[c.species]=s.time;
         this.emit('effect',{kind:'friend',x:c.x,y:c.y,color:sp.color});
@@ -435,9 +435,9 @@
       if(this.state.fuel>=99){this.emit('message',{text:'연료가 충분해요!'});return{ok:false,reason:'연료 가득'};}
       if(this.solarCharge>0)return{ok:false,reason:'비상 충전 중'};
       if(this.state.inventory.biomass>=3){this.state.inventory.biomass-=3;this.state.fuel=clamp(this.state.fuel+40,0,100);this.emit('message',{text:'바이오 연료 합성 완료 · 연료 +40'});this.emit('save');return{ok:true,amount:40};}
-      this.solarCharge=6;this.emit('message',{text:'풀이 부족해요. 6초 동안 비상 태양광 충전을 진행합니다.'});return{ok:true,emergency:true};
+      this.solarCharge=6;this.emit('message',{text:'식물이 부족해요. 6초 동안 비상 태양광 충전을 진행합니다.'});return{ok:true,emergency:true};
     }
-    goals(){const s=this.state;return[{text:'철광석 12개, 풀 8개 모으기',done:s.stats.collected.iron>=12&&s.stats.collected.biomass>=8},{text:'나만의 집 한 채 짓기',done:Object.values(s.worlds).some(w=>w.buildings.some(b=>b.type==='habitat'))},{text:'낯선 생명체와 친구 되기',done:s.met.length>0},{text:'우주선을 타고 두 번째 행성 탐험',done:s.visited.length>=2}];}
+    goals(){const s=this.state;return[{text:'철광석 12개, 식물 8개 모으기',done:s.stats.collected.iron>=12&&s.stats.collected.biomass>=8},{text:'나만의 집 한 채 짓기',done:Object.values(s.worlds).some(w=>w.buildings.some(b=>b.type==='habitat'))},{text:'낯선 생명체와 친구 되기',done:s.met.length>0},{text:'우주선을 타고 두 번째 행성 탐험',done:s.visited.length>=2}];}
     nearbyState(){return{mode:this.state.mode,planet:this.planet().name,player:{...this.state.player},ship:{...this.state.ship},inventory:{...this.state.inventory},tools:[...this.state.tools],equippedTool:this.state.equippedTool,flight:this.flight?{...this.flight}:null,oxygen:Math.round(this.state.oxygen),fuel:Math.round(this.state.fuel),visited:[...this.state.visited],discovered:[...this.state.discovered],met:[...this.state.met],goals:this.goals(),nearby:this.state.mode==='surface'?{resources:this.world().nodes.filter(n=>n.hp>0&&dist(n,this.state.player)<350).map(n=>({id:n.id,type:n.type,x:n.x,y:n.y,hp:n.hp})),creatures:this.world().creatures.filter(c=>dist(c,this.state.player)<500).map(c=>({id:c.id,species:c.species,x:c.x,y:c.y})),buildings:this.world().buildings}:null};}
   }
   const exports={Game,PROBE,probePose,PLANETS,surfaceSpeedMultiplier,SPECIES,BUILDINGS,RESOURCE_NAMES,TOOLS,RESOURCE_TOOLS,FLIGHT_DURATION,SURFACE_MAP_SCALE,WORLD_LIMIT,TERRAIN_LIMIT,rand,clamp,dist};
