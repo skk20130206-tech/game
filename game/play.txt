@@ -102,6 +102,13 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
 .ship-overview{display:grid;grid-template-columns:42% 1fr;gap:24px;align-items:center}.ship-blueprint{background:radial-gradient(ellipse at center,#36695b66,#0b2029 70%);border:1px solid #78ada73a;border-radius:14px;position:relative;text-align:center;padding:10px 0 15px;overflow:hidden}.ship-blueprint:before{content:'';position:absolute;inset:0;background-image:linear-gradient(#8fccc30a 1px,transparent 1px),linear-gradient(90deg,#8fccc30a 1px,transparent 1px);background-size:24px 24px;pointer-events:none}.ship-blueprint canvas{display:block;width:100%;max-width:320px;height:auto;margin:auto}.ship-blueprint>span{font-size:10px;letter-spacing:1px;color:#a9d4c4}.ship-overview-copy .eyebrow{font-size:10px;color:var(--accent)}.ship-overview-copy h3{font-size:32px;margin:10px 0 12px}.ship-overview-copy h3 small{display:block;margin-top:6px;font-size:14px;color:#c3d7cd;font-weight:500}.ship-overview-copy p{color:#a2bcb2;font-size:13px;line-height:1.8}.ship-overview-copy dl{display:flex;gap:22px;margin:19px 0 0}.ship-overview-copy dt{color:#8daea2;font-size:10px}.ship-overview-copy dd{margin:7px 0 0;font-size:19px;color:#d8e9d7}.next-upgrade{margin-top:25px;padding-top:4px;border-top:1px solid #92b8a333}.upgrade-benefits{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:15px 0}.upgrade-benefits>div{background:#0f232a;border-radius:9px;padding:13px}.upgrade-benefits span{font-size:10px;color:#9bbcaf;display:block;margin-bottom:8px}.upgrade-benefits strong{font-size:16px;font-weight:600;color:#c3f379}.upgrade-costs{display:flex;gap:12px;padding:16px;background:#203839;border-radius:9px}.upgrade-costs>div{flex:1;display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap;font-size:12px}.upgrade-costs span{color:#c3d6cc}.upgrade-costs .missing strong{color:#f0b18e}.upgrade-costs .ready strong{color:#c3f379}.upgrade-rule{font-size:12px;color:#c6d6c7;line-height:1.7;margin:16px 0}.upgrade-notice{background:#c3f37915;border:1px solid #c3f37955;padding:15px;border-radius:9px;color:#d5f4ae;font-size:14px;line-height:1.7;margin-top:20px}.ship-route-list{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:24px}.ship-route-list>div{display:flex;flex-direction:column;gap:7px;padding:12px;border:1px solid #8aa99533;border-radius:9px;color:#8aa49a}.ship-route-list .current{border-color:#c3f37999;background:#c3f3790d;color:#d5f3b3}.ship-route-list .complete{color:#b3d3c2}.ship-route-list span{font-size:11px}.ship-route-list strong{font-size:13px}.ship-route-list small{font-size:10px}.shipyard-note{font-size:11px;color:#94b1a4;line-height:1.8;margin-top:14px}
 @media(max-width:850px){.player-bar{padding:8px 16px;gap:14px}.player-bar>p{display:none}.player-level{min-width:180px}.growth-summary{padding:18px;gap:20px}}
 @media(max-width:600px){.player-bar{padding:7px 12px;gap:9px;min-height:54px}.player-level{min-width:0;flex:1;gap:4px 8px}.player-level>strong{font-size:14px}.player-level>span{font-size:9px}.player-actions{gap:5px}.player-actions button{padding:7px 9px;font-size:10px;min-height:34px}.player-actions kbd{display:none}.progression-modal .modal-heading h2{font-size:22px}.growth-summary{padding:16px;gap:18px;flex-wrap:wrap}.growth-summary h3{font-size:28px}.growth-progress{min-width:140px}.inventory-section-title{align-items:flex-start;flex-direction:column;gap:5px}.bag-grid{gap:7px}.bag-item{display:flex;flex-direction:column;text-align:center;padding:14px 7px;gap:7px}.bag-symbol{font-size:26px}.bag-item p{font-size:10px}.bag-tool{padding:14px 7px}.bag-tool h4{font-size:13px}.bag-tool .small-button{padding:8px 3px;font-size:10px}.tool-emblem{font-size:24px}.ship-overview{grid-template-columns:1fr;gap:17px}.ship-blueprint{max-height:190px}.ship-blueprint canvas{height:150px;width:auto}.ship-overview-copy h3{font-size:28px}.ship-overview-copy h3 small{display:inline;margin-left:10px}.ship-overview-copy dl{justify-content:space-between}.upgrade-benefits{gap:6px}.upgrade-benefits>div{padding:10px 7px}.upgrade-benefits strong{font-size:12px}.upgrade-costs{padding:12px;gap:12px}.upgrade-costs>div{font-size:11px}.ship-route-list{gap:5px}.ship-route-list>div{padding:9px 6px}.ship-route-list strong{font-size:11px}}
+/* Scroll the building choices while keeping placement and close controls visible. */
+.build-panel{display:flex;flex-direction:column;max-height:calc(100% - 230px);overflow:hidden}
+#build-options{min-height:0;overflow-y:auto;overscroll-behavior:contain;flex:1 1 auto}
+.build-panel>.panel-heading,.build-panel>.muted,.build-panel>#place-building{flex-shrink:0}
+@media(max-width:600px){.build-panel{max-height:calc(100% - 350px)}}
+@media(max-width:600px) and (max-height:760px){.build-panel{top:12px;max-height:calc(100% - 112px)}}
+@media(max-height:560px){.build-panel{top:12px;max-height:calc(100% - 24px);z-index:8;padding:12px}.build-panel>.muted,.build-option small:not(.cost){display:none}.build-option{padding:8px;margin-top:6px}}
 </style>
 </head>
 <body>
@@ -270,7 +277,8 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
   const BUILDINGS={
     habitat:{name:'탐험가의 집',icon:'⌂',cost:{iron:12,biomass:8},description:'머무르면 산소를 충전해요.',radius:67},
     solar:{name:'태양광 충전기',icon:'▦',cost:{iron:8,crystal:6},description:'근처에서 우주선 연료를 충전해요.',radius:52},
-    beacon:{name:'탐사 비콘',icon:'⌁',cost:{iron:6,crystal:4},description:'주변 자원과 생명체를 표시해요.',radius:32}
+    beacon:{name:'탐사 비콘',icon:'⌁',cost:{iron:6,crystal:4},description:'주변 자원과 생명체를 표시해요.',radius:32},
+    workbench:{name:'제작대',icon:'⚒',cost:{iron:16,crystal:4,biomass:8},description:'장비를 준비하는 작업 공간이에요. 상위 장비 제작법은 추후 추가됩니다.',radius:56}
   };
   const RESOURCE_NAMES={iron:'철광석',crystal:'수정',biomass:'식물'};
   const TOOLS={pickaxe:{name:'곡괭이',resource:'iron',key:'1'},axe:{name:'도끼',resource:'biomass',key:'2'},sword:{name:'칼',resource:'crystal',key:'3'}};
@@ -365,7 +373,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
       const before=this.levelInfo();this.state.progression.xp=levelProgress(before.xp+amount).xp;
       const after=this.levelInfo(),earned=after.xp-before.xp;
       if(earned)this.emit('xp',{amount:earned,reason});
-      if(after.level>before.level)this.emit('level-up',{level:after.level});
+      for(let level=before.level+1;level<=after.level;level++)this.emit('level-up',{level});
       if(earned)this.emit('save');
     }
     planetAccess(id){
@@ -625,6 +633,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
       const s=this.state,b=this.world().buildings.find(v=>v.id===id);
       if(!b||dist(b,s.player)>180)return{ok:false,reason:'건물 가까이로 이동하세요.'};
       if(action==='upgrade'){
+        if(b.type==='workbench')return{ok:false,reason:'제작대 업그레이드는 아직 준비 중이에요.'};
         if(b.level===2)return{ok:false,reason:'이미 업그레이드한 건물이에요.'};
         if(s.inventory.iron<6||s.inventory.crystal<4)return{ok:false,reason:'철광석 6개와 수정 4개가 필요해요.'};
         s.inventory.iron-=6;s.inventory.crystal-=4;b.level=2;
@@ -1011,6 +1020,16 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
       line(c,27,-52,27,-70,'#799b90',3);oval(c,27,-72,4,4,'#d5f1ae');
     }else if(b.type==='solar'){
       line(c,-23,-2,-23,27,'#80938d',7);line(c,24,-2,24,27,'#80938d',7);box(c,-52,-45,104,50,4,'#2c5879','#9bbfbc');for(let x=-44;x<50;x+=23)line(c,x,-39,x,0,'#5685a0',1.5);for(let y=-29;y<0;y+=14)line(c,-49,y,49,y,'#5685a0',1.5);box(c,-16,16,32,17,4,'#d3dbc4');
+    }else if(b.type==='workbench'){
+      // Broad worktop, braced legs, tool board and a small vise.
+      line(c,-39,-6,-39,29,'#526b72',9);line(c,39,-6,39,29,'#526b72',9);line(c,-36,19,36,19,'#8aada4',5);
+      box(c,-49,-69,98,42,5,'#365967','#8bb7b1');
+      for(const x of [-31,-10,11,32])for(const y of [-59,-43])oval(c,x,y,1.5,1.5,'#769a9d');
+      line(c,-27,-54,-27,-28,'#ddb582',4);line(c,-37,-54,-17,-54,'#c5e0db',7);
+      line(c,10,-57,10,-31,'#9ee3d4',4);ring(c,10,-57,5,'#d6f0d5',3);
+      box(c,-58,-25,116,19,5,'#c49d6c','#6c6557');line(c,-48,-21,46,-21,'#ebce97',2);
+      box(c,26,-32,19,10,2,'#98c5c0');line(c,35,-35,35,-18,'#c7e6d9',3);line(c,26,-17,44,-17,'#c7e6d9',3);
+      box(c,-13,-22,23,7,2,'#8ee0cc');
     }else{
       box(c,-18,5,36,16,5,'#a2bbae');path(c,[[-11,4],[-6,-54],[6,-54],[11,4]],'#c8d8c2','#628d90');oval(c,0,-55,15,8,'#a6e0d6');ring(c,0,-55,19+Math.sin(time*2)*3,'#baf9e477',2);oval(c,0,-55,6,5,'#e6ffc4');
     }
@@ -1045,10 +1064,10 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
       this.radar=radar;this.rctx=radar?.getContext('2d');this.game=game;this.width=1;this.height=1;this.dpr=1;this.zoom=1;this.pan={x:0,y:0};this.camera={...game.state.player};this.mode=game.state.mode;this.mouse=null;this.particles=[];this.rings=[];this.time=0;this.frameMs=16.67;this.jumpHeight=0;this.yaw=0;this.shake=0;this.radarTime=0;this.decoration=new Map();
       this.immersive=!(root.matchMedia?.('(prefers-reduced-motion: reduce)').matches);this.intensity=.55;this.haptics=false;
       try{const prefs=JSON.parse(root.localStorage?.getItem('justgame-2d-effects')||'null');if(prefs){this.immersive=prefs.enabled!==false;this.intensity=clamp(Number(prefs.intensity)||0,0,1);this.haptics=prefs.haptics===true;}}catch(e){}
-      this.resize();this.reset();
+      this.celebrations=[];this.resize();this.reset();
     }
     resize(){const rect=this.canvas.getBoundingClientRect?.()||{width:this.canvas.width,height:this.canvas.height};this.width=Math.max(1,rect.width);this.height=Math.max(1,rect.height);this.dpr=clamp(root.devicePixelRatio||1,1,2);this.canvas.width=Math.round(this.width*this.dpr);this.canvas.height=Math.round(this.height*this.dpr);this.zoom=this.width<600?.8:1;}
-    reset(){this.mode=this.game.state.mode;this.camera={...(this.mode==='space'?this.game.state.ship:this.game.state.player)};this.pan={x:0,y:0};this.mouse=null;this.particles=[];this.rings=[];this.shake=0;}
+    reset(preserveCelebrations=false){this.mode=this.game.state.mode;this.camera={...(this.mode==='space'?this.game.state.ship:this.game.state.player)};this.pan={x:0,y:0};this.mouse=null;this.particles=[];this.rings=[];if(!preserveCelebrations)this.celebrations=[];this.shake=0;}
     get scale(){return this.zoom*(this.mode==='space'?.7:1);}
     project(x,y){const a=(x-this.camera.x)*this.scale+this.width*.5,b=(y-this.camera.y)*this.scale+this.height*.53;return{x:a,y:b,visible:a>-100&&a<this.width+100&&b>-100&&b<this.height+100,depth:y};}
     unproject(x,y){return{x:(x-this.width*.5)/this.scale+this.camera.x,y:(y-this.height*.53)/this.scale+this.camera.y};}
@@ -1056,16 +1075,43 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     orbit(dx,dy){this.pan.x=clamp(this.pan.x-dx/this.scale,-650,650);this.pan.y=clamp(this.pan.y-dy/this.scale,-650,650);}
     zoomBy(delta){this.zoom=clamp(this.zoom*Math.exp(-delta*.001),.5,1.7);}
     toggleView(){this.pan={x:0,y:0};this.zoom=this.zoom>1?.8:1.3;return this.zoom>1;}
-    setImmersive(value){this.immersive=!!value;this.storeSettings();}
+    setImmersive(value){this.immersive=!!value;if(!this.immersive)this.celebrations=[];this.storeSettings();}
     storeSettings(){try{root.localStorage?.setItem('justgame-2d-effects',JSON.stringify({enabled:this.immersive,intensity:this.intensity,haptics:this.haptics}));}catch(e){}}
     pulse(pattern){if(this.immersive&&this.haptics)try{root.navigator?.vibrate?.(pattern);}catch(e){}}
     stopHaptics(){if(this.haptics)try{root.navigator?.vibrate?.(0);}catch(e){}}
+    celebrateLevel(level){
+      if(!this.immersive||this.intensity<=0||!Number.isInteger(level)||level<2||level>root.OrbitCore.MAX_LEVEL)return;
+      if(this.celebrations.length>=root.OrbitCore.MAX_LEVEL-1)return;
+      const last=this.celebrations.at(-1);
+      this.celebrations.push({level,age:last?last.age-2.4:0});
+    }
+    drawFireworks(c,dt){
+      if(!this.immersive||this.intensity<=0){this.celebrations=[];return;}
+      const colors=['#ffcf77','#9cf5cf','#ffa9ca','#acd9ff','#e3bdff'];
+      for(const celebration of this.celebrations){
+        celebration.age+=dt;const age=celebration.age;if(age<0||age>=2.4)continue;
+        c.save();
+        for(let burst=0;burst<3;burst++){
+          const t=age-burst*.23;if(t<0||t>1.6)continue;
+          const x=this.width*[.28,.72,.5][burst],y=this.height*(this.width<600?[.56,.58,.48]:[.3,.28,.22])[burst],radius=Math.min(this.width*.18,120)*(1-Math.exp(-t*2.8));
+          const count=16+Math.round(16*this.intensity);c.globalAlpha=Math.max(0,1-t/1.6);
+          for(let i=0;i<count;i++){
+            const angle=i/count*TAU+burst+.15*celebration.level,color=colors[(i+burst)%colors.length],reach=radius*(i%2?.82:1);
+            const px=x+Math.cos(angle)*reach,py=y+Math.sin(angle)*reach+t*t*24;
+            line(c,px-Math.cos(angle)*8,py-Math.sin(angle)*8,px,py,color,2);oval(c,px,py,2.2,2.2,color);
+          }
+        }
+        c.globalAlpha=Math.min(1,age*5,Math.max(0,(2.4-age)*2));c.textAlign='center';c.font='bold '+(this.width<600?22:30)+'px sans-serif';c.fillStyle='#f5ffd9';c.shadowColor='#123344';c.shadowBlur=8;
+        c.fillText('LEVEL UP! · Lv.'+celebration.level,this.width*.5,this.height*(this.width<600?.62:.43)-Math.min(age,1)*8);c.restore();
+      }
+      this.celebrations=this.celebrations.filter(v=>v.age<2.4);
+    }
     effect(e){
       const s=this.game.state,a=s.mode==='surface'?s.player:s.ship,x=e.x??a.x,y=e.y??a.y;
       if(['scan','friend','build','rest','relic','land','launch'].includes(e.kind))this.rings.push({x,y,age:0,kind:e.kind,color:e.color||'#c3f379'});
       if(['mine','break','collect','build','friend','relic'].includes(e.kind))for(let i=0;i<(e.kind==='break'?20:8);i++){const angle=i*2.4+this.time;this.particles.push({x,y:y-14,vx:Math.cos(angle)*55,vy:Math.sin(angle)*45-25,age:0,color:e.color||'#ddfcb5',size:e.kind==='break'?5:3});}
       if(this.particles.length>160)this.particles.splice(0,this.particles.length-160);if(this.rings.length>16)this.rings.shift();
-      if(e.kind==='break'){this.shake=3;this.pulse(25);}if(e.kind==='land'||e.kind==='launch')this.reset();
+      if(e.kind==='break'){this.shake=3;this.pulse(25);}if(e.kind==='land'||e.kind==='launch')this.reset(true);
     }
     getDecor(p){
       if(this.decoration.has(p.id))return this.decoration.get(p.id);const random=rand(p.seed+713),items=[];
@@ -1194,10 +1240,10 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     }
     drawRadar(){if(!this.rctx)return;const c=this.rctx,w=this.radar.width,h=this.radar.height,g=this.game,s=g.state,a=s.mode==='space'?s.ship:s.player,k=s.mode==='space'?.045:.095;c.clearRect(0,0,w,h);box(c,0,0,w,h,10,'#0e252f');c.save();c.beginPath();c.rect(0,0,w,h);c.clip();const point=(x,y,r,color)=>oval(c,w/2+(x-a.x)*k,h/2+(y-a.y)*k,r,r,color);if(s.mode==='space')for(const p of PLANETS)point(p.x,p.y,Math.max(3,p.r*k),p.color);else{point(0,0,4,'#fff4b3');for(const n of g.world().nodes)if(n.hp>0)point(n.x,n.y,1.5,n.type==='crystal'?'#b9d4f3':'#91ae99');for(const v of g.world().creatures)point(v.x,v.y,2.5,'#d5eea0');for(const b of g.world().buildings)point(b.x,b.y,3,'#84d5e1');if(g.waypoint)point(g.waypoint.x,g.waypoint.y,4,'#f5cc85');}point(a.x,a.y,3.5,'#efffda');c.restore();}
     draw(dt=.016){
-      dt=clamp(Number(dt)||.016,0,.1);this.frameMs=this.frameMs*.94+dt*1000*.06;const s=this.game.state;if(this.mode!==s.mode)this.reset();if(!this.game.paused)this.time+=dt;
+      dt=clamp(Number(dt)||.016,0,.1);this.frameMs=this.frameMs*.94+dt*1000*.06;const s=this.game.state;if(this.mode!==s.mode)this.reset(true);if(!this.game.paused)this.time+=dt;
       const actor=this.game.probeCinematic?{x:PROBE.x,y:PROBE.y+10}:this.game.flight?{x:0,y:-75}:s.mode==='space'?s.ship:s.player;if(this.game.flight||this.game.probeCinematic)this.pan={x:0,y:0};if(this.game.moving){this.pan.x*=Math.exp(-dt*3);this.pan.y*=Math.exp(-dt*3);}const response=1-Math.exp(-dt*10);this.camera.x+=(actor.x+this.pan.x-this.camera.x)*response;this.camera.y+=(actor.y+this.pan.y-this.camera.y)*response;
       const c=this.ctx;c.setTransform(this.dpr,0,0,this.dpr,0,0);c.save();if(this.immersive&&this.shake>0){c.translate(Math.sin(this.time*50)*this.shake*this.intensity,Math.cos(this.time*63)*this.shake*this.intensity);this.shake=Math.max(0,this.shake-dt*12);}
-      if(s.mode==='surface')this.surface(c,dt);else this.space(c,dt);this.screenFx(c,s.mode);c.restore();this.radarTime+=dt;if(this.radarTime>.15){this.drawRadar();this.radarTime=0;}
+      if(s.mode==='surface')this.surface(c,dt);else this.space(c,dt);this.screenFx(c,s.mode);c.restore();this.drawFireworks(c,dt);this.radarTime+=dt;if(this.radarTime>.15){this.drawRadar();this.radarTime=0;}
     }
   }
   function drawPreview(canvas){const g=new Game();g.state.player={x:70,y:115,angle:0};g.world().buildings.push({type:'habitat',x:220,y:0,level:1},{type:'solar',x:270,y:120});const friend=g.world().creatures[0];friend.x=130;friend.y=150;g.state.met.push(friend.species);const r=new Renderer(canvas,null,g);r.zoom=.9;r.camera={x:80,y:60};r.time=1.2;r.draw(0);return r;}
@@ -1768,6 +1814,10 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
   function showBuilding(id){
     const b=game.world().buildings.find(v=>v.id===id);if(!b)return;
     const definition=BUILDINGS[b.type],level=b.level===2?2:1;
+    if(b.type==='workbench'){
+      showModal(definition.name,'WORKBENCH / 장비 작업 공간','<p class="modal-intro">제작대를 세웠어요. 이곳에서 사용할 상위 장비 제작법은 추후 추가됩니다.</p><p class="modal-intro">지금은 인벤토리에서 보유한 기본 도구와 재료를 확인하고 도구를 장착할 수 있어요.</p><button class="primary-button" id="workbench-inventory">인벤토리 · 도구 장착</button><button class="subtle-button" id="building-close">탐험으로 돌아가기</button>');
+      $('workbench-inventory').onclick=showInventory;$('building-close').onclick=closeModal;return;
+    }
     const primary=b.type==='habitat'?['rest','집에서 쉬기','산소를 가득 채워요']:b.type==='solar'?['charge','충전 상태 확인','주변에서 초당 '+(level===2?7:3)+'% 충전']:['scan','주변 탐색','미탐사 유적의 방향을 표시해요'];
     showModal(definition.name,'MY OUTPOST / Lv.'+level,'<p class="modal-intro">'+definition.description+'</p><div class="interaction-grid"><button data-building-action="'+primary[0]+'">'+primary[1]+'<small>'+primary[2]+'</small></button>'+(b.type==='habitat'?'<button data-building-action="lights">조명 '+(b.lit===false?'켜기':'끄기')+'<small>집 창문의 불빛을 바꿔요</small></button>':'')+'<button data-building-action="upgrade" '+(level===2?'disabled':'')+'>설비 업그레이드<small>'+(level===2?'업그레이드 완료':'철광석 6 · 수정 4')+'</small></button></div><p class="modal-intro">Lv.2: 집은 휴식 시 연료 10%도 보충하고, 충전기는 더 빠르게 충전하며, 비콘은 행성의 모든 생명체를 탐지합니다.</p><button class="primary-button" id="building-close">탐험으로 돌아가기</button>');
     $('building-close').onclick=closeModal;modal.querySelectorAll('[data-building-action]').forEach(button=>button.onclick=()=>{closeModal();const result=game.useBuilding(id,button.dataset.buildingAction);if(!result.ok)toast(result.reason,true);processEvents();hud(true);});
@@ -1777,7 +1827,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #d5ffa9;outline-offset:4p
     while(game.events.length){const e=game.events.shift();if(e.type==='launch'||e.type==='land')clearTutorialWaypoint();tutorial.event(e,game);
       if(e.type==='message')toast(e.text,e.error);
       else if(e.type==='xp'){toast('+'+e.amount+' XP · '+e.reason);}
-      else if(e.type==='level-up'){toast('레벨 업! 탐험가 Lv.'+e.level+' · U 키로 강화 확인');sound('discovery');}
+      else if(e.type==='level-up'){renderer.celebrateLevel(e.level);toast('레벨 업! 탐험가 Lv.'+e.level+' · U 키로 강화 확인');sound('discovery');}
       else if(e.type==='effect'){renderer.effect(e);sound(e.kind,e);}
       else if(e.type==='save'){save();if(buildOpen)renderBuildOptions();}
       else if(e.type==='dialogue')showDialogue(e);

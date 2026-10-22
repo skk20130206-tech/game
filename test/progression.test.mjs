@@ -11,10 +11,13 @@ test('XP crosses multiple levels, caps at 20, and ignores invalid gains',()=>{
   const g=new Game();assert.equal(g.levelInfo().level,1);
   g.awardXp(99,'test');assert.equal(g.levelInfo().level,1);assert.equal(g.levelInfo().remaining,1);
   g.awardXp(151,'test');assert.equal(g.levelInfo().level,3);assert.equal(g.levelInfo().current,0);
-  assert.deepEqual(g.events.filter(e=>e.type==='level-up').map(e=>e.level),[3]);
+  assert.deepEqual(g.events.filter(e=>e.type==='level-up').map(e=>e.level),[2,3]);
   for(const amount of [NaN,Infinity,-100,0])g.awardXp(amount,'invalid');assert.equal(g.levelInfo().xp,250);
   g.awardXp(999999,'test');assert.equal(g.levelInfo().level,MAX_LEVEL);assert.equal(g.levelInfo().percent,100);assert.equal(g.levelInfo().remaining,0);
   const loaded=new Game(g.snapshot());assert.deepEqual(loaded.levelInfo(),g.levelInfo());
+  assert.equal(loaded.events.filter(e=>e.type==='level-up').length,0);
+  assert.deepEqual(g.events.filter(e=>e.type==='level-up').map(e=>e.level),Array.from({length:19},(_,i)=>i+2));
+  g.events=[];g.awardXp(100,'already max');assert.equal(g.events.filter(e=>e.type==='level-up').length,0);
   assert.equal(levelProgress(NaN).level,1);
 });
 

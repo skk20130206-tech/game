@@ -332,6 +332,10 @@
   function showBuilding(id){
     const b=game.world().buildings.find(v=>v.id===id);if(!b)return;
     const definition=BUILDINGS[b.type],level=b.level===2?2:1;
+    if(b.type==='workbench'){
+      showModal(definition.name,'WORKBENCH / 장비 작업 공간','<p class="modal-intro">제작대를 세웠어요. 이곳에서 사용할 상위 장비 제작법은 추후 추가됩니다.</p><p class="modal-intro">지금은 인벤토리에서 보유한 기본 도구와 재료를 확인하고 도구를 장착할 수 있어요.</p><button class="primary-button" id="workbench-inventory">인벤토리 · 도구 장착</button><button class="subtle-button" id="building-close">탐험으로 돌아가기</button>');
+      $('workbench-inventory').onclick=showInventory;$('building-close').onclick=closeModal;return;
+    }
     const primary=b.type==='habitat'?['rest','집에서 쉬기','산소를 가득 채워요']:b.type==='solar'?['charge','충전 상태 확인','주변에서 초당 '+(level===2?7:3)+'% 충전']:['scan','주변 탐색','미탐사 유적의 방향을 표시해요'];
     showModal(definition.name,'MY OUTPOST / Lv.'+level,'<p class="modal-intro">'+definition.description+'</p><div class="interaction-grid"><button data-building-action="'+primary[0]+'">'+primary[1]+'<small>'+primary[2]+'</small></button>'+(b.type==='habitat'?'<button data-building-action="lights">조명 '+(b.lit===false?'켜기':'끄기')+'<small>집 창문의 불빛을 바꿔요</small></button>':'')+'<button data-building-action="upgrade" '+(level===2?'disabled':'')+'>설비 업그레이드<small>'+(level===2?'업그레이드 완료':'철광석 6 · 수정 4')+'</small></button></div><p class="modal-intro">Lv.2: 집은 휴식 시 연료 10%도 보충하고, 충전기는 더 빠르게 충전하며, 비콘은 행성의 모든 생명체를 탐지합니다.</p><button class="primary-button" id="building-close">탐험으로 돌아가기</button>');
     $('building-close').onclick=closeModal;modal.querySelectorAll('[data-building-action]').forEach(button=>button.onclick=()=>{closeModal();const result=game.useBuilding(id,button.dataset.buildingAction);if(!result.ok)toast(result.reason,true);processEvents();hud(true);});
@@ -341,7 +345,7 @@
     while(game.events.length){const e=game.events.shift();if(e.type==='launch'||e.type==='land')clearTutorialWaypoint();tutorial.event(e,game);
       if(e.type==='message')toast(e.text,e.error);
       else if(e.type==='xp'){toast('+'+e.amount+' XP · '+e.reason);}
-      else if(e.type==='level-up'){toast('레벨 업! 탐험가 Lv.'+e.level+' · U 키로 강화 확인');sound('discovery');}
+      else if(e.type==='level-up'){renderer.celebrateLevel(e.level);toast('레벨 업! 탐험가 Lv.'+e.level+' · U 키로 강화 확인');sound('discovery');}
       else if(e.type==='effect'){renderer.effect(e);sound(e.kind,e);}
       else if(e.type==='save'){save();if(buildOpen)renderBuildOptions();}
       else if(e.type==='dialogue')showDialogue(e);

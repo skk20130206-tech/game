@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url);
-const {Game,PLANETS,SPECIES}=require('../game/core.js');require('../game/portraits.js');
+const {Game,PLANETS,SPECIES,BUILDINGS}=require('../game/core.js');require('../game/portraits.js');
 const {Renderer,ship}=require('../game/renderer-2d.js');
 function canvas(width=1280,height=720){
  const ops=[];const gradient={addColorStop(){}};
@@ -11,7 +11,7 @@ function canvas(width=1280,height=720){
 }
 test('Canvas renderer draws all biomes, species, ships and building previews without WebGL',()=>{
  const g=new Game(),c=canvas(),r=new Renderer(c,canvas(160,126),g);
- for(const p of PLANETS){g.state.planet=p.id;g.ensureWorld(p.id);for(const type of ['habitat','solar','beacon'])g.world().buildings.push({x:160,y:160,type,level:2});g.state.inventory={iron:100,biomass:100,crystal:100};g.selectedBuild='habitat';r.reset();r.draw(.016);}
+ for(const p of PLANETS){g.state.planet=p.id;g.ensureWorld(p.id);for(const type of Object.keys(BUILDINGS))g.world().buildings.push({x:160,y:160,type,level:2});g.state.inventory={iron:100,biomass:100,crystal:100};g.selectedBuild='workbench';r.reset();r.draw(.016);}
  for(const id of Object.keys(SPECIES))globalThis.OrbitPortraits.creature(c.getContext('2d'),id,1,1,true);
  g.state.mode='space';r.draw(.016);ship(c.getContext('2d'),1,true,true);assert.ok(c.ops.includes('fill'));assert.ok(c.ops.includes('lineTo'));assert.ok(c.ops.includes('drawImage')===false);
 });
@@ -26,6 +26,19 @@ test('old high-altitude space saves load in 2D and can land at a nearby planet',
 });
 test('particles stop while paused and expire when resumed; effects stay bounded',()=>{
  const g=new Game(),r=new Renderer(canvas(),null,g);for(let n=0;n<30;n++)r.effect({kind:'break',x:90,y:90});assert.ok(r.particles.length<=160);g.paused=true;const n=r.particles.length;for(let i=0;i<100;i++)r.draw(.016);assert.equal(r.particles.length,n);g.paused=false;for(let i=0;i<100;i++)r.draw(.016);assert.equal(r.particles.length,0);
+});
+
+test('level fireworks queue each level, survive landing, finish during menus and respect effects settings',()=>{
+ const g=new Game(),r=new Renderer(canvas(390,844),null,g);r.immersive=true;
+ g.awardXp(250,'exploration');for(const e of g.events)if(e.type==='level-up')r.celebrateLevel(e.level);
+ assert.deepEqual(r.celebrations.map(v=>v.level),[2,3]);assert.ok(r.celebrations[1].age<0);
+ r.effect({kind:'land'});assert.equal(r.celebrations.length,2);
+ g.paused=true;for(let i=0;i<301;i++)r.draw(1/60);assert.equal(r.celebrations.length,0);
+ g.state.mode='space';r.celebrateLevel(4);r.draw(.016);assert.equal(r.celebrations.length,1);
+ r.setImmersive(false);r.celebrateLevel(5);assert.equal(r.celebrations.length,0);
+ r.setImmersive(true);r.intensity=0;r.celebrateLevel(5);assert.equal(r.celebrations.length,0);
+ r.intensity=.55;for(let i=0;i<50;i++)r.celebrateLevel(5);assert.ok(r.celebrations.length<=19);
+ r.reset();assert.equal(r.celebrations.length,0);
 });
 
 test('academy deck and instructor render throughout ground training',()=>{

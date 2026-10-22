@@ -30,7 +30,8 @@
   const BUILDINGS={
     habitat:{name:'탐험가의 집',icon:'⌂',cost:{iron:12,biomass:8},description:'머무르면 산소를 충전해요.',radius:67},
     solar:{name:'태양광 충전기',icon:'▦',cost:{iron:8,crystal:6},description:'근처에서 우주선 연료를 충전해요.',radius:52},
-    beacon:{name:'탐사 비콘',icon:'⌁',cost:{iron:6,crystal:4},description:'주변 자원과 생명체를 표시해요.',radius:32}
+    beacon:{name:'탐사 비콘',icon:'⌁',cost:{iron:6,crystal:4},description:'주변 자원과 생명체를 표시해요.',radius:32},
+    workbench:{name:'제작대',icon:'⚒',cost:{iron:16,crystal:4,biomass:8},description:'장비를 준비하는 작업 공간이에요. 상위 장비 제작법은 추후 추가됩니다.',radius:56}
   };
   const RESOURCE_NAMES={iron:'철광석',crystal:'수정',biomass:'식물'};
   const TOOLS={pickaxe:{name:'곡괭이',resource:'iron',key:'1'},axe:{name:'도끼',resource:'biomass',key:'2'},sword:{name:'칼',resource:'crystal',key:'3'}};
@@ -125,7 +126,7 @@
       const before=this.levelInfo();this.state.progression.xp=levelProgress(before.xp+amount).xp;
       const after=this.levelInfo(),earned=after.xp-before.xp;
       if(earned)this.emit('xp',{amount:earned,reason});
-      if(after.level>before.level)this.emit('level-up',{level:after.level});
+      for(let level=before.level+1;level<=after.level;level++)this.emit('level-up',{level});
       if(earned)this.emit('save');
     }
     planetAccess(id){
@@ -385,6 +386,7 @@
       const s=this.state,b=this.world().buildings.find(v=>v.id===id);
       if(!b||dist(b,s.player)>180)return{ok:false,reason:'건물 가까이로 이동하세요.'};
       if(action==='upgrade'){
+        if(b.type==='workbench')return{ok:false,reason:'제작대 업그레이드는 아직 준비 중이에요.'};
         if(b.level===2)return{ok:false,reason:'이미 업그레이드한 건물이에요.'};
         if(s.inventory.iron<6||s.inventory.crystal<4)return{ok:false,reason:'철광석 6개와 수정 4개가 필요해요.'};
         s.inventory.iron-=6;s.inventory.crystal-=4;b.level=2;
